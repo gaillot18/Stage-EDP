@@ -86,7 +86,6 @@ void calculer_u_jacobi(double *f, int N, double *u){
     }
 
     // Vecteur de départ 
-
     double *u_anc = (double *)malloc(nb_pt_divise * sizeof(double));
     for (int i = 0 ; i < nb_pt_divise ; i ++){
         u_anc[i] = 0.5;
@@ -104,12 +103,9 @@ void calculer_u_jacobi(double *f, int N, double *u){
 
         // Communications : bloquante pour cellule gauche non bloquante pour cellule droite
         if (nb_cpu > 1){
-            //MPI_Sendrecv(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquette, &buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquette, MPI_COMM_WORLD, &statut);
             MPI_Sendrecv(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquettes[0], &buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquettes[0], MPI_COMM_WORLD, &statut);
             MPI_Isend(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquettes[1], MPI_COMM_WORLD, &requetes[0]);
-            //MPI_Isend(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquette, MPI_COMM_WORLD, requete_droite);
             MPI_Irecv(&buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquettes[1], MPI_COMM_WORLD, &requetes[1]);
-            //MPI_Irecv(&buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquette, MPI_COMM_WORLD, requete_droite);
         }
 
         // Schéma
@@ -140,13 +136,6 @@ void calculer_u_jacobi(double *f, int N, double *u){
             norme = sqrt(norme_diff_master) / sqrt(norme_master);
         }
         MPI_Bcast(&norme, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-        /*
-        MPI_Barrier(MPI_COMM_WORLD);
-        printf("iteration = %d, rang = %d, solution approchée :\n", iteration, rang);
-        afficher_vecteur(u, nb_pt_divise);
-        MPI_Barrier(MPI_COMM_WORLD);
-        */
 
         // Copie
         for (int i = 0 ; i < nb_pt_divise ; i ++){
