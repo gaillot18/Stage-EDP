@@ -12,7 +12,7 @@ void generer(int *t, int n);
 
 /* resolution.c */
 
-void f_0(int N, double *f);
+void f_0(int nb_pt, double *f);
 void f_1(int N, double *f);
 double u_0(double x);
 double u_1(double x);
@@ -29,7 +29,15 @@ void somme_matrice_carre(double alpha, double *A, double beta, double *B, int N,
 void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C);
 double norme_L2(double *u, double *v, int n);
 
-/* Parallèle */
+/* Variables globales pour arallèle */
 
 extern int rang;
-#pragma omp threadprivate(rang)
+extern int nb_cpu;
+extern int quotient;
+extern int reste;
+extern int nb_pt_divise;
+extern int i_debut;
+extern int i_fin;
+extern int cpu_bord;
+extern int voisin_gauche;
+extern int voisin_droite;

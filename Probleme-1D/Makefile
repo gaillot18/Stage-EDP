@@ -1,42 +1,59 @@
 CC = clang
+CCP = mpicc
 BIN = ./bin
 LIB = ./lib
 OBJ = ./obj
 SRC = ./src
-FLAGS = -fopenmp
+FLAGS = -g0
+
+ifeq ($(USE_MPI),1)
+    COMPILER = $(CCP)
+    MPI_FLAGS = -DUSE_MPI
+else
+    COMPILER = $(CC)
+    MPI_FLAGS =
+endif
 
 .SUFFIXES: .o .c
 
 $(OBJ)/%.o: $(SRC)/%.c
-	$(CC) $(FLAGS) -c $< -o $@
+	$(COMPILER) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
-all: $(BIN)/prog $(BIN)/tests-calcul_mat $(BIN)/tests-resolution
+all: $(BIN)/prog
 
 $(BIN)/prog: $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/main.o
-	$(CC) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/main.o -o $@
+	$(CCP) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/main.o -o $@
+
+$(BIN)/prog-seq: $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution_seq.o $(OBJ)/main_seq.o
+	$(CC) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution_seq.o $(OBJ)/main_seq.o -o $@
 
 $(BIN)/tests-calcul_mat: $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-calcul_mat.o
-	$(CC) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-calcul_mat.o -o $@
+	$(COMPILER) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-calcul_mat.o -o $@
 
 $(BIN)/tests-resolution: $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-resolution.o
-	$(CC) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-resolution.o -o $@
+	$(COMPILER) $(FLAGS) $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ)/resolution.o $(OBJ)/tests-resolution.o -o $@
 
 .PHONY: clean exe kill
 
 exe_prog:
 	make clean
 	make all
-	OMP_NUM_THREADS=6 $(BIN)/prog
+	mpiexec -n 1 $(BIN)/prog
+
+exe_prog-seq:
+	make clean
+	make $(BIN)/prog-seq
+	$(BIN)/prog-seq
 
 exe_tests-calcul_mat:
 	make clean
 	make all
-	OMP_NUM_THREADS=1 $(BIN)/tests-calcul_mat
+	$(BIN)/tests-calcul_mat
 
 exe_tests-resolution:
 	make clean
 	make all
-	OMP_NUM_THREADS=1 $(BIN)/tests-resolution
+	$(BIN)/tests-resolution
 
 clean:
 	rm -f $(OBJ)/* $(BIN)/*

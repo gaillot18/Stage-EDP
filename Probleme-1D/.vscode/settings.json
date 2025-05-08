@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "lib0.h": "c"
+        "lib0.h": "c",
+        "omp.h": "c"
     }
 }

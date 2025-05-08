@@ -1,7 +1,9 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <omp.h>
 # include <sys/time.h>
+# ifdef USE_MPI
+# include <mpi.h>
+# endif
 
 # include "../lib/lib0.h"
 
