@@ -38,7 +38,7 @@ $(BIN)/tests-resolution: $(OBJ)/gen.o $(OBJ)/convert.o $(OBJ)/calcul_mat.o $(OBJ
 exe_prog:
 	make clean
 	make all
-	mpiexec -n 1 $(BIN)/prog
+	mpiexec -n 4 $(BIN)/prog
 
 exe_prog-seq:
 	make clean

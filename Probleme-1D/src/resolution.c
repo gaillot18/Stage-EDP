@@ -3,14 +3,16 @@
 # include <sys/time.h>
 # include <math.h>
 # include <mpi.h>
+# include <float.h>
 
-# include "../lib/lib0.h"
+
+# include "../lib/lib.h"
 
 # define pi 3.14159265358979323846
 
-void f_0(int nb_pt, double *f){
+void f_0(double *f){
 
-    for (int i = 0 ; i < nb_pt ; i ++){
+    for (int i = 0 ; i < nb_pt_divise ; i ++){
         f[i] = 1;
     }
 
@@ -20,8 +22,10 @@ void f_1(int N, double *f){
 
     int nb_pt = N + 1;
     double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        f[i] = pi * pi * sin(pi * i * h);
+    int i_reel = i_debut;
+    for (int i = 0 ; i < nb_pt_divise ; i ++){
+        f[i] = pi * pi * sin(pi * i_reel * h);
+        i_reel ++;
     }
 
 }
@@ -62,11 +66,17 @@ void generer_f(int N, void (*fonction)(double *, int), double *f){
 void calculer_u_jacobi(double *f, int N, double *u){
 
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 5000000;
+    int nb_iteration_max = 500000;
+    double norme = DBL_MAX;
+    double norme_diff;
+    double norme_master;
+    double norme_diff_master;
     double buffer_fantome_gauche;
     double buffer_fantome_droite;
-    int etiquette = 100;
+    int etiquettes[2] = {1, 2};
     MPI_Status statut;
+    MPI_Status statuts[2];
+    MPI_Request requetes[2];
 
     if (cpu_bord == -1){
         u[0] = 0;
@@ -79,16 +89,27 @@ void calculer_u_jacobi(double *f, int N, double *u){
 
     double *u_anc = (double *)malloc(nb_pt_divise * sizeof(double));
     for (int i = 0 ; i < nb_pt_divise ; i ++){
-        u_anc[i] = 0;
+        u_anc[i] = 0.5;
+    }
+    if (cpu_bord == -1 || cpu_bord == 2){
+        u_anc[0] = 0;
+    }
+    if (cpu_bord == 1 || cpu_bord == 2){
+        u_anc[nb_pt_divise - 1] = 0;
     }
 
     // Itérations
-    for (int iteration = 0 ; iteration < nb_iteration_max ; iteration ++){
+    int count = 0;
+    for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
-        // Communications
+        // Communications : bloquante pour cellule gauche non bloquante pour cellule droite
         if (nb_cpu > 1){
-            MPI_Sendrecv(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquette, &buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquette, MPI_COMM_WORLD, &statut);
-            MPI_Sendrecv(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquette, &buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquette, MPI_COMM_WORLD, &statut);
+            //MPI_Sendrecv(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquette, &buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquette, MPI_COMM_WORLD, &statut);
+            MPI_Sendrecv(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquettes[0], &buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquettes[0], MPI_COMM_WORLD, &statut);
+            MPI_Isend(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquettes[1], MPI_COMM_WORLD, &requetes[0]);
+            //MPI_Isend(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquette, MPI_COMM_WORLD, requete_droite);
+            MPI_Irecv(&buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquettes[1], MPI_COMM_WORLD, &requetes[1]);
+            //MPI_Irecv(&buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquette, MPI_COMM_WORLD, requete_droite);
         }
 
         // Schéma
@@ -100,9 +121,25 @@ void calculer_u_jacobi(double *f, int N, double *u){
             u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
         }
 
+        if (nb_cpu > 1){
+            //MPI_Wait(&requetes[0], &statut);
+            //MPI_Wait(&requetes[1], &statut);
+            MPI_Waitall(2, requetes, statuts);
+        }
+
         if (cpu_bord != 1 && cpu_bord != 2){
             u[nb_pt_divise - 1] = 0.5 * ((u_anc[nb_pt_divise - 2] + buffer_fantome_droite) + h_carre * f[nb_pt_divise - 1]);
         }
+
+        // Test d'arrêt
+        norme_diff = norme_L2_diff(u, u_anc, nb_pt_divise) * norme_L2_diff(u, u_anc, nb_pt_divise);
+        norme = norme_L2(u_anc, nb_pt_divise) * norme_L2(u_anc, nb_pt_divise);
+        MPI_Reduce(&norme_diff, &norme_diff_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&norme, &norme_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        if (rang == 0){
+            norme = sqrt(norme_diff_master) / sqrt(norme_master);
+        }
+        MPI_Bcast(&norme, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
         /*
         MPI_Barrier(MPI_COMM_WORLD);
@@ -115,10 +152,12 @@ void calculer_u_jacobi(double *f, int N, double *u){
         for (int i = 0 ; i < nb_pt_divise ; i ++){
             u_anc[i] = u[i];
         }
+        count ++;
 
     }
 
     free(u_anc);
+    printf("iteration = %d, norme = %f\n", count, norme);
 
 }
 

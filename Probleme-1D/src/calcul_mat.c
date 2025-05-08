@@ -6,7 +6,7 @@
 # include <mpi.h>
 # endif
 
-# include "../lib/lib0.h"
+//# include "../lib/lib0.h"
 
 void init_matrice_carre_zero(int n, double *A){
 
@@ -52,13 +52,27 @@ void produit_matrice_carre(double alpha, double *A, double *B, int n, double *C)
    
 }
 
-double norme_L2(double *u, double *v, int n){
+double norme_L2_diff(double *u, double *v, int n){
 
     double res = 0;
 
     for (int i = 0 ; i < n ; i ++){
         double dif = u[i] - v[i];
         res += dif * dif;
+    }
+    
+    res = sqrt(res);
+
+    return res;
+
+}
+
+double norme_L2(double *u, int n){
+
+    double res = 0;
+
+    for (int i = 0 ; i < n ; i ++){
+        res += u[i] * u[i];
     }
     
     res = sqrt(res);

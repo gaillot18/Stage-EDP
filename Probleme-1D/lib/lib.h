@@ -7,12 +7,13 @@ void clear_file(const char *filename);
 /* gen.c */
 
 void afficher_matrice(double *t, int n);
+void afficher_vecteur_int(int *t, int n);
 void afficher_vecteur(double *t, int n);
 void generer(int *t, int n);
 
 /* resolution.c */
 
-void f_0(int nb_pt, double *f);
+void f_0(double *f);
 void f_1(int N, double *f);
 double u_0(double x);
 double u_1(double x);
@@ -27,7 +28,8 @@ void calculer_u_gaussseidel(double *f, int N, double *u);
 void init_matrice_carre_zero(int N, double *A);
 void somme_matrice_carre(double alpha, double *A, double beta, double *B, int N, double *C);
 void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C);
-double norme_L2(double *u, double *v, int n);
+double norme_L2_diff(double *u, double *v, int n);
+double norme_L2(double *u, int n);
 
 /* Variables globales pour arallèle */
 

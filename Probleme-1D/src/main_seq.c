@@ -3,7 +3,7 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../lib/lib0.h"
+# include "../lib/lib_seq.h"
 
 int rang;
 static int nb_rang;
@@ -28,14 +28,14 @@ int main(int argc, char **argv){
 
     /* Début de la préparation des données */
 
-    int N = 30;
+    int N = 1000;
     int nb_pt = N + 1;
     double *f = (double *)malloc(nb_pt * sizeof(double));
-    f_0(N, f);
+    f_1_seq(N, f);
     double *u = (double *)malloc(nb_pt * sizeof(double));
 
     double *u_exact = (double *)malloc(nb_pt * sizeof(double));
-    calculer_u_exact(N, u_0, u_exact);
+    calculer_u_exact_seq(N, u_1_seq, u_exact);
 
     //double *A = (double *)malloc(8 * 8 * sizeof(double));
     //generer_A(6, A);
@@ -47,8 +47,8 @@ int main(int argc, char **argv){
 
     /* Début du calcul */
 
-    calculer_u_jacobi(f, N, u);
-    double erreur_L2 = norme_L2(u, u_exact, nb_pt);
+    calculer_u_jacobi_seq(f, N, u);
+    double erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
     if (N < 1000){
         printf("Solution approchée :\n"); afficher_vecteur(u, nb_pt);
         printf("Solution exacte :\n"); afficher_vecteur(u_exact, nb_pt);

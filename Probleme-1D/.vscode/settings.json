@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "lib0.h": "c",
-        "omp.h": "c"
+        "omp.h": "c",
+        "float.h": "c"
     }
 }

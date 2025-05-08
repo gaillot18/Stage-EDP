@@ -5,7 +5,7 @@
 # include <mpi.h>
 # endif
 
-# include "../lib/lib0.h"
+//# include "../lib/lib0.h"
 
 void afficher_matrice(double *t, int n){
     for (int i = 0 ; i < n ; i ++){
@@ -19,6 +19,13 @@ void afficher_matrice(double *t, int n){
 void afficher_vecteur(double *t, int n){
     for (int i = 0 ; i < n ; i ++){
         printf("%f ", t[i]);
+    }
+    printf("\n");
+}
+
+void afficher_vecteur_int(int *t, int n){
+    for (int i = 0 ; i < n ; i ++){
+        printf("%d ", t[i]);
     }
     printf("\n");
 }

@@ -3,12 +3,13 @@
 # include <omp.h>
 # include <sys/time.h>
 # include <math.h>
+# include <float.h>
 
-# include "../lib/lib0.h"
+# include "../lib/lib_seq.h"
 
 # define pi 3.14159265358979323846
 
-void f_0(int N, double *f){
+void f_0_seq(int N, double *f){
 
     int nb_pt = N + 1;
     for (int i = 0 ; i < nb_pt ; i ++){
@@ -17,7 +18,7 @@ void f_0(int N, double *f){
 
 }
 
-void f_1(int N, double *f){
+void f_1_seq(int N, double *f){
 
     int nb_pt = N + 1;
     double h = 1.0 / N;
@@ -27,7 +28,7 @@ void f_1(int N, double *f){
 
 }
 
-double u_0(double x){
+double u_0_seq(double x){
 
     double res = 0.5 * x * (1 - x);
 
@@ -35,7 +36,7 @@ double u_0(double x){
 
 }
 
-double u_1(double x){
+double u_1_seq(double x){
 
     double res = sin(pi * x);
 
@@ -43,7 +44,7 @@ double u_1(double x){
 
 }
 
-void calculer_u_exact(int N, double (*fonction)(double), double *u){
+void calculer_u_exact_seq(int N, double (*fonction)(double), double *u){
 
     int nb_pt = N + 1;
     double h = 1.0 / N;
@@ -53,7 +54,7 @@ void calculer_u_exact(int N, double (*fonction)(double), double *u){
 
 }
 
-void generer_A(int N, double *A){
+void generer_A_seq(int N, double *A){
 
     int N_i = N - 2; // = N sans u_0 et u_N
     double coeff_1 = 2 * N * N; // = (1 / h^2) * 2
@@ -76,53 +77,58 @@ void generer_A(int N, double *A){
 
 }
 
-void generer_f(int N, void (*fonction)(double *, int), double *f){
+void generer_f_seq(int N, void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
 
-void calculer_u_jacobi(double *f, int N, double *u){
+void calculer_u_jacobi_seq(double *f, int N, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 500;
+    int nb_iteration_max = 500000;
+    double norme = DBL_MAX;
     u[0] = 0;
     u[nb_pt - 1] = 0;
 
     // Vecteur de départ 
 
     double *u_anc = (double *)malloc(nb_pt * sizeof(double));
-    for (int i = 0 ; i < nb_pt ; i ++){
-        u_anc[i] = 0;
+    u_anc[0] = 0;
+    for (int i = 1 ; i < nb_pt - 1 ; i ++){
+        u_anc[i] = 0.5;
     }
+    u[nb_pt - 1] = 0;
 
     // Itérations
 
-    for (int iteration = 0 ; iteration < nb_iteration_max ; iteration ++){
+    int count = 0;
+    for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
-        # pragma omp parallel for schedule(runtime)
-        {
-            for (int i = 1 ; i < nb_pt - 1 ; i ++){
-                //printf("i = %d, rang = %d\n", i, rang);
-                u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
-            }
+        for (int i = 1 ; i < nb_pt - 1 ; i ++){
+            //printf("i = %d, rang = %d\n", i, rang);
+            u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
         }
+
+        // Test d'arrêt
+        norme = norme_L2_diff(u, u_anc, nb_pt) / norme_L2(u_anc, nb_pt);
 
         // Copie
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
             u_anc[i] = u[i];
         }
-
+        count++;
     }
 
     free(u_anc);
+    printf("iteration = %d\n", count);
 
 }
 
-void calculer_u_gaussseidel(double *f, int N, double *u){
+void calculer_u_gaussseidel_seq(double *f, int N, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
