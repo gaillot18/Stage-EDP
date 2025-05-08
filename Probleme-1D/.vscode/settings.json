@@ -2,6 +2,10 @@
     "files.associations": {
         "lib0.h": "c",
         "omp.h": "c",
-        "float.h": "c"
+        "float.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "parallele.h": "c",
+        "sequentiel.h": "c"
     }
 }

@@ -11,17 +11,24 @@ void afficher_vecteur_int(int *t, int n);
 void afficher_vecteur(double *t, int n);
 void generer(int *t, int n);
 
+/* parallele.c */
+
+void affichage_ordonne(double *u_divise, int nb_pt_divise, char *message);
+void infos_processus(int nb_pt, int *nb_pt_divise, int *i_debut, int *i_fin);
+void infos_topologie(int *cpu_bord, int *voisin_gauche, int *voisin_droite);
+void infos_gather(int **deplacements, int **nb_elements_recus);
+
 /* resolution.c */
 
-void f_0(double *f);
-void f_1(int N, double *f);
+void f_0(double **f);
+void f_1(double **f);
 double u_0(double x);
 double u_1(double x);
-void calculer_u_exact(int N, double (*fonction)(double), double *u);
-void generer_A(int N, double *A);
-void generer_f(int N, void (*fonction)(double *, int), double *f);
-void calculer_u_jacobi(double *f, int N, double *u);
-void calculer_u_gaussseidel(double *f, int N, double *u);
+void calculer_u_exact(double (*fonction)(double), double *u);
+void generer_A(double *A);
+void generer_f(void (*fonction)(double *, int), double *f);
+void calculer_u_jacobi(double *f, double *u);
+void calculer_u_gaussseidel(double *f, double *u);
 
 /* calcul_mat.c */
 
@@ -31,12 +38,13 @@ void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C)
 double norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 
-/* Variables globales pour arallèle */
+/* Variables globales statiques */
+
+extern int N;
+extern int nb_pt;
 
 extern int rang;
 extern int nb_cpu;
-extern int quotient;
-extern int reste;
 extern int nb_pt_divise;
 extern int i_debut;
 extern int i_fin;

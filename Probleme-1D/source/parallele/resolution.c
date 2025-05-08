@@ -5,26 +5,27 @@
 # include <mpi.h>
 # include <float.h>
 
-
-# include "../lib/lib.h"
+# include "../../librairie/parallele.h"
 
 # define pi 3.14159265358979323846
 
-void f_0(double *f){
+void f_0(double **f){
 
+    *f = (double *)malloc(nb_pt_divise * sizeof(double));
     for (int i = 0 ; i < nb_pt_divise ; i ++){
-        f[i] = 1;
+        (*f)[i] = 1;
     }
 
 }
 
-void f_1(int N, double *f){
+void f_1(double **f){
 
+    *f = (double *)malloc(nb_pt_divise * sizeof(double));
     int nb_pt = N + 1;
     double h = 1.0 / N;
     int i_reel = i_debut;
     for (int i = 0 ; i < nb_pt_divise ; i ++){
-        f[i] = pi * pi * sin(pi * i_reel * h);
+        (*f)[i] = pi * pi * sin(pi * i_reel * h);
         i_reel ++;
     }
 
@@ -46,9 +47,8 @@ double u_1(double x){
 
 }
 
-void calculer_u_exact(int N, double (*fonction)(double), double *u){
+void calculer_u_exact(double (*fonction)(double), double *u){
 
-    int nb_pt = N + 1;
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
         u[i] = fonction(i * h);
@@ -56,14 +56,14 @@ void calculer_u_exact(int N, double (*fonction)(double), double *u){
 
 }
 
-void generer_f(int N, void (*fonction)(double *, int), double *f){
+void generer_f(void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
 
-void calculer_u_jacobi(double *f, int N, double *u){
+void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
@@ -118,8 +118,6 @@ void calculer_u_jacobi(double *f, int N, double *u){
         }
 
         if (nb_cpu > 1){
-            //MPI_Wait(&requetes[0], &statut);
-            //MPI_Wait(&requetes[1], &statut);
             MPI_Waitall(2, requetes, statuts);
         }
 
@@ -146,11 +144,13 @@ void calculer_u_jacobi(double *f, int N, double *u){
     }
 
     free(u_anc);
-    printf("iteration = %d, norme = %f\n", count, norme);
+    if (rang == 0){
+        printf("iteration = %d, norme = %f\n", count, norme);
+    }
 
 }
 
-void calculer_u_gaussseidel(double *f, int N, double *u){
+void calculer_u_gaussseidel(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);

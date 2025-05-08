@@ -5,25 +5,25 @@
 # include <math.h>
 # include <float.h>
 
-# include "../lib/lib_seq.h"
+# include "../../librairie/sequentiel.h"
 
 # define pi 3.14159265358979323846
 
-void f_0_seq(int N, double *f){
+void f_0_seq(double **f){
 
-    int nb_pt = N + 1;
+    *f = (double *)malloc(nb_pt * sizeof(double));
     for (int i = 0 ; i < nb_pt ; i ++){
-        f[i] = 1;
+        (*f)[i] = 1;
     }
 
 }
 
-void f_1_seq(int N, double *f){
+void f_1_seq(double **f){
 
-    int nb_pt = N + 1;
+    *f = (double *)malloc(nb_pt* sizeof(double));
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
-        f[i] = pi * pi * sin(pi * i * h);
+        (*f)[i] = pi * pi * sin(pi * i * h);
     }
 
 }
@@ -44,9 +44,8 @@ double u_1_seq(double x){
 
 }
 
-void calculer_u_exact_seq(int N, double (*fonction)(double), double *u){
+void calculer_u_exact_seq(double (*fonction)(double), double *u){
 
-    int nb_pt = N + 1;
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
         u[i] = fonction(i * h);
@@ -54,7 +53,7 @@ void calculer_u_exact_seq(int N, double (*fonction)(double), double *u){
 
 }
 
-void generer_A_seq(int N, double *A){
+void generer_A_seq(double *A){
 
     int N_i = N - 2; // = N sans u_0 et u_N
     double coeff_1 = 2 * N * N; // = (1 / h^2) * 2
@@ -77,14 +76,14 @@ void generer_A_seq(int N, double *A){
 
 }
 
-void generer_f_seq(int N, void (*fonction)(double *, int), double *f){
+void generer_f_seq(void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
 
-void calculer_u_jacobi_seq(double *f, int N, double *u){
+void calculer_u_jacobi_seq(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
@@ -128,7 +127,7 @@ void calculer_u_jacobi_seq(double *f, int N, double *u){
 
 }
 
-void calculer_u_gaussseidel_seq(double *f, int N, double *u){
+void calculer_u_gaussseidel_seq(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);

@@ -3,8 +3,6 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../lib/lib0.h"
-
 # define N 4
 # define INT_MAX 2147483647 // = 2^31 - 1
 
