@@ -70,7 +70,6 @@ void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
-    int nb_iteration = 0;
     double norme = DBL_MAX;
     double norme_diff;
     double norme_master;
@@ -142,49 +141,7 @@ void calculer_u_jacobi(double *f, double *u){
         for (int i = 0 ; i < nb_pt_divise ; i ++){
             u_anc[i] = u[i];
         }
-        nb_iteration ++;
-
-    }
-
-    free(u_anc);
-
-    # ifdef SORTIE
-    if (rang == 0){
-        sprintf(buffer_print, "nb_iteration = %d\n", nb_iteration); printf("%s", buffer_print);
-        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
-    }
-    # endif
-
-}
-
-void calculer_u_gaussseidel(double *f, double *u){
-
-    int nb_pt = N + 1;
-    double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 9900000;
-    u[0] = 0;
-    u[nb_pt - 1] = 0;
-
-    // Vecteur de départ 
-
-    double *u_anc = (double *)malloc(nb_pt * sizeof(double));
-    for (int i = 0 ; i < nb_pt ; i ++){
-        u_anc[i] = 0;
-    }
-
-    // Itérations
-
-    for (int iteration = 0 ; iteration < nb_iteration_max ; iteration ++){
-
-        // Schéma
-        for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u[i] = 0.5 * (u[i - 1] + u_anc[i + 1] + h_carre * f[i]);
-        }
-
-        // Copie
-        for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u_anc[i] = u[i];
-        }
+        nb_iterations ++;
 
     }
 

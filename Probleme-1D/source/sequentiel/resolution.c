@@ -9,7 +9,7 @@
 
 # define pi 3.14159265358979323846
 
-void f_0_seq(double **f){
+void f_0(double **f){
 
     *f = (double *)malloc(nb_pt * sizeof(double));
     for (int i = 0 ; i < nb_pt ; i ++){
@@ -18,7 +18,7 @@ void f_0_seq(double **f){
 
 }
 
-void f_1_seq(double **f){
+void f_1(double **f){
 
     *f = (double *)malloc(nb_pt* sizeof(double));
     double h = 1.0 / N;
@@ -28,7 +28,7 @@ void f_1_seq(double **f){
 
 }
 
-double u_0_seq(double x){
+double u_0(double x){
 
     double res = 0.5 * x * (1 - x);
 
@@ -36,7 +36,7 @@ double u_0_seq(double x){
 
 }
 
-double u_1_seq(double x){
+double u_1(double x){
 
     double res = sin(pi * x);
 
@@ -44,7 +44,7 @@ double u_1_seq(double x){
 
 }
 
-void calculer_u_exact_seq(double (*fonction)(double), double *u){
+void calculer_u_exact(double (*fonction)(double), double *u){
 
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
@@ -53,42 +53,18 @@ void calculer_u_exact_seq(double (*fonction)(double), double *u){
 
 }
 
-void generer_A_seq(double *A){
-
-    int N_i = N - 2; // = N sans u_0 et u_N
-    double coeff_1 = 2 * N * N; // = (1 / h^2) * 2
-    double coeff_2 = - N * N; // = (1 / h^2) * (-1)
-
-    // 1ère et dernière ligne
-
-    A[0] = coeff_1;
-    A[1] = coeff_2;
-    A[N_i * N_i - 1] = coeff_1;
-    A[N_i * N_i - 2] = coeff_2;
-
-    // Autres lignes
-
-    for (int i = 1 ; i < N_i - 1; i ++){
-        A[i * N_i + i] = coeff_1;
-        A[i * N_i + i - 1] = coeff_2;
-        A[i * N_i + i + 1] = coeff_2;
-    }
-
-}
-
-void generer_f_seq(void (*fonction)(double *, int), double *f){
+void generer_f(void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
 
-void calculer_u_jacobi_seq(double *f, double *u){
+void calculer_u_jacobi(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
-    int nb_iteration = 0;
     double norme = DBL_MAX;
     u[0] = 0;
     u[nb_pt - 1] = 0;
@@ -119,15 +95,14 @@ void calculer_u_jacobi_seq(double *f, double *u){
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
             u_anc[i] = u[i];
         }
-        nb_iteration ++;
+        nb_iterations ++;
     }
 
     free(u_anc);
-    printf("iteration = %d\n", nb_iteration);
 
 }
 
-void calculer_u_gaussseidel_seq(double *f, double *u){
+void calculer_u_gaussseidel(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);

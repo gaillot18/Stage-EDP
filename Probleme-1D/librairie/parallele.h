@@ -1,8 +1,7 @@
 /* convert.c */
 
-int data_to_txt(const char *nom_fichier_binaire, const char *nom_fichier_txt);
-int txt_to_data(const char *nom_fichier_txt, const char *nom_fichier_binaire);
-void clear_file(const char *filename);
+void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
+void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
 
 /* gen.c */
 
@@ -25,10 +24,8 @@ void f_1(double **f);
 double u_0(double x);
 double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
-void generer_A(double *A);
 void generer_f(void (*fonction)(double *, int), double *f);
 void calculer_u_jacobi(double *f, double *u);
-void calculer_u_gaussseidel(double *f, double *u);
 
 /* calcul_mat.c */
 
@@ -42,6 +39,7 @@ double norme_L2(double *u, int n);
 
 extern int N;
 extern int nb_pt;
+extern int nb_iterations;
 
 extern int rang;
 extern int nb_cpu;
@@ -51,6 +49,3 @@ extern int i_fin;
 extern int cpu_bord;
 extern int voisin_gauche;
 extern int voisin_droite;
-
-extern char *buffer_print;
-extern MPI_File descripteur;

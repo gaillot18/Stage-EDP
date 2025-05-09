@@ -11,10 +11,7 @@
 void affichage_ordonne(double *u_divise, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
             if (rang == i){
-                sprintf(buffer_print, "rang = %d, %s :\n", rang, message); printf("%s", buffer_print);
-                MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
-                MPI_File_write(descripteur, u_divise, nb_pt_divise, MPI_DOUBLE, MPI_STATUS_IGNORE);
-                sprintf(buffer_print, "\n"); MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+                printf("rang = %d, %s :\n", rang, message);
                 afficher_vecteur(u_divise, nb_pt_divise);
             }
             MPI_Barrier(MPI_COMM_WORLD);
@@ -86,14 +83,6 @@ void infos_gather(int **deplacements, int **nb_elements_recus){
             (*deplacements)[i] = offset;
             offset += (*nb_elements_recus)[i];
         }
-        # ifdef SORTIE
-        sprintf(buffer_print, "nb_elements_recu = "); printf("%s", buffer_print); afficher_vecteur_int(*nb_elements_recus, nb_cpu);
-        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
-        MPI_File_write(descripteur, *nb_elements_recus, nb_cpu, MPI_INT, MPI_STATUS_IGNORE);
-        sprintf(buffer_print, "deplacements = "); printf("%s", buffer_print); afficher_vecteur_int(*deplacements, nb_cpu);
-        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
-        MPI_File_write(descripteur, *deplacements, nb_cpu, MPI_INT, MPI_STATUS_IGNORE);
-        # endif
     }
 
     MPI_Barrier(MPI_COMM_WORLD);

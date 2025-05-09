@@ -1,8 +1,7 @@
 /* convert.c */
 
-int data_to_txt(const char *nom_fichier_binaire, const char *nom_fichier_txt);
-int txt_to_data(const char *nom_fichier_txt, const char *nom_fichier_binaire);
-void clear_file(const char *filename);
+void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
+void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
 
 /* gen.c */
 
@@ -12,15 +11,14 @@ void generer(int *t, int n);
 
 /* resolution_seq.c */
 
-void f_0_seq(double **f);
-void f_1_seq(double **f);
-double u_0_seq(double x);
-double u_1_seq(double x);
-void calculer_u_exact_seq( double (*fonction)(double), double *u);
-void generer_A_seq(double *A);
-void generer_f_seq(void (*fonction)(double *, int), double *f);
-void calculer_u_jacobi_seq(double *f, double *u);
-void calculer_u_gaussseidel_seq(double *f, double *u);
+void f_0(double **f);
+void f_1(double **f);
+double u_0(double x);
+double u_1(double x);
+void calculer_u_exact( double (*fonction)(double), double *u);
+void generer_f(void (*fonction)(double *, int), double *f);
+void calculer_u_jacobi(double *f, double *u);
+void calculer_u_gaussseidel(double *f, double *u);
 
 /* calcul_mat.c */
 
@@ -34,3 +32,4 @@ double norme_L2(double *u, int n);
 
 extern int N;
 extern int nb_pt;
+extern int nb_iterations;

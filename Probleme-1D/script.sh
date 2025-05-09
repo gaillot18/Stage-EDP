@@ -8,7 +8,7 @@ make parallele
 
 # Éxecution
 
-$BIN/exe-sequentiel > ./texte/resultats0.txt
+$BIN/exe-sequentiel
 sleep 3
 mpiexec -n 1 $BIN/exe-parallele
 sleep 3

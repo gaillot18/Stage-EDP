@@ -5,56 +5,112 @@
 
 # include "../../librairie/sequentiel.h"
 
+# define SORTIE 1
+
+// ======================================================
+// Déclarations des variables globales
+// ======================================================
 int N;
 int nb_pt;
+int nb_iterations;
 
 int main(int argc, char **argv){
 
-    setvbuf(stdout, NULL, _IONBF, 0);
-
-    printf("——————————————————————————————————————————————————\n");
-    printf("Éxecution séquentielle\n");
-
-    struct timeval t_elapsed_0, t_elapsed_1;
-    double t_elapsed;
-
-    /* Début de la préparation des données */
-
+    // ======================================================
+    // Déclarations des variables
+    // ======================================================
+    // Temps
+    struct timeval temps_debut;
+    struct timeval temps_fin;
+    double temps;
+    // Buffers
+    double *f;
+    double *u;
+    double *u_exact;
+    // Résultats
+    double erreur_L2 = 0;
+    nb_iterations = 0;
+    // Fichiers
+    FILE *descripteur;
+    char *nom_fichier_data;
+    char *nom_fichier_txt;
+    // Paramètres
     N = 30;
     nb_pt = N + 1;
-    double *f;
-    f_0_seq(&f);
-    double *u = (double *)malloc(nb_pt * sizeof(double));
 
-    double *u_exact = (double *)malloc(nb_pt * sizeof(double));
-    calculer_u_exact_seq(u_0_seq, u_exact);
 
-    /* Fin de la préparation des données */
 
-    gettimeofday(&t_elapsed_0, NULL);
+    // ======================================================
+    // Initialisation
+    // ======================================================
+    # ifdef SORTIE
+    printf("------------------------------------------------------------\n");
+    printf("Éxecution séquentielle\n");
+    # endif
 
-    /* Début du calcul */
 
-    calculer_u_jacobi_seq(f, u);
-    double erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-    if (N < 1000){
-        printf("Solution approchée :\n"); afficher_vecteur(u, nb_pt);
-        printf("Solution exacte :\n"); afficher_vecteur(u_exact, nb_pt);
-    }
-    printf("erreur_L2 = %f\n", erreur_L2);
 
-    /* Fin du calcul */
+    // ======================================================
+    // Calcul de f_divise, u_divise et u_exact
+    // ======================================================
+    f_0(&f);
+    u = (double *)malloc(nb_pt * sizeof(double));
+    u_exact = (double *)malloc(nb_pt * sizeof(double));
+    calculer_u_exact(u_0, u_exact);
 
-    gettimeofday(&t_elapsed_1, NULL);
-    t_elapsed = (t_elapsed_1.tv_sec - t_elapsed_0.tv_sec) + (t_elapsed_1.tv_usec - t_elapsed_0.tv_usec) / (double)1000000;
-    printf("temps : %f sec\n", t_elapsed);
 
+
+    // ======================================================
+    // Calcul de u avec mesure de temps
+    // ======================================================
+    gettimeofday(&temps_debut, NULL);
+    calculer_u_jacobi(f, u);
+    gettimeofday(&temps_fin, NULL);
+    temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
+
+
+
+    // ======================================================
+    // Affichage d'autres informations
+    // ======================================================
+    erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
+    # ifdef SORTIE
+    afficher_vecteur(u, nb_pt);
+    printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
+    # endif
+
+
+
+    // ======================================================
+    // Sauvegarde de u dans un fichier
+    // ======================================================
+    nom_fichier_data = (char *)malloc(128 * sizeof(char));
+    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
+    sprintf(nom_fichier_data, "./texte/resultats0.data");
+    sprintf(nom_fichier_txt, "./texte/resultats0.txt");
+    ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
+
+
+
+    // ======================================================
+    // Libérations de la mémoire
+    // ======================================================
+    free(nom_fichier_data);
+    free(nom_fichier_txt);
     free(f);
     free(u_exact);
     free(u);
 
+
+
+    // ======================================================
+    // Fermeture
+    // ======================================================
+    # ifdef SORTIE
     printf("Éxecution terminée\n");
-    printf("——————————————————————————————————————————————————\n");
+    printf("------------------------------------------------------------\n");
+    # endif
     
     return 0;
+    
 }
