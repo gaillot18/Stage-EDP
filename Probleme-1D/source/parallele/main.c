@@ -1,11 +1,14 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <sys/time.h>
 # include <mpi.h>
 
 # include "../../librairie/parallele.h"
 
-# define DEBUG 1
+# define SORTIE
+
+# define TAILLE_buffer_print 8192
 
 int rang;
 int nb_cpu;
@@ -20,6 +23,9 @@ int voisin_droite;
 
 int N;
 int nb_pt;
+
+char *buffer_print;
+MPI_File descripteur;
 
 int main(int argc, char **argv){
 
@@ -37,8 +43,15 @@ int main(int argc, char **argv){
 
     double erreur_L2 = 0;
 
-    N = 1000;
+    char *nom_fichier_data;
+    char *nom_fichier_txt;
+
+    N = 30;
     nb_pt = N + 1;
+
+    # ifdef SORTIE
+    buffer_print = (char *)malloc(TAILLE_buffer_print * sizeof(char));
+    # endif
 
     /* —————————————————————————————————————————————————— */
     // Initialisation de MPI
@@ -46,10 +59,19 @@ int main(int argc, char **argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rang);
     MPI_Comm_size(MPI_COMM_WORLD, &nb_cpu);
 
+    # ifdef SORTIE
+    nom_fichier_data = (char *)malloc(128 * sizeof(char));
+    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
+    sprintf(nom_fichier_data, "./texte/resultats%d.data", nb_cpu);
+    sprintf(nom_fichier_txt, "./texte/resultats%d.txt", nb_cpu);
+    MPI_File_open(MPI_COMM_WORLD, nom_fichier_txt, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &descripteur);
     if (rang == 0){
-        printf("——————————————————————————————————————————————————\n");
-        printf("Éxecution parallèle pour %d processus\n", nb_cpu);
+        sprintf(buffer_print, "------------------------------------------------------------\n"); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+        sprintf(buffer_print, "Execution parallèle pour %d processus\n", nb_cpu); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
     }
+    # endif
     //
     /* —————————————————————————————————————————————————— */
     /* —————————————————————————————————————————————————— */
@@ -61,20 +83,21 @@ int main(int argc, char **argv){
     /* —————————————————————————————————————————————————— */
     /* —————————————————————————————————————————————————— */
     // Afficher des informations
-    # if (DEBUG == 1)
-    printf("rang = %d, voisin_gauche = %d, voisin_droite = %d, cpu_bord = %d, nb_pt_divise = %d, i_debut = %d, i_fin = %d\n", rang, voisin_gauche, voisin_droite, cpu_bord, nb_pt_divise, i_debut, i_fin);
+    # ifdef SORTIE
+    sprintf(buffer_print, "rang = %d, voisin_gauche = %d, voisin_droite = %d, cpu_bord = %d, nb_pt_divise = %d, i_debut = %d, i_fin = %d\n", rang, voisin_gauche, voisin_droite, cpu_bord, nb_pt_divise, i_debut, i_fin); printf("%s", buffer_print);
+    MPI_File_write_ordered(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
     # endif
     //
     /* —————————————————————————————————————————————————— */
     /* —————————————————————————————————————————————————— */
     // Initialiser les buffers et calculer la solution exacte
-    f_1(&f_divise);
+    f_0(&f_divise);
     u_divise = (double *)malloc(nb_pt_divise * sizeof(double));
 
     if (rang == 0){
         u = (double *)malloc(nb_pt * sizeof(double));
         u_exact = (double *)malloc(nb_pt * sizeof(double));
-        calculer_u_exact(u_1, u_exact);
+        calculer_u_exact(u_0, u_exact);
     }
     //
     /* —————————————————————————————————————————————————— */
@@ -89,34 +112,52 @@ int main(int argc, char **argv){
     /* —————————————————————————————————————————————————— */
     /* —————————————————————————————————————————————————— */
     // Affichage des résultats
-    # if (DEBUG == 1)
+    if (rang == 0){
+        erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
+    }
+    # ifdef SORTIE
     if (N < 1000){
         char message[] = "solution approchée partielle";
-        affichage_ordonne(u_divise, nb_pt_divise, message);
+        affichage_ordonne(u_divise, message);
         if (rang == 0){
             printf("rang = %d, solution approchée :\n", rang); afficher_vecteur(u, nb_pt);
         }
     }
     if (rang == 0){
-        erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-        printf("Norme L2 de l'erreur = %f\n", erreur_L2);
-        printf("Temps : %f sec\n", temps);
+        sprintf(buffer_print, "erreur_L2 = %f\ntemps = %f sec \n", erreur_L2, temps); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
     }
     # endif
     //
     /* —————————————————————————————————————————————————— */
     /* —————————————————————————————————————————————————— */
     // Libération de mémoire et fermeture de MPI
+    # ifdef SORTIE
     if (rang == 0){
-        printf("Éxecution terminée\n");
-        printf("——————————————————————————————————————————————————\n");
+        sprintf(buffer_print, "Éxecution terminée\n"); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+        sprintf(buffer_print, "------------------------------------------------------------\n"); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
     }
+    # endif
+    MPI_Barrier(MPI_COMM_WORLD);
     free(u_divise);
+    free(f_divise);
     if (rang == 0){
         free(u);
         free(u_exact);
+        free(nb_elements_recus);
+        free(deplacements);
     }
-    free(f_divise);
+    # ifdef SORTIE
+    free(buffer_print);
+    if (rang == 0){
+        //data_to_txt(nom_fichier_data, nom_fichier_txt);
+    }
+    free(nom_fichier_data);
+    free(nom_fichier_txt);
+    MPI_File_close(&descripteur);
+    # endif
     MPI_Finalize();
     //
     /* —————————————————————————————————————————————————— */

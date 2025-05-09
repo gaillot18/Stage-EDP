@@ -45,10 +45,10 @@ $(BIN)/exe-sequentiel: $(OBJ)/$(FCT)/$(SQT)/affichage.o $(OBJ)/$(FCT)/$(SQT)/cal
 	$(CC) $(FLAGS) $^ -o $@
 
 $(OBJ)/$(SQT)/main.o: $(SRC)/$(SQT)/main.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(SQT)/resolution.o: $(SRC)/$(SQT)/resolution.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 # fonctions-generales
 
@@ -86,6 +86,7 @@ exe-sequentiel:
 	$(BIN)/exe-sequentiel
 
 clean:
+	rm -f ./texte/*.data ./texte/*.txt
 	rm -f $(OBJ)/$(FCT)/$(PRL)/*.o $(OBJ)/$(FCT)/$(SQT)/*.o $(OBJ)/$(PRL)/*.o $(OBJ)/$(SQT)/*.o $(BIN)/*
 
 kill:

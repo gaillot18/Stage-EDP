@@ -1,16 +1,21 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <sys/time.h>
 # include <mpi.h>
 
 # include "../../librairie/parallele.h"
 
-# define DEBUG 1
+# define SORTIE
 
-void affichage_ordonne(double *u_divise, int nb_pt_divise, char *message){
+void affichage_ordonne(double *u_divise, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
             if (rang == i){
-                printf("rang = %d, %s :\n", rang, message); afficher_vecteur(u_divise, nb_pt_divise);
+                sprintf(buffer_print, "rang = %d, %s :\n", rang, message); printf("%s", buffer_print);
+                MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+                MPI_File_write(descripteur, u_divise, nb_pt_divise, MPI_DOUBLE, MPI_STATUS_IGNORE);
+                sprintf(buffer_print, "\n"); MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+                afficher_vecteur(u_divise, nb_pt_divise);
             }
             MPI_Barrier(MPI_COMM_WORLD);
         }
@@ -71,7 +76,7 @@ void infos_gather(int **deplacements, int **nb_elements_recus){
     if (rang == 0){
         *nb_elements_recus = (int *)malloc(nb_cpu * sizeof(int));
         *deplacements = (int *)malloc(nb_cpu * sizeof(int));
-        for (int i = 0 ; i < nb_cpu ; i++) {
+        for (int i = 0 ; i < nb_cpu ; i++){
             if (i < reste){
                 (*nb_elements_recus)[i] = quotient + 1;
             }
@@ -81,9 +86,13 @@ void infos_gather(int **deplacements, int **nb_elements_recus){
             (*deplacements)[i] = offset;
             offset += (*nb_elements_recus)[i];
         }
-        # if (DEBUG == 1)
-        printf("nb_elements_recu = \n"); afficher_vecteur_int(*nb_elements_recus, nb_cpu);
-        printf("deplacements = \n"); afficher_vecteur_int(*deplacements, nb_cpu);
+        # ifdef SORTIE
+        sprintf(buffer_print, "nb_elements_recu = "); printf("%s", buffer_print); afficher_vecteur_int(*nb_elements_recus, nb_cpu);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+        MPI_File_write(descripteur, *nb_elements_recus, nb_cpu, MPI_INT, MPI_STATUS_IGNORE);
+        sprintf(buffer_print, "deplacements = "); printf("%s", buffer_print); afficher_vecteur_int(*deplacements, nb_cpu);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
+        MPI_File_write(descripteur, *deplacements, nb_cpu, MPI_INT, MPI_STATUS_IGNORE);
         # endif
     }
 

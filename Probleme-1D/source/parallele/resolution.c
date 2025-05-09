@@ -1,11 +1,14 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <sys/time.h>
 # include <math.h>
 # include <mpi.h>
 # include <float.h>
 
 # include "../../librairie/parallele.h"
+
+# define SORTIE
 
 # define pi 3.14159265358979323846
 
@@ -67,6 +70,7 @@ void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
+    int nb_iteration = 0;
     double norme = DBL_MAX;
     double norme_diff;
     double norme_master;
@@ -98,7 +102,6 @@ void calculer_u_jacobi(double *f, double *u){
     }
 
     // Itérations
-    int count = 0;
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Communications : bloquante pour cellule gauche non bloquante pour cellule droite
@@ -139,14 +142,18 @@ void calculer_u_jacobi(double *f, double *u){
         for (int i = 0 ; i < nb_pt_divise ; i ++){
             u_anc[i] = u[i];
         }
-        count ++;
+        nb_iteration ++;
 
     }
 
     free(u_anc);
+
+    # ifdef SORTIE
     if (rang == 0){
-        printf("iteration = %d, norme = %f\n", count, norme);
+        sprintf(buffer_print, "nb_iteration = %d\n", nb_iteration); printf("%s", buffer_print);
+        MPI_File_write(descripteur, buffer_print, strlen(buffer_print), MPI_CHAR, MPI_STATUS_IGNORE);
     }
+    # endif
 
 }
 

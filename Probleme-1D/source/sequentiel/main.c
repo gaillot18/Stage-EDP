@@ -10,6 +10,8 @@ int nb_pt;
 
 int main(int argc, char **argv){
 
+    setvbuf(stdout, NULL, _IONBF, 0);
+
     printf("——————————————————————————————————————————————————\n");
     printf("Éxecution séquentielle\n");
 
@@ -18,14 +20,14 @@ int main(int argc, char **argv){
 
     /* Début de la préparation des données */
 
-    N = 1000;
+    N = 30;
     nb_pt = N + 1;
     double *f;
-    f_1_seq(&f);
+    f_0_seq(&f);
     double *u = (double *)malloc(nb_pt * sizeof(double));
 
     double *u_exact = (double *)malloc(nb_pt * sizeof(double));
-    calculer_u_exact_seq(u_1_seq, u_exact);
+    calculer_u_exact_seq(u_0_seq, u_exact);
 
     /* Fin de la préparation des données */
 
@@ -39,13 +41,13 @@ int main(int argc, char **argv){
         printf("Solution approchée :\n"); afficher_vecteur(u, nb_pt);
         printf("Solution exacte :\n"); afficher_vecteur(u_exact, nb_pt);
     }
-    printf("Norme L2 de l'erreur = %f\n", erreur_L2);
+    printf("erreur_L2 = %f\n", erreur_L2);
 
     /* Fin du calcul */
 
     gettimeofday(&t_elapsed_1, NULL);
     t_elapsed = (t_elapsed_1.tv_sec - t_elapsed_0.tv_sec) + (t_elapsed_1.tv_usec - t_elapsed_0.tv_usec) / (double)1000000;
-    printf("Temps : %f sec\n", t_elapsed);
+    printf("temps : %f sec\n", t_elapsed);
 
     free(f);
     free(u_exact);

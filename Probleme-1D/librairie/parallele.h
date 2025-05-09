@@ -13,7 +13,7 @@ void generer(int *t, int n);
 
 /* parallele.c */
 
-void affichage_ordonne(double *u_divise, int nb_pt_divise, char *message);
+void affichage_ordonne(double *u_divise, char *message);
 void infos_processus(int nb_pt, int *nb_pt_divise, int *i_debut, int *i_fin);
 void infos_topologie(int *cpu_bord, int *voisin_gauche, int *voisin_droite);
 void infos_gather(int **deplacements, int **nb_elements_recus);
@@ -38,7 +38,7 @@ void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C)
 double norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 
-/* Variables globales statiques */
+/* Variables globales */
 
 extern int N;
 extern int nb_pt;
@@ -51,3 +51,6 @@ extern int i_fin;
 extern int cpu_bord;
 extern int voisin_gauche;
 extern int voisin_droite;
+
+extern char *buffer_print;
+extern MPI_File descripteur;

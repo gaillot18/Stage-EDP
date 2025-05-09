@@ -6,6 +6,7 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "parallele.h": "c",
-        "sequentiel.h": "c"
+        "sequentiel.h": "c",
+        "time.h": "c"
     }
 }

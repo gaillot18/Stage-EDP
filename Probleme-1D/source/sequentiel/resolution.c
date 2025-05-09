@@ -88,6 +88,7 @@ void calculer_u_jacobi_seq(double *f, double *u){
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
+    int nb_iteration = 0;
     double norme = DBL_MAX;
     u[0] = 0;
     u[nb_pt - 1] = 0;
@@ -103,7 +104,6 @@ void calculer_u_jacobi_seq(double *f, double *u){
 
     // Itérations
 
-    int count = 0;
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
@@ -119,11 +119,11 @@ void calculer_u_jacobi_seq(double *f, double *u){
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
             u_anc[i] = u[i];
         }
-        count++;
+        nb_iteration ++;
     }
 
     free(u_anc);
-    printf("iteration = %d\n", count);
+    printf("iteration = %d\n", nb_iteration);
 
 }
 
