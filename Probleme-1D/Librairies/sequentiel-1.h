@@ -1,4 +1,12 @@
 // ======================================================
+// Variables globales
+// ======================================================
+extern int N;
+extern int nb_pt;
+extern int nb_iterations;
+
+
+// ======================================================
 // ../../Fonctions-communes/affichage.c
 // ======================================================
 void afficher_matrice_carre_double(double *t, int n);
@@ -25,7 +33,7 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 
 
 // ======================================================
-// ../../Sources/Fonctions-numeriques/fonctions.c
+// ../Source/parallele-1/resolution.c
 // ======================================================
 void f_0(double **f);
 void f_1(double **f);
@@ -33,18 +41,5 @@ double u_0(double x);
 double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
 void generer_f(void (*fonction)(double *, int), double *f);
-
-
-// ======================================================
-// ../Source/Parallele/resolution.c
-// ======================================================
 void calculer_u_jacobi(double *f, double *u);
 void calculer_u_gaussseidel(double *f, double *u);
-
-
-// ======================================================
-// Variables globales
-// ======================================================
-extern int N;
-extern int nb_pt;
-extern int nb_iterations;

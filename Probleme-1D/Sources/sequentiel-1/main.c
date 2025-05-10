@@ -3,7 +3,7 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../../Librairie/sequentiel-1.h"
+# include "../../Librairies/sequentiel-1.h"
 
 # define SORTIE 1
 
@@ -86,8 +86,8 @@ int main(int argc, char **argv){
     // ======================================================
     nom_fichier_data = (char *)malloc(128 * sizeof(char));
     nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-    sprintf(nom_fichier_data, "./Texte/sequentiel-1/resultats0.data");
-    sprintf(nom_fichier_txt, "./Texte/sequentiel-1/resultats0.txt");
+    sprintf(nom_fichier_data, "./Textes/sequentiel-1/resultats0.data");
+    sprintf(nom_fichier_txt, "./Textes/sequentiel-1/resultats0.txt");
     ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
 
 

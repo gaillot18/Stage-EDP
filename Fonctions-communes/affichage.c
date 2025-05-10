@@ -7,7 +7,7 @@
 void afficher_matrice_carre_double(double *t, int n){
     for (int i = 0 ; i < n ; i ++){
         for (int j = 0 ; j < n ; j ++){
-            printf("%f ", t[i * n + j]);
+            printf("%10.6f ", t[i * n + j]);
         }
         printf("\n");
     }
@@ -26,7 +26,7 @@ void afficher_matrice_carre_int(int *t, int n){
 // Afficher un vecteur de doubles
 void afficher_vecteur_double(double *t, int n){
     for (int i = 0 ; i < n ; i ++){
-        printf("%f ", t[i]);
+        printf("%10.6f ", t[i]);
     }
     printf("\n");
 }

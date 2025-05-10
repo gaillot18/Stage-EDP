@@ -3,13 +3,15 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../../Librairie/sequentiel-2.h"
+# include "../../Librairies/sequentiel-2.h"
 
 # define SORTIE 1
 
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
+int N;
+int nb_pt;
 
 int main(int argc, char **argv){
 
@@ -27,7 +29,8 @@ int main(int argc, char **argv){
     char *nom_fichier_data;
     char *nom_fichier_txt;
     // Paramètres
-
+    N = 30;
+    nb_pt = N + 1;
 
 
     // ======================================================
@@ -41,13 +44,24 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Calcul de f_divise, u_divise et u_exact
+    // 
     // ======================================================
+    int n = 5;
+    double h = 1.0 / (n + 1);
+    double alpha = 2.0 / (h * h);
+    double beta = - 1.0 / (h * h);
+    struct mat_2bandes L;
+    calculer_cholesky_tridiag(alpha, beta, n, &L);
+    printf("n = %d, h = %f, alpha = %f, beta = %f\n", n, h, alpha, beta);
+    afficher_mat_2bandes(&L); printf("\n");
+    afficher_mat_2bandes_totale(&L);
+    free(L.diag);
+    free(L.sous_diag);
 
 
 
     // ======================================================
-    // Calcul de u avec mesure de temps
+    // 
     // ======================================================
     gettimeofday(&temps_debut, NULL);
     // Calcul

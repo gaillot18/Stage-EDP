@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairie/parallele-1.h"
+# include "../../Librairies/parallele-1.h"
 
 # define SORTIE
 
@@ -137,8 +137,8 @@ int main(int argc, char **argv){
     if (rang == 0){
         nom_fichier_data = (char *)malloc(128 * sizeof(char));
         nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-        sprintf(nom_fichier_data, "./Texte/parallele-1/resultats%d.data", nb_cpu);
-        sprintf(nom_fichier_txt, "./Texte/parallele-1/resultats%d.txt", nb_cpu);
+        sprintf(nom_fichier_data, "./Textes/parallele-1/resultats%d.data", nb_cpu);
+        sprintf(nom_fichier_txt, "./Textes/parallele-1/resultats%d.txt", nb_cpu);
         ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
     }
 

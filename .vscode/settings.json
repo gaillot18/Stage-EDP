@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "parallele-1.h": "c",
-        "sequentiel-1.h": "c"
+        "sequentiel-1.h": "c",
+        "sequentiel-2.h": "c"
     }
 }

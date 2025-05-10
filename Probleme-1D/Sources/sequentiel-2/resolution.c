@@ -5,7 +5,7 @@
 # include <math.h>
 # include <float.h>
 
-# include "../../Librairie/sequentiel-2.h"
+# include "../../Librairies/sequentiel-2.h"
 
 # define pi 3.14159265358979323846
 
@@ -60,4 +60,22 @@ void generer_f(void (*fonction)(double *, int), double *f){
 
 }
 
-void 
+// Construire la matrice creuse (buffer 1D) de la décomposition de Cholesky d'une matrice tridiagonale
+// alpha, beta, gamma sont les coefficients des diagonales (pour le problème 1D : alpha = 2 / h^2, beta = -1 / h^2)
+void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2bandes *L){
+
+    L -> n = n;
+    L -> diag = (double *)malloc(n * sizeof(double));
+    L -> sous_diag = (double *)malloc((n - 1) * sizeof(double));
+
+    (L -> diag)[0] = sqrt(alpha);
+    (L -> sous_diag)[0] = 1.0 / (L -> diag)[0] * beta;
+
+    for (int i = 1 ; i < (n - 1) ; i ++){
+        (L -> diag)[i] = sqrt(alpha - pow((L -> sous_diag[i - 1]), 2));
+        (L -> sous_diag)[i] = 1.0 / (L -> diag[i]) * beta;
+    }
+
+    (L -> diag)[n - 1] = sqrt(alpha - pow((L -> sous_diag[n - 2]), 2));
+
+}

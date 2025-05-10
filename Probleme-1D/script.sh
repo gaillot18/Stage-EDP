@@ -1,4 +1,4 @@
-BIN="./Binaire"
+BIN="./Binaires"
 
 # Compilation
 

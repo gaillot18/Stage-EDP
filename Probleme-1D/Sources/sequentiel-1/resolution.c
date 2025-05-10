@@ -5,7 +5,7 @@
 # include <math.h>
 # include <float.h>
 
-# include "../../Librairie/sequentiel-1.h"
+# include "../../Librairies/sequentiel-1.h"
 
 # define pi 3.14159265358979323846
 
