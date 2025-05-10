@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../librairie/parallele.h"
+# include "../../Librairie/parallele.h"
 
 # define SORTIE
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv){
     # ifdef SORTIE
     if (rang == 0){
         erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-        afficher_vecteur(u, nb_pt);
+        afficher_vecteur_double(u, nb_pt);
         printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
     }
     # endif

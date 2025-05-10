@@ -1,13 +1,9 @@
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/time.h>
 # include <math.h>
 # ifdef USE_MPI
 # include <mpi.h>
 # endif
 
-//# include "../lib/lib0.h"
-
+// Initialiser une matrice carré à 0
 void init_matrice_carre_zero(int n, double *A){
 
     for (int i = 0 ; i < n * n ; i ++){
@@ -16,6 +12,7 @@ void init_matrice_carre_zero(int n, double *A){
 
 }
 
+// Somme de matrices
 void somme_matrice_carre(double alpha, double *A, double beta, double *B, int n, double *C){
 
     for (int i = 0 ; i < n ; i ++){
@@ -26,6 +23,7 @@ void somme_matrice_carre(double alpha, double *A, double beta, double *B, int n,
 
 }
 
+// Produit de matrices
 void produit_matrice_carre(double alpha, double *A, double *B, int n, double *C){
 
     init_matrice_carre_zero(n, C);
@@ -52,6 +50,7 @@ void produit_matrice_carre(double alpha, double *A, double *B, int n, double *C)
    
 }
 
+// Norme L2 de la différence de deux vecteurs
 double norme_L2_diff(double *u, double *v, int n){
 
     double res = 0;
@@ -67,6 +66,7 @@ double norme_L2_diff(double *u, double *v, int n){
 
 }
 
+// Norme L2 d'un vecteur
 double norme_L2(double *u, int n){
 
     double res = 0;

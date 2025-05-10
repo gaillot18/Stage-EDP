@@ -6,7 +6,7 @@
 # include <mpi.h>
 # include <float.h>
 
-# include "../../librairie/parallele.h"
+# include "../../Librairie/parallele.h"
 
 # define SORTIE
 

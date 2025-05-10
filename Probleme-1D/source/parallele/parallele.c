@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../librairie/parallele.h"
+# include "../../Librairie/parallele.h"
 
 # define SORTIE
 
@@ -12,7 +12,7 @@ void affichage_ordonne(double *u_divise, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
             if (rang == i){
                 printf("rang = %d, %s :\n", rang, message);
-                afficher_vecteur(u_divise, nb_pt_divise);
+                afficher_vecteur_double(u_divise, nb_pt_divise);
             }
             MPI_Barrier(MPI_COMM_WORLD);
         }

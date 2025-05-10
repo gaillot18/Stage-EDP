@@ -3,7 +3,7 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../../librairie/sequentiel.h"
+# include "../../Librairie/sequentiel.h"
 
 # define SORTIE 1
 
@@ -75,7 +75,7 @@ int main(int argc, char **argv){
     // ======================================================
     erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
     # ifdef SORTIE
-    afficher_vecteur(u, nb_pt);
+    afficher_vecteur_double(u, nb_pt);
     printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
     # endif
 
