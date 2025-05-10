@@ -3,16 +3,13 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../../Librairie/sequentiel-1.h"
+# include "../../Librairie/sequentiel-2.h"
 
 # define SORTIE 1
 
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
-int N;
-int nb_pt;
-int nb_iterations;
 
 int main(int argc, char **argv){
 
@@ -24,19 +21,12 @@ int main(int argc, char **argv){
     struct timeval temps_fin;
     double temps;
     // Buffers
-    double *f;
-    double *u;
-    double *u_exact;
     // Résultats
-    double erreur_L2 = 0;
-    nb_iterations = 0;
     // Fichiers
     FILE *descripteur;
     char *nom_fichier_data;
     char *nom_fichier_txt;
     // Paramètres
-    N = 30;
-    nb_pt = N + 1;
 
 
 
@@ -53,10 +43,6 @@ int main(int argc, char **argv){
     // ======================================================
     // Calcul de f_divise, u_divise et u_exact
     // ======================================================
-    f_0(&f);
-    u = (double *)malloc(nb_pt * sizeof(double));
-    u_exact = (double *)malloc(nb_pt * sizeof(double));
-    calculer_u_exact(u_0, u_exact);
 
 
 
@@ -64,7 +50,7 @@ int main(int argc, char **argv){
     // Calcul de u avec mesure de temps
     // ======================================================
     gettimeofday(&temps_debut, NULL);
-    calculer_u_jacobi(f, u);
+    // Calcul
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
@@ -73,10 +59,7 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
     # ifdef SORTIE
-    afficher_vecteur_double(u, nb_pt);
-    printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
     # endif
 
 
@@ -84,22 +67,12 @@ int main(int argc, char **argv){
     // ======================================================
     // Sauvegarde de u dans un fichier
     // ======================================================
-    nom_fichier_data = (char *)malloc(128 * sizeof(char));
-    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-    sprintf(nom_fichier_data, "./texte/resultats0.data");
-    sprintf(nom_fichier_txt, "./texte/resultats0.txt");
-    ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
 
 
 
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    free(nom_fichier_data);
-    free(nom_fichier_txt);
-    free(f);
-    free(u_exact);
-    free(u);
 
 
 
