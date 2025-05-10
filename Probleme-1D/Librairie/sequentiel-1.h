@@ -25,16 +25,7 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 
 
 // ======================================================
-// ../Source/Parallele/parallele.c
-// ======================================================
-void affichage_ordonne(double *u_divise, char *message);
-void infos_processus(int nb_pt, int *nb_pt_divise, int *i_debut, int *i_fin);
-void infos_topologie(int *cpu_bord, int *voisin_gauche, int *voisin_droite);
-void infos_gather(int **deplacements, int **nb_elements_recus);
-
-
-// ======================================================
-// ../Source/Parallele/resolution.c
+// ../../Sources/Fonctions-numeriques/fonctions.c
 // ======================================================
 void f_0(double **f);
 void f_1(double **f);
@@ -42,7 +33,13 @@ double u_0(double x);
 double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
 void generer_f(void (*fonction)(double *, int), double *f);
+
+
+// ======================================================
+// ../Source/Parallele/resolution.c
+// ======================================================
 void calculer_u_jacobi(double *f, double *u);
+void calculer_u_gaussseidel(double *f, double *u);
 
 
 // ======================================================
@@ -51,11 +48,3 @@ void calculer_u_jacobi(double *f, double *u);
 extern int N;
 extern int nb_pt;
 extern int nb_iterations;
-extern int rang;
-extern int nb_cpu;
-extern int nb_pt_divise;
-extern int i_debut;
-extern int i_fin;
-extern int cpu_bord;
-extern int voisin_gauche;
-extern int voisin_droite;

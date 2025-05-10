@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairie/parallele.h"
+# include "../../Librairie/parallele-1.h"
 
 # define SORTIE
 

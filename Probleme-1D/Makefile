@@ -6,9 +6,10 @@ LIB = ./Librairie
 OBJ = ./Objet
 SRC = ./Source
 
-FCT = Fonctions-communes
-PRL = Parallele
-SQT = Sequentiel
+FCC = Fonctions-communes
+PRL1 = parallele-1
+SQT1 = sequentiel-1
+FCN = Fonctions-numeriques
 
 FLAGS = -g0
 
@@ -22,72 +23,67 @@ endif
 
 .SUFFIXES: .o .c
 
-$(OBJ)/%.o: $(SRC)/%.c
-	$(COMPILER) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+# parallele-1
 
-# parallele
-
-$(BIN)/exe-parallele: $(OBJ)/$(FCT)/$(PRL)/affichage.o $(OBJ)/$(FCT)/$(PRL)/calcul-mat.o $(OBJ)/$(FCT)/$(PRL)/convert.o $(OBJ)/$(PRL)/resolution.o $(OBJ)/$(PRL)/parallele.o $(OBJ)/$(PRL)/main.o
+$(BIN)/parallele-1: $(OBJ)/$(PRL1)/affichage.o $(OBJ)/$(PRL1)/calcul-mat.o $(OBJ)/$(PRL1)/convert.o $(OBJ)/$(PRL1)/resolution.o $(OBJ)/$(PRL1)/parallele.o $(OBJ)/$(PRL1)/main.o
 	$(CCP) $(MPI_FLAGS) $(FLAGS) $^ -o $@
 
-$(OBJ)/$(PRL)/main.o: $(SRC)/$(PRL)/main.c
+$(OBJ)/$(PRL1)/main.o: $(SRC)/$(PRL1)/main.c
 	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
-$(OBJ)/$(PRL)/parallele.o: $(SRC)/$(PRL)/parallele.c
+$(OBJ)/$(PRL1)/parallele.o: $(SRC)/$(PRL1)/parallele.c
 	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
-$(OBJ)/$(PRL)/resolution.o: $(SRC)/$(PRL)/resolution.c
+$(OBJ)/$(PRL1)/resolution.o: $(SRC)/$(PRL1)/resolution.c
 	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
-# sequentiel
+$(OBJ)/$(PRL1)/affichage.o: ../$(FCC)/affichage.c
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
-$(BIN)/exe-sequentiel: $(OBJ)/$(FCT)/$(SQT)/affichage.o $(OBJ)/$(FCT)/$(SQT)/calcul-mat.o $(OBJ)/$(FCT)/$(SQT)/convert.o $(OBJ)/$(SQT)/resolution.o $(OBJ)/$(SQT)/main.o
+$(OBJ)/$(PRL1)/calcul-mat.o: ../$(FCC)/calcul-mat.c
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(PRL1)/convert.o: ../$(FCC)/convert.c
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+
+# sequentiel-1
+
+$(BIN)/sequentiel-1: $(OBJ)/$(SQT1)/affichage.o $(OBJ)/$(SQT1)/calcul-mat.o $(OBJ)/$(SQT1)/convert.o $(OBJ)/$(SQT1)/resolution.o $(OBJ)/$(SQT1)/main.o
 	$(CC) $(FLAGS) $^ -o $@
 
-$(OBJ)/$(SQT)/main.o: $(SRC)/$(SQT)/main.c
-	$(CC) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT)/resolution.o: $(SRC)/$(SQT)/resolution.c
-	$(CC) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-# Fonctions-communes
-
-$(OBJ)/$(FCT)/$(PRL)/affichage.o: ../$(FCT)/affichage.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(FCT)/$(SQT)/affichage.o: ../$(FCT)/affichage.c
+$(OBJ)/$(SQT1)/main.o: $(SRC)/$(SQT1)/main.c
 	$(CC) $(FLAGS) -c $< -o $@
 
-$(OBJ)/$(FCT)/$(PRL)/calcul-mat.o: ../$(FCT)/calcul-mat.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(FCT)/$(SQT)/calcul-mat.o: ../$(FCT)/calcul-mat.c
+$(OBJ)/$(SQT1)/resolution.o: $(SRC)/$(SQT1)/resolution.c
 	$(CC) $(FLAGS) -c $< -o $@
 
-$(OBJ)/$(FCT)/$(PRL)/convert.o: ../$(FCT)/convert.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+$(OBJ)/$(SQT1)/affichage.o: ../$(FCC)/affichage.c
+	$(CC) $(FLAGS) -c $< -o $@
 
-$(OBJ)/$(FCT)/$(SQT)/convert.o: ../$(FCT)/convert.c
+$(OBJ)/$(SQT1)/calcul-mat.o: ../$(FCC)/calcul-mat.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT1)/convert.o: ../$(FCC)/convert.c
 	$(CC) $(FLAGS) -c $< -o $@
 
 .PHONY: clean exe kill
 
-sequentiel: $(BIN)/exe-sequentiel
-parallele: $(BIN)/exe-parallele
+sequentiel-1: $(BIN)/sequentiel-1
+parallele-1: $(BIN)/parallele-1
 
-exe-parallele:
+exe-parallele-1:
 	make clean
-	make parallele
-	mpiexec -n 1 $(BIN)/exe-parallele
+	make parallele-1
+	mpiexec -n 1 $(BIN)/arallele-1
 
-exe-sequentiel:
+exe-sequentiel-1:
 	make clean
-	make sequentiel
-	$(BIN)/exe-sequentiel
+	make sequentiel-1
+	$(BIN)/exe-sequentiel-1
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(FCT)/$(PRL)/*.o $(OBJ)/$(FCT)/$(SQT)/*.o $(OBJ)/$(PRL)/*.o $(OBJ)/$(SQT)/*.o $(BIN)/*
+	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/*
 
 kill:
 	pkill -9 prog

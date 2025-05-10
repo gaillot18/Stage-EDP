@@ -3,7 +3,7 @@
 # include <omp.h>
 # include <sys/time.h>
 
-# include "../../Librairie/sequentiel.h"
+# include "../../Librairie/sequentiel-1.h"
 
 # define SORTIE 1
 

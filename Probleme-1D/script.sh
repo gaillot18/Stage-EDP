@@ -1,22 +1,22 @@
-BIN="./binaire"
+BIN="./Binaire"
 
 # Compilation
 
 make clean
-make sequentiel
-make parallele
+make sequentiel-1
+make parallele-1
 
 # Éxecution
 
-$BIN/exe-sequentiel
+$BIN/sequentiel-1
 sleep 3
-mpiexec -n 1 $BIN/exe-parallele
+mpiexec -n 1 $BIN/parallele-1
 sleep 3
-mpiexec -n 2 $BIN/exe-parallele
+mpiexec -n 2 $BIN/parallele-1
 sleep 3
-mpiexec -n 4 $BIN/exe-parallele
+mpiexec -n 4 $BIN/parallele-1
 sleep 3
-mpiexec -n 6 $BIN/exe-parallele
+mpiexec -n 6 $BIN/parallele-1
 sleep 3
-mpiexec -n 8 $BIN/exe-parallele
+mpiexec -n 8 $BIN/parallele-1
 sleep 3
