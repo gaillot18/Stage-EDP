@@ -9,10 +9,10 @@ extern int nb_iterations;
 // ======================================================
 // ../../Fonctions-communes/affichage.c
 // ======================================================
-void afficher_matrice_carre_double(double *t, int n);
-void afficher_matrice_carre_int(int *t, int n);
-void afficher_vecteur_double(double *t, int n);
-void afficher_vecteur_int(int *t, int n);
+void afficher_matrice_carre_double(double *A, int n);
+void afficher_matrice_carre_int(int *A, int n);
+void afficher_vecteur_double(double *v, int n);
+void afficher_vecteur_int(int *v, int n);
 
 
 // ======================================================

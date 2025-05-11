@@ -28,6 +28,7 @@ int N;
 int nb_pt;
 int nb_iterations;
 
+
 int main(int argc, char **argv){
 
     // ======================================================
@@ -46,11 +47,10 @@ int main(int argc, char **argv){
     // Buffers rang 0
     double *u = NULL;
     double *u_exact = NULL;
-    // Résultats
+    // Autres résultats
     double erreur_L2 = 0;
     nb_iterations = 0;
     // Fichiers
-    FILE *descripteur;
     char *nom_fichier_data;
     char *nom_fichier_txt;
     // Paramètres
@@ -124,7 +124,9 @@ int main(int argc, char **argv){
     # ifdef SORTIE
     if (rang == 0){
         erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-        afficher_vecteur_double(u, nb_pt);
+        if (nb_pt <= 100){
+            afficher_vecteur_double(u, nb_pt);
+        }
         printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
     }
     # endif

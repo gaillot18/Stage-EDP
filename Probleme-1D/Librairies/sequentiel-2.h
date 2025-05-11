@@ -19,10 +19,10 @@ struct mat_2bandes{
 // ======================================================
 // ../../Fonctions-communes/affichage.c
 // ======================================================
-void afficher_matrice_carre_double(double *t, int n);
-void afficher_matrice_carre_int(int *t, int n);
-void afficher_vecteur_double(double *t, int n);
-void afficher_vecteur_int(int *t, int n);
+void afficher_matrice_carre_double(double *A, int n);
+void afficher_matrice_carre_int(int *A, int n);
+void afficher_vecteur_double(double *v, int n);
+void afficher_vecteur_int(int *v, int n);
 
 
 // ======================================================
@@ -47,6 +47,7 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 // ======================================================
 void afficher_mat_2bandes(struct mat_2bandes *A);
 void afficher_mat_2bandes_totale(struct mat_2bandes *A);
+void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B);
 
 
 // ======================================================
@@ -59,3 +60,6 @@ double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
 void generer_f(void (*fonction)(double *, int), double *f);
 void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2bandes *L);
+void resoudre_cholesky_descente(struct mat_2bandes *L, double *f, double *y);
+void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u);
+void resoudre_cholesky(double *f, double *u);
