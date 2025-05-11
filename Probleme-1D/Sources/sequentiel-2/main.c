@@ -43,7 +43,7 @@ int main(int argc, char **argv){
     // ======================================================
     # ifdef SORTIE
     printf("------------------------------------------------------------\n");
-    printf("Éxecution séquentielle\n");
+    printf("Éxecution séquentielle solution 2\n");
     # endif
 
 

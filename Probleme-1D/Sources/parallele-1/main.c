@@ -69,7 +69,7 @@ int main(int argc, char **argv){
     # ifdef SORTIE
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Éxecution parallèle pour %d processus\n", nb_cpu);
+        printf("Éxecution parallèle pour %d processus solution 1\n", nb_cpu);
     }
     # endif
 

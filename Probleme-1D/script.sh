@@ -2,9 +2,7 @@ BIN="./Binaires"
 
 # Compilation
 
-make clean
-make sequentiel-1
-make parallele-1
+make all
 
 # Éxecution
 
@@ -20,3 +18,4 @@ mpiexec -n 6 $BIN/parallele-1
 sleep 3
 mpiexec -n 8 $BIN/parallele-1
 sleep 3
+$BIN/sequentiel-2

@@ -99,7 +99,7 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean exe kill
 
-all: sequentiel-1 parallele-1 sequentiel-2
+all: clean sequentiel-1 parallele-1 sequentiel-2
 
 sequentiel-1: $(BIN)/$(SQT1)
 
@@ -108,17 +108,14 @@ parallele-1: $(BIN)/$(PRL1)
 sequentiel-2: $(BIN)/$(SQT2)
 
 exe-sequentiel-1:
-	make clean
 	make $(SQT1)
 	$(BIN)/$(SQT1)
 
 exe-parallele-1:
-	make clean
 	make $(PRL1)
 	mpiexec -n 1 $(BIN)/$(PRL1)
 
 exe-sequentiel-2:
-	make clean
 	make $(SQT2)
 	$(BIN)/$(SQT2)
 
