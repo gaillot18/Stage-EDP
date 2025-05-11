@@ -99,6 +99,8 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean exe kill
 
+all: sequentiel-1 parallele-1 sequentiel-2
+
 sequentiel-1: $(BIN)/$(SQT1)
 
 parallele-1: $(BIN)/$(PRL1)
