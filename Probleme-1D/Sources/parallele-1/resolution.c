@@ -135,8 +135,8 @@ void calculer_u_jacobi(double *f, double *u){
         }
 
         // Test d'arrêt
-        norme_diff = norme_L2_diff(u, u_anc, nb_pt_divise) * norme_L2_diff(u, u_anc, nb_pt_divise);
-        norme = norme_L2(u_anc, nb_pt_divise) * norme_L2(u_anc, nb_pt_divise);
+        norme_diff = carre_norme_L2_diff(u, u_anc, nb_pt_divise);
+        norme = carre_norme_L2(u_anc, nb_pt_divise);
         MPI_Reduce(&norme_diff, &norme_diff_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         MPI_Reduce(&norme, &norme_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         if (rang == 0){

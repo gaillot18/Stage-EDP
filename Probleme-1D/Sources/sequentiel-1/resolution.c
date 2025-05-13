@@ -110,11 +110,12 @@ void calculer_u_jacobi(double *f, double *u){
 }
 
 
+// Test de Gauss-Seidel sans calcul de la norme
 void calculer_u_gaussseidel(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 0;
+    int nb_iteration_max = 50000;
     u[0] = 0;
     u[nb_pt - 1] = 0;
 
@@ -140,6 +141,7 @@ void calculer_u_gaussseidel(double *f, double *u){
         }
 
     }
+    nb_iterations = nb_iteration_max;
 
     free(u_anc);
 

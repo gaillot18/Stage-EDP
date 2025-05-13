@@ -15,6 +15,7 @@ int N;
 int nb_pt;
 
 
+
 int main(int argc, char **argv){
 
     // ======================================================
@@ -29,13 +30,21 @@ int main(int argc, char **argv){
     double *u;
     double *u_exact;
     // Autres résultats
-    double erreur_L2 = 0;
+    double erreur_infty;
+    double erreur_L2;
     // Fichiers
     char *nom_fichier_data;
     char *nom_fichier_txt;
     // Paramètres
-    N = 1000;
+    if (argc > 1){
+        N = atoi(argv[1]);
+    }
+    else{
+        // Si pas d'argument, alors on affiche juste l'illustration de la strucutre mat_2bandes
+        N = 0;
+    }
     nb_pt = N + 1;
+
 
 
     // ======================================================
@@ -43,20 +52,21 @@ int main(int argc, char **argv){
     // ======================================================
     # ifdef SORTIE
     printf("------------------------------------------------------------\n");
-    printf("Éxecution séquentielle solution 2\n");
+    printf("Éxecution séquentielle de : sequentiel-2\n");
     # endif
+
 
 
     // ======================================================
     // Illustration de la structure mat_2bandes
     // ======================================================
-    # ifdef EXEMPLE
+    if (N == 0)
     {
         printf("\n-------------------------\n");
         printf("Illustration de la structure mat_2bandes (exemple pour N petit) :\n");
-        int N = 5;
+        int N = 7;
         int nb_pt = N + 1;
-        double h = 1.0 / (nb_pt + 1 - 2);
+        double h = 1.0 / N;
         double alpha = 2.0 / (h * h);
         double beta = - 1.0 / (h * h);
         struct mat_2bandes L;
@@ -77,8 +87,9 @@ int main(int argc, char **argv){
         free(L.sous_diag);
         printf("-------------------------\n\n");
 
+        return 0;
     }
-    # endif
+
 
 
     // ======================================================
@@ -90,6 +101,7 @@ int main(int argc, char **argv){
     calculer_u_exact(u_1, u_exact);
 
 
+
     // ======================================================
     // Calcul de u avec mesure de temps
     // ======================================================
@@ -99,15 +111,17 @@ int main(int argc, char **argv){
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
 
+
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
     erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
+    erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
     # ifdef SORTIE
     if (nb_pt <= 100){
         afficher_vecteur_double(u, nb_pt);
     }
-    printf("erreur_L2 = %f\ntemps = %f sec\n", erreur_L2, temps);
+    printf("N = %d\nerreur_L2 = %f\nerreur_infty = %f\ntemps = %f sec\n", N, erreur_L2, erreur_infty, temps);
     # endif
 
 
@@ -122,6 +136,7 @@ int main(int argc, char **argv){
     ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
 
 
+
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
@@ -130,6 +145,7 @@ int main(int argc, char **argv){
     free(f);
     free(u_exact);
     free(u);
+
 
 
     // ======================================================

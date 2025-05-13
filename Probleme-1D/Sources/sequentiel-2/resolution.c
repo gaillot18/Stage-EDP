@@ -78,7 +78,7 @@ void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2ban
     (L -> diag)[0] = sqrt(alpha);
     (L -> sous_diag)[0] = beta / (L -> diag)[0];
 
-    for (int i = 1 ; i < (n - 1) ; i ++){
+    for (int i = 1 ; i < n - 1 ; i ++){
         (L -> diag)[i] = sqrt(alpha - pow((L -> sous_diag[i - 1]), 2));
         (L -> sous_diag)[i] = beta / (L -> diag[i]);
     }
@@ -113,7 +113,6 @@ void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u){
         u[i] = (y[i] - (L -> sous_diag)[i] * u[i + 1]) / (L -> diag)[i];
     }
 
-
 }
 
 
@@ -130,7 +129,7 @@ void resoudre_cholesky(double *f, double *u){
     calculer_cholesky_tridiag(alpha, beta, nb_pt - 2, &L);
 
     double *y = (double *)malloc((nb_pt - 2) * sizeof(double));
-    resoudre_cholesky_descente(&L, f, y);
+    resoudre_cholesky_descente(&L, &(f[1]), y); // Laisser f[0] pour le bord
     resoudre_cholesky_remontee(&L, y, &(u[1])); // Laisser u[0] pour le bord
 
     free(L.diag);

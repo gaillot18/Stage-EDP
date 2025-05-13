@@ -30,7 +30,10 @@ void init_matrice_carre_zero(int N, double *A);
 void somme_matrice_carre(double alpha, double *A, double beta, double *B, int N, double *C);
 void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C);
 double norme_L2_diff(double *u, double *v, int n);
+double norme_infty_diff(double *u, double *v, int n);
+double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
+double carre_norme_L2(double *u, int n);
 
 
 // ======================================================
@@ -44,8 +47,8 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 // ../Source/Parallele/parallele.c
 // ======================================================
 void affichage_ordonne(double *u_divise, char *message);
-void infos_processus(int nb_pt, int *nb_pt_divise, int *i_debut, int *i_fin);
-void infos_topologie(int *cpu_bord, int *voisin_gauche, int *voisin_droite);
+void infos_processus();
+void infos_topologie();
 void infos_gather(int **deplacements, int **nb_elements_recus);
 
 

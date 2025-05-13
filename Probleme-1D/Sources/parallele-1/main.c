@@ -29,6 +29,7 @@ int nb_pt;
 int nb_iterations;
 
 
+
 int main(int argc, char **argv){
 
     // ======================================================
@@ -48,7 +49,7 @@ int main(int argc, char **argv){
     double *u = NULL;
     double *u_exact = NULL;
     // Autres résultats
-    double erreur_L2 = 0;
+    double erreur_L2;
     nb_iterations = 0;
     // Fichiers
     char *nom_fichier_data;
@@ -69,7 +70,7 @@ int main(int argc, char **argv){
     # ifdef SORTIE
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Éxecution parallèle pour %d processus solution 1\n", nb_cpu);
+        printf("Éxecution parallèle (pour %d processus) de : parallele-1\n", nb_cpu);
     }
     # endif
 
@@ -78,9 +79,12 @@ int main(int argc, char **argv){
     // ======================================================
     // Récupération des informations de chaque processus
     // ======================================================
-    infos_processus(nb_pt, &nb_pt_divise, &i_debut, &i_fin);
-    infos_topologie(&cpu_bord, &voisin_gauche, &voisin_droite);
-    infos_gather(&deplacements, &nb_elements_recus);
+    infos_processus();
+    infos_topologie();
+    if (rang == 0){
+        infos_gather(&deplacements, &nb_elements_recus);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
     # ifdef SORTIE
     if (rang == 0){
         printf("nb_elements_recu = "); afficher_vecteur_int(nb_elements_recus, nb_cpu);
@@ -127,7 +131,7 @@ int main(int argc, char **argv){
         if (nb_pt <= 100){
             afficher_vecteur_double(u, nb_pt);
         }
-        printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
+        printf("N = %d\nnb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_iterations, erreur_L2, temps);
     }
     # endif
     

@@ -3,7 +3,6 @@
 // ======================================================
 extern int N;
 extern int nb_pt;
-extern int nb_iterations;
 
 
 // ======================================================
@@ -11,8 +10,8 @@ extern int nb_iterations;
 // ======================================================
 struct mat_2bandes{
     int n;
-    double *diag;
-    double *sous_diag;
+    double *diag; // taille n
+    double *sous_diag; // taille n - 1
 };
 
 
@@ -32,7 +31,10 @@ void init_matrice_carre_zero(int N, double *A);
 void somme_matrice_carre(double alpha, double *A, double beta, double *B, int N, double *C);
 void produit_matrice_carre(double alpha, double *A, double *B, int N, double *C);
 double norme_L2_diff(double *u, double *v, int n);
+double norme_infty_diff(double *u, double *v, int n);
+double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
+double carre_norme_L2(double *u, int n);
 
 
 // ======================================================
@@ -48,6 +50,7 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 void afficher_mat_2bandes(struct mat_2bandes *A);
 void afficher_mat_2bandes_totale(struct mat_2bandes *A);
 void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B);
+void mat_2bandes_vers_mat_trans(struct mat_2bandes *A, double **B);
 
 
 // ======================================================

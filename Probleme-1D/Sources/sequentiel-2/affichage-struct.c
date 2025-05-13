@@ -73,3 +73,27 @@ void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B){
     }
 
 }
+
+
+// Convertir une structure mat_2bandes en matrice carré (transposée)
+void mat_2bandes_vers_mat_trans(struct mat_2bandes *A, double **B){
+
+    int n = A -> n;
+    double zero = 0.0;
+
+    *B = (double *)malloc(n * n * sizeof(double));
+    for (int i = 0 ; i < n ; i ++){
+        for (int j = 0 ; j < n ; j ++){
+            if (i == j){
+                (*B)[i * n + j] = (A -> diag)[i];
+            }
+            else if (i == j + 1){
+                (*B)[j * n + i] = (A -> sous_diag)[j];
+            }
+            else{
+                (*B)[i * n + j] = zero;
+            }
+        }
+    }
+
+}

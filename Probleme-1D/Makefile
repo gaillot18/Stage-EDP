@@ -117,7 +117,7 @@ exe-parallele-1:
 
 exe-sequentiel-2:
 	make $(SQT2)
-	$(BIN)/$(SQT2)
+	$(BIN)/$(SQT2) 2
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt

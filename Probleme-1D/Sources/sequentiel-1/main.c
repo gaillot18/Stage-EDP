@@ -15,6 +15,7 @@ int nb_pt;
 int nb_iterations;
 
 
+
 int main(int argc, char **argv){
 
     // ======================================================
@@ -29,7 +30,7 @@ int main(int argc, char **argv){
     double *u;
     double *u_exact;
     // Autres résultats
-    double erreur_L2 = 0;
+    double erreur_L2;
     nb_iterations = 0;
     // Fichiers
     char *nom_fichier_data;
@@ -39,13 +40,12 @@ int main(int argc, char **argv){
     nb_pt = N + 1;
 
 
-
     // ======================================================
     // Initialisation
     // ======================================================
     # ifdef SORTIE
     printf("------------------------------------------------------------\n");
-    printf("Éxecution séquentielle solution 1\n");
+    printf("Éxecution séquentielle de : sequentiel-1\n");
     # endif
 
 
@@ -78,7 +78,7 @@ int main(int argc, char **argv){
     if (nb_pt <= 100){
         afficher_vecteur_double(u, nb_pt);
     }
-    printf("nb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", nb_iterations, erreur_L2, temps);
+    printf("N = %d\nnb_iterations = %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_iterations, erreur_L2, temps);
     # endif
 
 
