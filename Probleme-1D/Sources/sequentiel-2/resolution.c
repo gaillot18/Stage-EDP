@@ -10,6 +10,7 @@
 # define pi 3.14159265358979323846
 
 
+
 void f_0(double **f){
 
     *f = (double *)malloc(nb_pt * sizeof(double));
@@ -18,6 +19,7 @@ void f_0(double **f){
     }
 
 }
+
 
 
 void f_1(double **f){
@@ -31,6 +33,7 @@ void f_1(double **f){
 }
 
 
+
 double u_0(double x){
 
     double res = 0.5 * x * (1 - x);
@@ -40,6 +43,7 @@ double u_0(double x){
 }
 
 
+
 double u_1(double x){
 
     double res = sin(pi * x);
@@ -47,6 +51,7 @@ double u_1(double x){
     return res;
 
 }
+
 
 
 void calculer_u_exact(double (*fonction)(double), double *u){
@@ -59,12 +64,14 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 }
 
 
+
 void generer_f(void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
+
 
 
 // Construire la matrice creuse (buffer 1D) de la décomposition de Cholesky d'une matrice tridiagonale
@@ -88,6 +95,7 @@ void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2ban
 }
 
 
+
 // Résoudre Ly = f (descente)
 void resoudre_cholesky_descente(struct mat_2bandes *L, double *f, double *y){
 
@@ -102,6 +110,7 @@ void resoudre_cholesky_descente(struct mat_2bandes *L, double *f, double *y){
 }
 
 
+
 // Résoudre L^{T}u = y (remontée)
 void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u){
 
@@ -114,6 +123,7 @@ void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u){
     }
 
 }
+
 
 
 // Résoudre Au = f avec les conditions aux bords

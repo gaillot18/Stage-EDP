@@ -6,6 +6,8 @@ make all
 
 # Éxecution
 
+echo EXECUTIONS POUR PROBLEME-1D
+sleep 3
 $BIN/sequentiel-1
 sleep 3
 mpiexec -n 1 $BIN/parallele-1

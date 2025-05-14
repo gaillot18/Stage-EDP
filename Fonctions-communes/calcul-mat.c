@@ -3,6 +3,8 @@
 # include <mpi.h>
 # endif
 
+
+
 // Initialiser une matrice carré à 0
 void init_matrice_carre_zero(int n, double *A){
 
@@ -11,6 +13,7 @@ void init_matrice_carre_zero(int n, double *A){
     }
 
 }
+
 
 
 // Somme de matrices
@@ -23,6 +26,7 @@ void somme_matrice_carre(double alpha, double *A, double beta, double *B, int n,
     }
 
 }
+
 
 
 // Produit de matrices
@@ -53,6 +57,7 @@ void produit_matrice_carre(double alpha, double *A, double *B, int n, double *C)
 }
 
 
+
 // Norme L2 de la différence de deux vecteurs
 double norme_L2_diff(double *u, double *v, int n){
 
@@ -68,6 +73,8 @@ double norme_L2_diff(double *u, double *v, int n){
     return res;
 
 }
+
+
 
 // Norme infinie de la différence de deux vecteurs
 double norme_infty_diff(double *u, double *v, int n){
@@ -86,6 +93,7 @@ double norme_infty_diff(double *u, double *v, int n){
 }
 
 
+
 // Carré de la norme L2 de la différence de deux vecteurs
 double carre_norme_L2_diff(double *u, double *v, int n){
 
@@ -99,6 +107,7 @@ double carre_norme_L2_diff(double *u, double *v, int n){
     return res;
 
 }
+
 
 
 // Norme L2 d'un vecteur
@@ -115,6 +124,7 @@ double norme_L2(double *u, int n){
     return res;
 
 }
+
 
 
 // Carré de la norme L2 d'un vecteur

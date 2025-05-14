@@ -1,5 +1,7 @@
 # include <stdio.h>
 
+
+
 // Convertir un fichier data contenant des double en fichier txt
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt){
 
@@ -19,6 +21,8 @@ void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichi
     fclose(fichier_txt);
 
 }
+
+
 
 // Écrire un tableau de doubles dans un fichier data
 void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n){

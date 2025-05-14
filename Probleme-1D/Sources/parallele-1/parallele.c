@@ -9,6 +9,7 @@
 # define SORTIE
 
 
+
 void affichage_ordonne(double *u_divise, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
             if (rang == i){
@@ -18,6 +19,7 @@ void affichage_ordonne(double *u_divise, char *message){
             MPI_Barrier(MPI_COMM_WORLD);
         }
 }
+
 
 
 void infos_processus(){
@@ -38,6 +40,7 @@ void infos_processus(){
     MPI_Barrier(MPI_COMM_WORLD);
 
 }
+
 
 
 void infos_topologie(){
@@ -63,6 +66,7 @@ void infos_topologie(){
     MPI_Barrier(MPI_COMM_WORLD);
 
 }
+
 
 
 void infos_gather(int **deplacements, int **nb_elements_recus){

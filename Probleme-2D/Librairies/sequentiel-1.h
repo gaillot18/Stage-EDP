@@ -3,17 +3,7 @@
 // ======================================================
 extern int N;
 extern int nb_pt;
-
-
-
-// ======================================================
-// Structures
-// ======================================================
-struct mat_2bandes{
-    int n;
-    double *diag; // taille n
-    double *sous_diag; // taille n - 1
-};
+extern int nb_iterations;
 
 
 
@@ -50,25 +40,11 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 
 
 // ======================================================
-// ../Source/sequentiel-2/affichage.c
+// ../Source/parallele-1/resolution.c
 // ======================================================
-void afficher_mat_2bandes(struct mat_2bandes *A);
-void afficher_mat_2bandes_totale(struct mat_2bandes *A);
-void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B);
-void mat_2bandes_vers_mat_trans(struct mat_2bandes *A, double **B);
-
-
-
-// ======================================================
-// ../Source/sequentiel-2/resolution.c
-// ======================================================
-void f_0(double **f);
-void f_1(double **f);
-double u_0(double x);
-double u_1(double x);
-void calculer_u_exact(double (*fonction)(double), double *u);
-void generer_f(void (*fonction)(double *, int), double *f);
-void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2bandes *L);
-void resoudre_cholesky_descente(struct mat_2bandes *L, double *f, double *y);
-void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u);
-void resoudre_cholesky(double *f, double *u);
+//void f_0(double **f);
+//void f_1(double **f);
+//double u_0(double x);
+//double u_1(double x);
+//void calculer_u_exact(double (*fonction)(double), double *u);
+//void generer_f(void (*fonction)(double *, int), double *f);

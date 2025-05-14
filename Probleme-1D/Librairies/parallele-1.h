@@ -14,6 +14,7 @@ extern int voisin_gauche;
 extern int voisin_droite;
 
 
+
 // ======================================================
 // ../../Fonctions-communes/affichage.c
 // ======================================================
@@ -21,6 +22,7 @@ void afficher_matrice_carre_double(double *A, int n);
 void afficher_matrice_carre_int(int *A, int n);
 void afficher_vecteur_double(double *v, int n);
 void afficher_vecteur_int(int *v, int n);
+
 
 
 // ======================================================
@@ -36,11 +38,13 @@ double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
 
 
+
 // ======================================================
 // ../../Fonctions-communes/convert.c
 // ======================================================
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
 void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
+
 
 
 // ======================================================
@@ -50,6 +54,7 @@ void affichage_ordonne(double *u_divise, char *message);
 void infos_processus();
 void infos_topologie();
 void infos_gather(int **deplacements, int **nb_elements_recus);
+
 
 
 // ======================================================

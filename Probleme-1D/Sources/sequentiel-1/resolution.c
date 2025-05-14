@@ -10,6 +10,7 @@
 # define pi 3.14159265358979323846
 
 
+
 void f_0(double **f){
 
     *f = (double *)malloc(nb_pt * sizeof(double));
@@ -18,6 +19,7 @@ void f_0(double **f){
     }
 
 }
+
 
 
 void f_1(double **f){
@@ -31,6 +33,7 @@ void f_1(double **f){
 }
 
 
+
 double u_0(double x){
 
     double res = 0.5 * x * (1 - x);
@@ -40,6 +43,7 @@ double u_0(double x){
 }
 
 
+
 double u_1(double x){
 
     double res = sin(pi * x);
@@ -47,6 +51,7 @@ double u_1(double x){
     return res;
 
 }
+
 
 
 void calculer_u_exact(double (*fonction)(double), double *u){
@@ -59,12 +64,14 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 }
 
 
+
 void generer_f(void (*fonction)(double *, int), double *f){
 
     int N_i = N - 2;
     fonction(f, N_i);
 
 }
+
 
 
 void calculer_u_jacobi(double *f, double *u){
@@ -108,6 +115,7 @@ void calculer_u_jacobi(double *f, double *u){
     free(u_anc);
 
 }
+
 
 
 // Test de Gauss-Seidel sans calcul de la norme
