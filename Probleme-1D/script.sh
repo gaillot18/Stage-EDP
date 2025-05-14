@@ -32,8 +32,6 @@ $BIN/sequentiel-2 5
 sleep 1
 $BIN/sequentiel-2 10
 sleep 1
-$BIN/sequentiel-2 50
-sleep 1
 $BIN/sequentiel-2 100
 sleep 1
 $BIN/sequentiel-2 1000

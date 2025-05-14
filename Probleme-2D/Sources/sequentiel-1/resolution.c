@@ -48,28 +48,50 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
+void init_u_anc(double **u_anc, double param){
+
+    *u_anc = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+
+    // Conditions aux bords
+    // Ligne j = 0
+    for (int i = 0 ; i < nb_pt ; i ++){
+        (*u_anc)[i] = 0;
+    }
+    // Ligne j = nb_pt - 1
+    for (int i = 0 ; i < nb_pt ; i ++){
+        (*u_anc)[(nb_pt - 1) * nb_pt + i] = 0;
+    }
+    // Colonne i = 0
+    for (int j = 0 ; j < nb_pt ; j ++){
+        (*u_anc)[j * nb_pt] = 0;
+    }
+    // Colonne i = nb_pt - 1
+    for (int j = 0 ; j < nb_pt ; j ++){
+        (*u_anc)[j * nb_pt + nb_pt - 1] = 0;
+    }
+
+    // Paramètre
+    for (int i = 1 ; i < nb_pt - 1 ; i ++){
+        for (int j = 1 ; j < nb_pt - 1 ; j ++){
+            (*u_anc)[j * nb_pt + i] = param;
+        }
+    }
+
+}
+
+
+
 void calculer_u_jacobi(double *f, double *u){
 
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
     double norme = DBL_MAX;
+    double *u_anc;
+    double param = 0.0;
 
-    // 2 boucles pour éviter des remplacement dans le cache successifs
-    // Ligne j = 0
-    for (int i = 0 ; i < nb_pt ; i ++){
-        u[i] = 0;
-    }
-    // Ligne j = nb_pt - 1
-    for (int i = 0 ; i < nb_pt ; i ++){
-        u[(nb_pt - 1) * nb_pt + i] = 0;
-    }
-
-    // Vecteur de départ 
-    double *u_anc = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
-        u_anc[i] = 0;
-    }
+    // Vecteur de départ
+    init_u_anc(&u_anc, param);
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > DBL_EPSILON ; iteration ++){

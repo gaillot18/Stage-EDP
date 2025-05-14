@@ -71,20 +71,34 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
+void init_u_anc(double **u_anc, double param){
+
+    *u_anc = (double *)malloc(nb_pt_divise * sizeof(double));
+    for (int i = 0 ; i < nb_pt_divise ; i ++){
+        (*u_anc)[i] = param;
+    }
+    if (cpu_bord == -1 || cpu_bord == 2){
+        (*u_anc)[0] = 0;
+    }
+    if (cpu_bord == 1 || cpu_bord == 2){
+        (*u_anc)[nb_pt_divise - 1] = 0;
+    }
+
+}
+
+
+
 void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
-    double norme = DBL_MAX;
-    double norme_diff;
-    double norme_master;
-    double norme_diff_master;
-    double buffer_fantome_gauche;
-    double buffer_fantome_droite;
+    double norme = DBL_MAX, norme_diff;
+    double norme_master, norme_diff_master;
+    double buffer_fantome_gauche, buffer_fantome_droite;
     int etiquettes[2] = {1, 2};
-    MPI_Status statut;
-    MPI_Status statuts[2];
-    MPI_Request requetes[2];
+    MPI_Status statut; MPI_Status statuts[2]; MPI_Request requetes[2];
+    double *u_anc;
+    double param = 0.5;
 
     if (cpu_bord == -1){
         u[0] = 0;
@@ -93,17 +107,8 @@ void calculer_u_jacobi(double *f, double *u){
         u[nb_pt_divise - 1] = 0;
     }
 
-    // Vecteur de départ 
-    double *u_anc = (double *)malloc(nb_pt_divise * sizeof(double));
-    for (int i = 0 ; i < nb_pt_divise ; i ++){
-        u_anc[i] = 0.5;
-    }
-    if (cpu_bord == -1 || cpu_bord == 2){
-        u_anc[0] = 0;
-    }
-    if (cpu_bord == 1 || cpu_bord == 2){
-        u_anc[nb_pt_divise - 1] = 0;
-    }
+    // Vecteur de départ
+    init_u_anc(&u_anc, param);
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
