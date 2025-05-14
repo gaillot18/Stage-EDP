@@ -43,8 +43,8 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 // ../Source/parallele-1/resolution.c
 // ======================================================
 //void f_0(double **f);
-//void f_1(double **f);
+void f_1(double **f);
 //double u_0(double x);
-//double u_1(double x);
-//void calculer_u_exact(double (*fonction)(double), double *u);
-//void generer_f(void (*fonction)(double *, int), double *f);
+double u_1(double x, double y);
+void calculer_u_exact(double (*fonction)(double, double), double *u);
+void calculer_u_jacobi(double *f, double *u);

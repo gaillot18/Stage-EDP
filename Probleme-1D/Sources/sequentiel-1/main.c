@@ -45,7 +45,7 @@ int main(int argc, char **argv){
     // ======================================================
     # ifdef SORTIE
     printf("------------------------------------------------------------\n");
-    printf("Éxecution séquentielle de : sequentiel-1\n");
+    printf("Exécution séquentielle de : sequentiel-1\n");
     # endif
 
 

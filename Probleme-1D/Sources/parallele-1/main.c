@@ -70,7 +70,7 @@ int main(int argc, char **argv){
     # ifdef SORTIE
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Éxecution parallèle (pour %d processus) de : parallele-1\n", nb_cpu);
+        printf("Exécution parallèle (pour %d processus) de : parallele-1\n", nb_cpu);
     }
     # endif
 

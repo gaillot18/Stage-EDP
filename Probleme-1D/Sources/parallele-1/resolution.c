@@ -71,15 +71,6 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
-void generer_f(void (*fonction)(double *, int), double *f){
-
-    int N_i = N - 2;
-    fonction(f, N_i);
-
-}
-
-
-
 void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);

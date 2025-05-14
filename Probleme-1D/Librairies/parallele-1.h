@@ -65,5 +65,4 @@ void f_1(double **f);
 double u_0(double x);
 double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
-void generer_f(void (*fonction)(double *, int), double *f);
 void calculer_u_jacobi(double *f, double *u);

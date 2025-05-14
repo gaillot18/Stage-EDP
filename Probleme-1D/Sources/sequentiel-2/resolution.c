@@ -65,15 +65,6 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
-void generer_f(void (*fonction)(double *, int), double *f){
-
-    int N_i = N - 2;
-    fonction(f, N_i);
-
-}
-
-
-
 // Construire la matrice creuse (buffer 1D) de la décomposition de Cholesky d'une matrice tridiagonale
 // alpha, beta, gamma sont les coefficients des diagonales (pour le problème 1D : alpha = 2 / h^2, beta = -1 / h^2)
 void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2bandes *L){

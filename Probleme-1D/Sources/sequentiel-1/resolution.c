@@ -65,15 +65,6 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
-void generer_f(void (*fonction)(double *, int), double *f){
-
-    int N_i = N - 2;
-    fonction(f, N_i);
-
-}
-
-
-
 void calculer_u_jacobi(double *f, double *u){
 
     int nb_pt = N + 1;
@@ -93,7 +84,6 @@ void calculer_u_jacobi(double *f, double *u){
     u[nb_pt - 1] = 0;
 
     // Itérations
-
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
@@ -128,14 +118,12 @@ void calculer_u_gaussseidel(double *f, double *u){
     u[nb_pt - 1] = 0;
 
     // Vecteur de départ 
-
     double *u_anc = (double *)malloc(nb_pt * sizeof(double));
     for (int i = 0 ; i < nb_pt ; i ++){
         u_anc[i] = 0;
     }
 
     // Itérations
-
     for (int iteration = 0 ; iteration < nb_iteration_max ; iteration ++){
 
         // Schéma
