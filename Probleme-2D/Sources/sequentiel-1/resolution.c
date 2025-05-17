@@ -4,6 +4,7 @@
 # include <sys/time.h>
 # include <math.h>
 # include <float.h>
+# include <limits.h>
 
 # include "../../Librairies/sequentiel-1.h"
 
@@ -84,7 +85,7 @@ void init_u_anc(double **u_anc, double param){
 void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 1000000;
+    int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     double *u_anc;
     double param = 0.0;

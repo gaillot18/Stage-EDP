@@ -27,14 +27,10 @@ void affichage_ordonne(double *u_divise, char *message){
 // Créer la topologie cartésienne 2D du domaine [0, 1] x [0, 1]
 void creer_topologie(){
 
+    int tore[2] = {0, 0};
     dims[0] = 0; dims[1] = 0;
-    tore[0] = 0; tore[1] = 0;
 
     MPI_Dims_create(nb_cpu, 2, dims);
-    
-    if (rang == 0){
-        printf("dims[0] = %d, dims[1] = %d\n", dims[0], dims[1]);
-    }
 
     MPI_Cart_create(MPI_COMM_WORLD, 2, dims, tore, 0, &comm_2D);
 
@@ -65,6 +61,7 @@ void infos_topologie(){
 
 
 
+// Obtenir les intervalles à traiter de chaque processus
 void infos_processus(){
 
     i_debut = (coords[0] * nb_pt) / dims[0];
@@ -80,7 +77,7 @@ void infos_processus(){
 }
 
 
-
+// Créer les types dérivés lignes, colonnes et bloc_send
 void creer_types(){
 
     int taille_send[2] = {nb_pt_div_j + 2, nb_pt_div_i + 2};
@@ -102,32 +99,26 @@ void creer_types(){
 
 
 
-void communiquer(double *u_divise){
+// Effectuer les communications des cellules fantômes
+void communiquer(double *u_div){
 
     // Envoi haut, reception bas
-    MPI_Sendrecv(&(u_divise[IDX(1, nb_pt_div_j)]), 1, ligne, voisins[1], etiquette, &(u_divise[IDX(1, 0)]), 1, ligne, voisins[3], etiquette, comm_2D, &statut);
+    MPI_Sendrecv(&(u_div[IDX(1, nb_pt_div_j)]), 1, ligne, voisins[1], etiquette, &(u_div[IDX(1, 0)]), 1, ligne, voisins[3], etiquette, comm_2D, &statut);
 
     // Envoi bas, reception haut
-    MPI_Sendrecv(&(u_divise[IDX(1, 1)]), 1, ligne, voisins[3], etiquette, &(u_divise[IDX(1, nb_pt_div_j + 1)]), 1, ligne, voisins[1], etiquette, comm_2D, &statut);
+    MPI_Sendrecv(&(u_div[IDX(1, 1)]), 1, ligne, voisins[3], etiquette, &(u_div[IDX(1, nb_pt_div_j + 1)]), 1, ligne, voisins[1], etiquette, comm_2D, &statut);
 
     // Envoi gauche, reception droite
-    MPI_Sendrecv(&(u_divise[IDX(1, 1)]), 1, colonne, voisins[0], etiquette, &(u_divise[IDX(nb_pt_div_i + 1, 1)]), 1, colonne, voisins[2], etiquette, comm_2D, &statut);
+    MPI_Sendrecv(&(u_div[IDX(1, 1)]), 1, colonne, voisins[0], etiquette, &(u_div[IDX(nb_pt_div_i + 1, 1)]), 1, colonne, voisins[2], etiquette, comm_2D, &statut);
 
     // Envoi droite, reception gauche
-    MPI_Sendrecv(&(u_divise[IDX(nb_pt_div_i, 1)]), 1, colonne, voisins[2], etiquette, &(u_divise[IDX(0, 1)]), 1, colonne, voisins[0], etiquette, comm_2D, &statut);
+    MPI_Sendrecv(&(u_div[IDX(nb_pt_div_i, 1)]), 1, colonne, voisins[2], etiquette, &(u_div[IDX(0, 1)]), 1, colonne, voisins[0], etiquette, comm_2D, &statut);
 
 }
 
 
 
-/*void verifier_communication(){
-
-    MPI_Waitall(2 * bord, requetes, statuts);
-
-}*/
-
-
-
+// Regrouper les parties finales dans un vecteur sur le rang 0
 void regrouper_u(double *u_divise, double *u){
 
 

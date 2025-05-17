@@ -18,21 +18,16 @@ int i_debut;
 int i_fin;
 int j_debut;
 int j_fin;
-int cpu_bord;
-int voisin_gauche;
-int voisin_droite;
 // Communicateur 2D
 MPI_Comm comm_2D;
 int dims[2];
-int tore[2];
 int coords[2];
 int voisins[4];
 int bord;
-int coins[4];
 MPI_Datatype ligne;
 MPI_Datatype colonne;
 MPI_Datatype bloc_send;
-int etiquette;
+int etiquette = 1;
 MPI_Status statut;
 // Variable égale pour chaque rang
 int N;
@@ -54,8 +49,8 @@ int main(int argc, char **argv){
     int *nb_elements_recus = NULL;
     int *deplacements = NULL;
     // Buffers MPI
-    double *f_divise;
-    double *u_divise;
+    double *f_div;
+    double *u_div;
     // Buffers rang 0
     double *u = NULL;
     double *u_exact = NULL;
@@ -108,14 +103,13 @@ int main(int argc, char **argv){
     // ======================================================
     // Calcul de f et u_exact
     // ======================================================
-    f_1(&f_divise);
-    u_divise = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
+    f_1(&f_div);
+    u_div = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
     if (rang == 0){
         u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
         u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
         calculer_u_exact(u_1, u_exact);
     }
-    double *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     
 
 
@@ -123,8 +117,8 @@ int main(int argc, char **argv){
     // Calcul de u avec mesure de temps
     // ======================================================
     temps_debut = MPI_Wtime();
-    calculer_u_jacobi(f_divise, u_divise);
-    regrouper_u(u_divise, u);
+    calculer_u_jacobi(f_div, u_div);
+    regrouper_u(u_div, u);
     temps_fin = MPI_Wtime();
     temps = temps_fin - temps_debut;
 
@@ -159,8 +153,8 @@ int main(int argc, char **argv){
     MPI_Type_free(&colonne);
     MPI_Type_free(&bloc_send);
     MPI_Comm_free(&comm_2D);
-    free(u_divise);
-    free(f_divise);
+    free(u_div);
+    free(f_div);
     if (rang == 0){
         free(u_exact);
         free(u);

@@ -118,7 +118,7 @@ exe-sequentiel-1:
 
 exe-parallele-1:
 	make $(PRL1)
-	mpiexec -n 3 $(BIN)/$(PRL1)
+	mpiexec -n 4 $(BIN)/$(PRL1)
 
 #exe-sequentiel-2:
 #make $(SQT2)

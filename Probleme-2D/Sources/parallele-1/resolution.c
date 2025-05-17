@@ -5,6 +5,7 @@
 # include <math.h>
 # include <mpi.h>
 # include <float.h>
+# include <limits.h>
 
 # include "../../Librairies/parallele-1.h"
 
@@ -62,12 +63,12 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
-void init_u_anc(double **u_anc, double param){
+void init_u_anc(double **u_anc_div, double param){
 
-    *u_anc = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
+    *u_anc_div = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
 
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
-        (*u_anc)[i] = 0.0;
+        (*u_anc_div)[i] = 0.0;
     }
 
 }
@@ -88,8 +89,8 @@ double norme_infty_iteration(double *u_div, double *u_anc_div){
             if (diff > norme_nume_div){
                 norme_nume_div = diff;
             }
-            if (u_anc_div[IDX(i, j)] > norme_deno_div){
-                norme_deno_div = u_anc_div[IDX(i, j)];
+            if (fabs(u_anc_div[IDX(i, j)]) > norme_deno_div){
+                norme_deno_div = fabs(u_anc_div[IDX(i, j)]);
             }
         }
     }
@@ -97,9 +98,6 @@ double norme_infty_iteration(double *u_div, double *u_anc_div){
     MPI_Allreduce(&norme_nume_div, &norme_nume, 1, MPI_DOUBLE, MPI_MAX, comm_2D);
     MPI_Allreduce(&norme_deno_div, &norme_deno, 1, MPI_DOUBLE, MPI_MAX, comm_2D);
     norme = norme_nume / norme_deno;
-    if (rang == 0){
-        //printf("rang %d, norme = %f\n", rang, norme);
-    }
 
     return norme;
 
@@ -107,27 +105,26 @@ double norme_infty_iteration(double *u_div, double *u_anc_div){
 
 
 
-void calculer_u_jacobi(double *f, double *u){
+void calculer_u_jacobi(double *f_div, double *u_div){
 
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 1000000;
+    int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     double norme_diff = DBL_MAX;
-    double *u_anc;
-    double *permut;
+    double *u_anc_div;
     double param = 0.0;
 
     // Vecteur de départ
-    init_u_anc(&u_anc, param);
+    init_u_anc(&u_anc_div, param);
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
-        u[i] = 0.0;
+        u_div[i] = 0.0;
     }
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Communication
-        communiquer(u_anc);
+        communiquer(u_anc_div);
 
         // Schéma
         int j_reel = j_debut;
@@ -137,7 +134,7 @@ void calculer_u_jacobi(double *f, double *u){
                 i_reel = i_debut;
                 for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
                     if (i_reel > 0 && i_reel < nb_pt - 1){
-                        u[IDX(i, j)] = 0.25 * (u_anc[IDX(i - 1, j)] + u_anc[IDX(i, j - 1)] + u_anc[IDX(i + 1, j)] + u_anc[IDX(i, j + 1)] + h_carre * f[IDX(i, j)]);
+                        u_div[IDX(i, j)] = 0.25 * (u_anc_div[IDX(i - 1, j)] + u_anc_div[IDX(i, j - 1)] + u_anc_div[IDX(i + 1, j)] + u_anc_div[IDX(i, j + 1)] + h_carre * f_div[IDX(i, j)]);
                     }
                     i_reel ++;
                 }
@@ -146,18 +143,18 @@ void calculer_u_jacobi(double *f, double *u){
         }
 
         // Test d'arrêt
-        norme = norme_infty_iteration(u, u_anc);
+        norme = norme_infty_iteration(u_div, u_anc_div);
 
         // Copie
         for (int j = 1 ; j < nb_pt_div_j + 1 ; j ++){
             for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
-                u_anc[IDX(i, j)] = u[IDX(i, j)];
+                u_anc_div[IDX(i, j)] = u_div[IDX(i, j)];
             }
         }
         nb_iterations ++;
         MPI_Barrier(comm_2D);
     }
     
-    free(u_anc);
+    free(u_anc_div);
 
 }

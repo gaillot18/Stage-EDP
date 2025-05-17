@@ -6,7 +6,7 @@ BIN="./Binaires"
 
 make all
 
-# Éxecution
+# Exécution
 
 echo "EXECUTIONS POUR PROBLEME-2D"
 echo " "
