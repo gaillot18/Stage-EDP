@@ -6,15 +6,13 @@
 
 # include "../../Librairies/parallele-1.h"
 
-# define SORTIE
 
 
-
-void affichage_ordonne(double *u_divise, char *message){
+void affichage_ordonne(double *u_div, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
             if (rang == i){
                 printf("rang = %d, %s :\n", rang, message);
-                afficher_vecteur_double(u_divise, nb_pt_divise);
+                afficher_vecteur_double(u_div, nb_pt_div);
             }
             MPI_Barrier(MPI_COMM_WORLD);
         }
@@ -22,71 +20,84 @@ void affichage_ordonne(double *u_divise, char *message){
 
 
 
-void infos_processus(){
+// Créer la topologie cartésienne 1D du domaine [0, 1]
+void creer_topologie(){
 
-    int quotient = nb_pt / nb_cpu;
-    int reste = nb_pt % nb_cpu;
-    
-    if (rang < reste){
-        nb_pt_divise = quotient + 1;
-        i_debut = rang * nb_pt_divise;
-    }
-    else{
-        nb_pt_divise = quotient;
-        i_debut = reste * (quotient + 1) + (rang - reste) * quotient;
-    }
-    i_fin = i_debut + nb_pt_divise - 1;
+    int tore = 0;
+    dims = 0;
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Dims_create(nb_cpu, 1, &dims);
+
+    MPI_Cart_create(MPI_COMM_WORLD, 1, &dims, &tore, 0, &comm_1D);
+
+    MPI_Barrier(comm_1D);
 
 }
 
 
 
+// Obtenir des informations sur la topologie
 void infos_topologie(){
 
-    if (nb_cpu != 1){
-        if (rang == 0){
-            cpu_bord = -1;
-        }
-        else if (rang == nb_cpu - 1){
-            cpu_bord = 1;
-        }
-        else{
-            cpu_bord = 0;
+    MPI_Cart_coords(comm_1D, rang, 1, &coords);
+
+    MPI_Cart_shift(comm_1D, 0, 1, &(voisins[0]), &(voisins[1]));
+
+    bord = 2;
+    for (int i = 0 ; i < 2 ; i ++){
+        if (voisins[i] == -1){
+            bord --;
         }
     }
-    else{
-        cpu_bord = 2;
-    }
 
-    voisin_gauche = (rang + (nb_cpu - 1)) % nb_cpu;
-    voisin_droite = (rang + 1) % nb_cpu;
+    MPI_Barrier(comm_1D);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+}
 
+
+
+// Obtenir les intervalles à traiter de chaque processus
+void infos_processus(){
+
+    i_debut = (coords * nb_pt) / dims;
+    i_fin = ((coords + 1) * nb_pt) / dims - 1;
+    nb_pt_div = i_fin - i_debut + 1;
+
+    MPI_Barrier(comm_1D);
+
+}
+
+
+
+// Effectuer les communications des cellules fantômes
+void communiquer(double *u_div){
+
+    // Envoi gauche, reception droite
+    MPI_Sendrecv(&(u_div[1]), 1, MPI_DOUBLE, voisins[0], etiquette, &(u_div[nb_pt_div + 1]), 1, MPI_DOUBLE, voisins[1], etiquette, comm_1D, &statut);
+
+    // Envoi droite, reception gauche
+    MPI_Sendrecv(&(u_div[nb_pt_div]), 1, MPI_DOUBLE, voisins[1], etiquette, &(u_div[0]), 1, MPI_DOUBLE, voisins[0], etiquette, comm_1D, &statut);
+    
 }
 
 
 
 void infos_gather(int **deplacements, int **nb_elements_recus){
 
-    int quotient = nb_pt / nb_cpu;
-    int reste = nb_pt % nb_cpu;
-    int offset = 0;
     if (rang == 0){
-        *nb_elements_recus = (int *)malloc(nb_cpu * sizeof(int));
+
         *deplacements = (int *)malloc(nb_cpu * sizeof(int));
-        for (int i = 0 ; i < nb_cpu ; i++){
-            if (i < reste){
-                (*nb_elements_recus)[i] = quotient + 1;
-            }
-            else{
-                (*nb_elements_recus)[i] = quotient;
-            }
-            (*deplacements)[i] = offset;
-            offset += (*nb_elements_recus)[i];
+        *nb_elements_recus = (int *)malloc(nb_cpu * sizeof(int));
+
+        for (int i = 0; i < nb_cpu; i++){
+            int i_debut_i = (i * nb_pt) / nb_cpu;
+            int i_fin_i = ((i + 1) * nb_pt) / nb_cpu - 1;
+            int nb_pt_div_i = i_fin_i - i_debut_i + 1;
+
+            (*deplacements)[i] = i_debut_i;
+            (*nb_elements_recus)[i] = nb_pt_div_i;
         }
+
     }
 
 }

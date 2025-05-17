@@ -1,17 +1,22 @@
 // ======================================================
 // Variables globales
 // ======================================================
+extern int rang;
+extern int nb_cpu;
+extern int nb_pt_div;
+extern int i_debut;
+extern int i_fin;
+extern MPI_Comm comm_1D;
+extern int dims;
+extern int coords;
+extern int voisins[2];
+extern int bord;
+extern int coins[4];
+extern int etiquette;
+extern MPI_Status statut;
 extern int N;
 extern int nb_pt;
 extern int nb_iterations;
-extern int rang;
-extern int nb_cpu;
-extern int nb_pt_divise;
-extern int i_debut;
-extern int i_fin;
-extern int cpu_bord;
-extern int voisin_gauche;
-extern int voisin_droite;
 
 
 
@@ -36,6 +41,7 @@ double norme_infty_diff(double *u, double *v, int n);
 double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
+double norme_infty(double *u, int n);
 
 
 
@@ -51,9 +57,11 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ======================================================
 // ../Source/Parallele/parallele.c
 // ======================================================
-void affichage_ordonne(double *u_divise, char *message);
-void infos_processus();
+void affichage_ordonne(double *u_div, char *message);
+void creer_topologie();
 void infos_topologie();
+void infos_processus();
+void communiquer(double *u_div);
 void infos_gather(int **deplacements, int **nb_elements_recus);
 
 

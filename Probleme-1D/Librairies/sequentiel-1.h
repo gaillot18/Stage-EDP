@@ -28,6 +28,7 @@ double norme_infty_diff(double *u, double *v, int n);
 double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
+double norme_infty(double *u, int n);
 
 
 

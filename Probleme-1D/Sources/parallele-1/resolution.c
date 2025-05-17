@@ -5,6 +5,7 @@
 # include <math.h>
 # include <mpi.h>
 # include <float.h>
+# include <limits.h>
 
 # include "../../Librairies/parallele-1.h"
 
@@ -16,8 +17,8 @@
 
 void f_0(double **f){
 
-    *f = (double *)malloc(nb_pt_divise * sizeof(double));
-    for (int i = 0 ; i < nb_pt_divise ; i ++){
+    *f = (double *)malloc((nb_pt_div + 2) * sizeof(double));
+    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
         (*f)[i] = 1;
     }
 
@@ -27,12 +28,11 @@ void f_0(double **f){
 
 void f_1(double **f){
 
-    *f = (double *)malloc(nb_pt_divise * sizeof(double));
-    int nb_pt = N + 1;
+    *f = (double *)malloc((nb_pt_div + 2) * sizeof(double));
     double h = 1.0 / N;
     int i_reel = i_debut;
-
-    for (int i = 0 ; i < nb_pt_divise ; i ++){
+    
+    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
         (*f)[i] = pi * pi * sin(pi * i_reel * h);
         i_reel ++;
     }
@@ -72,91 +72,85 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
-void init_u_anc(double **u_anc, double param){
+void init_u_div_anc(double **u_div_anc){
 
-    *u_anc = (double *)malloc(nb_pt_divise * sizeof(double));
-    for (int i = 0 ; i < nb_pt_divise ; i ++){
-        (*u_anc)[i] = param;
-    }
-    if (cpu_bord == -1 || cpu_bord == 2){
-        (*u_anc)[0] = 0;
-    }
-    if (cpu_bord == 1 || cpu_bord == 2){
-        (*u_anc)[nb_pt_divise - 1] = 0;
+    *u_div_anc = (double *)malloc((nb_pt_div + 2) * sizeof(double));
+    
+    for (int i = 0 ; i < nb_pt_div + 2 ; i ++){
+        (*u_div_anc)[i] = 0.0;
     }
 
 }
 
 
 
-void calculer_u_jacobi(double *f, double *u){
+double norme_infty_iteration(double *u_div, double *u_anc_div){
+
+    double norme_nume_div = 0.0;
+    double norme_deno_div = 0.0;
+    double norme_nume;
+    double norme_deno;
+    double norme;
+
+    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
+        double diff = fabs(u_div[i] - u_anc_div[i]);
+        if (diff > norme_nume_div){
+            norme_nume_div = diff;
+        }
+        if (fabs(u_anc_div[i]) > norme_deno_div){
+            norme_deno_div = fabs(u_anc_div[i]);
+        }
+    }
+
+    MPI_Allreduce(&norme_nume_div, &norme_nume, 1, MPI_DOUBLE, MPI_MAX, comm_1D);
+    MPI_Allreduce(&norme_deno_div, &norme_deno, 1, MPI_DOUBLE, MPI_MAX, comm_1D);
+    norme = norme_nume / norme_deno;
+
+    return norme;
+
+}
+
+
+
+void calculer_u_jacobi(double *f_div, double *u_div){
 
     nb_iterations = 0;
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 500000;
-    double norme = DBL_MAX, norme_diff;
-    double norme_master, norme_diff_master;
-    double buffer_fantome_gauche, buffer_fantome_droite;
-    int etiquettes[2] = {1, 2};
-    MPI_Status statut; MPI_Status statuts[2]; MPI_Request requetes[2];
-    double *u_anc;
-    double param = 0.5;
-
-    if (cpu_bord == -1){
-        u[0] = 0;
-    }
-    else if (cpu_bord == 1){
-        u[nb_pt_divise - 1] = 0;
-    }
+    int nb_iteration_max = INT_MAX;
+    double norme = DBL_MAX;
+    double *u_div_anc;
 
     // Vecteur de départ
-    init_u_anc(&u_anc, param);
+    init_u_div_anc(&u_div_anc);
+    for (int i = 0 ; i < nb_pt_div + 2 ; i ++){
+        u_div[i] = 0.0;
+    }
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
-        // Communications : bloquante pour cellule gauche non bloquante pour cellule droite
-        if (nb_cpu > 1){
-            MPI_Sendrecv(&(u_anc[nb_pt_divise - 1]), 1, MPI_DOUBLE, voisin_droite, etiquettes[0], &buffer_fantome_gauche, 1, MPI_DOUBLE, voisin_gauche, etiquettes[0], MPI_COMM_WORLD, &statut);
-            MPI_Isend(&(u_anc[0]), 1, MPI_DOUBLE, voisin_gauche, etiquettes[1], MPI_COMM_WORLD, &requetes[0]);
-            MPI_Irecv(&buffer_fantome_droite, 1, MPI_DOUBLE, voisin_droite, etiquettes[1], MPI_COMM_WORLD, &requetes[1]);
-        }
+        // Communication
+        communiquer(u_div_anc);
 
-        // Schéma
-        if (cpu_bord != -1 && cpu_bord != 2){
-            u[0] = 0.5 * ((buffer_fantome_gauche + u_anc[1]) + h_carre * f[0]);
-        }
-
-        for (int i = 1 ; i < nb_pt_divise - 1 ; i ++){
-            u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
-        }
-
-        if (nb_cpu > 1){
-            MPI_Waitall(2, requetes, statuts);
-        }
-
-        if (cpu_bord != 1 && cpu_bord != 2){
-            u[nb_pt_divise - 1] = 0.5 * ((u_anc[nb_pt_divise - 2] + buffer_fantome_droite) + h_carre * f[nb_pt_divise - 1]);
+        int i_reel = i_debut;
+        for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
+            if (i_reel > 0 && i_reel < nb_pt - 1){
+                u_div[i] = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
+            }
+            i_reel ++;
         }
 
         // Test d'arrêt
-        norme_diff = carre_norme_L2_diff(u, u_anc, nb_pt_divise);
-        norme = carre_norme_L2(u_anc, nb_pt_divise);
-        MPI_Reduce(&norme_diff, &norme_diff_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&norme, &norme_master, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        if (rang == 0){
-            norme = sqrt(norme_diff_master) / sqrt(norme_master);
-        }
-        MPI_Bcast(&norme, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        norme = norme_infty_iteration(u_div, u_div_anc);
 
         // Copie
-        for (int i = 0 ; i < nb_pt_divise ; i ++){
-            u_anc[i] = u[i];
+        for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
+            u_div_anc[i] = u_div[i];
         }
         nb_iterations ++;
 
     }
 
-    free(u_anc);
+    free(u_div_anc);
 
 }

@@ -6,13 +6,13 @@ BIN="./Binaires"
 
 make all
 
-# Éxecution
+# Exécution
 
 echo "EXECUTIONS POUR PROBLEME-1D"
 echo " "
 sleep 2
 
-for size in 5 10 50 100 300; do
+for size in 5 10 50 100 500 1000; do
     $BIN/sequentiel-1 $size
     sleep 2
     $BIN/sequentiel-2 $size

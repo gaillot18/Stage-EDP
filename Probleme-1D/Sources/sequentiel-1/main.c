@@ -54,10 +54,10 @@ int main(int argc, char **argv){
     // ======================================================
     // Calcul de f et u_exact
     // ======================================================
-    f_0(&f);
+    f_1(&f);
     u = (double *)malloc(nb_pt * sizeof(double));
     u_exact = (double *)malloc(nb_pt * sizeof(double));
-    calculer_u_exact(u_0, u_exact);
+    calculer_u_exact(u_1, u_exact);
 
 
 

@@ -4,6 +4,7 @@
 # include <sys/time.h>
 # include <math.h>
 # include <float.h>
+# include <limits.h>
 
 # include "../../Librairies/sequentiel-1.h"
 
@@ -65,36 +66,40 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
+void init_u_anc(double **u_anc){
+
+    *u_anc = (double *)malloc(nb_pt * sizeof(double));
+    
+    for (int i = 0 ; i < nb_pt + 2 ; i ++){
+        (*u_anc)[i] = 0.0;
+    }
+
+}
+
+
+
 void calculer_u_jacobi(double *f, double *u){
 
     nb_iterations = 0;
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 500000;
+    int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
-    u[0] = 0;
-    u[nb_pt - 1] = 0;
+    double *u_anc;
 
-    // Vecteur de départ 
-
-    double *u_anc = (double *)malloc(nb_pt * sizeof(double));
-    u_anc[0] = 0;
-    for (int i = 1 ; i < nb_pt - 1 ; i ++){
-        u_anc[i] = 0.5;
-    }
-    u[nb_pt - 1] = 0;
+    // Vecteur de départ
+    init_u_anc(&u_anc);
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            //printf("i = %d, rang = %d\n", i, rang);
             u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
         }
 
         // Test d'arrêt
-        norme = norme_L2_diff(u, u_anc, nb_pt) / norme_L2(u_anc, nb_pt);
+        norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
 
         // Copie
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
