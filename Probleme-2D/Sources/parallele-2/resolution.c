@@ -6,7 +6,7 @@
 # include <float.h>
 # include <limits.h>
 
-# include "../../Librairies/sequentiel-1.h"
+# include "../../Librairies/parallele-2.h"
 
 # define pi 3.14159265358979323846
 
@@ -75,6 +75,7 @@ void calculer_u_jacobi(double *f, double *u){
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
+        # pragma omp parallel for schedule(runtime)
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
                 u[j * nb_pt + i] = 0.25 * (u_anc[j * nb_pt + i - 1] + u_anc[(j - 1) * nb_pt + i] + u_anc[j * nb_pt + i + 1] + u_anc[(j + 1) * nb_pt + i] + h_carre * f[j * nb_pt + i]);

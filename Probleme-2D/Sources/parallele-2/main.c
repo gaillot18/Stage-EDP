@@ -1,14 +1,20 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <omp.h>
 
-# include "../../Librairies/sequentiel-2.h"
+# include "../../Librairies/parallele-2.h"
 
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
+// OpenMP
+int nb_cpu;
+int rang;
+// Variable égale pour chaque rang
 int N;
 int nb_pt;
+int nb_iterations;
 
 
 
@@ -27,7 +33,7 @@ int main(int argc, char **argv){
     double *u_exact;
     // Autres résultats
     double erreur_infty;
-    double erreur_L2;
+    nb_iterations = 0;
     // Fichiers
     const char *entete;
     double resultats[6];
@@ -37,53 +43,23 @@ int main(int argc, char **argv){
         N = atoi(argv[1]);
     }
     else{
-        // Si pas d'argument, alors on affiche juste l'illustration de la strucutre mat_2bandes
-        N = 0;
+        N = 10;
     }
     nb_pt = N + 1;
-
 
 
     // ======================================================
     // Initialisation
     // ======================================================
-    printf("------------------------------------------------------------\n");
-    printf("Exécution séquentielle de : sequentiel-2\n");
-
-
-
-    // ======================================================
-    // Illustration de la structure mat_2bandes
-    // ======================================================
-    if (N == 0)
+    # pragma omp parallel
     {
-        printf("\n-------------------------\n");
-        printf("Illustration de la structure mat_2bandes (exemple pour N petit) :\n");
-        int N = 7;
-        int nb_pt = N + 1;
-        double h = 1.0 / N;
-        double alpha = 2.0 / (h * h);
-        double beta = - 1.0 / (h * h);
-        struct mat_2bandes L;
-
-        calculer_cholesky_tridiag(alpha, beta, nb_pt - 2, &L);
-
-        printf("alpha = %10.6f, beta = %10.6f\n", alpha, beta);
-        printf("\nStructure mat2_bandes :\n");
-        afficher_mat_2bandes(&L);
-
-        double *A;
-        mat_2bandes_vers_mat(&L, &A);
-        printf("\nMatrice réelle correspondante :\n");
-        afficher_matrice_carre_double(A, nb_pt - 2);
-
-        free(A);
-        free(L.diag);
-        free(L.sous_diag);
-        printf("-------------------------\n\n");
-
-        return 0;
+        rang = omp_get_thread_num();
+        if (rang == 0){
+            nb_cpu = omp_get_num_threads();
+        }
     }
+    printf("------------------------------------------------------------\n");
+    printf("Exécution parallèle (pour %d processus) de : parallele-2\n", nb_cpu);
 
 
 
@@ -91,8 +67,8 @@ int main(int argc, char **argv){
     // Calcul de f et u_exact
     // ======================================================
     f_1(&f);
-    u = (double *)malloc(nb_pt * sizeof(double));
-    u_exact = (double *)malloc(nb_pt * sizeof(double));
+    u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     calculer_u_exact(u_1, u_exact);
 
 
@@ -101,7 +77,7 @@ int main(int argc, char **argv){
     // Calcul de u avec mesure de temps
     // ======================================================
     gettimeofday(&temps_debut, NULL);
-    resoudre_cholesky(f, u);
+    calculer_u_jacobi(f, u);
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
@@ -110,18 +86,17 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-    erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
-    printf("N = %d\nerreur_L2 = %f\nerreur_infty = %f\ntemps = %f sec\n", N, erreur_L2, erreur_infty, temps);
+    erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
+    printf("N = %d\nnb_pt * nb_pt = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iterations, erreur_infty, temps);
 
 
 
     // ======================================================
-    // Sauvegarde des résultats dans un fichier
+    // Sauvegarde les résultats dans un fichier
     // ======================================================
     nom_fichier_txt = "./Textes/resultats.txt";
     entete = "version nb_cpu N nb_iterations erreur_infty temps";
-    resultats[0] = 3.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = -1.0; resultats[4] = erreur_infty; resultats[5] = temps;
+    resultats[0] = 3.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iterations; resultats[4] = erreur_infty; resultats[5] = temps;
     ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 

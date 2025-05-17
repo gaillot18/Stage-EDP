@@ -1,6 +1,5 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <omp.h>
 # include <sys/time.h>
 # include <mpi.h>
 
@@ -9,7 +8,7 @@
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
-// Variable selon le rang
+// MPI
 int rang;
 int nb_cpu;
 int nb_pt_div_i;
@@ -166,7 +165,7 @@ int main(int argc, char **argv){
     // Fermeture de MPI
     // ======================================================
     if (rang == 0){
-        printf("Éxecution terminée\n");
+        printf("Exécution terminée\n");
         printf("------------------------------------------------------------\n");
     }
     MPI_Finalize();

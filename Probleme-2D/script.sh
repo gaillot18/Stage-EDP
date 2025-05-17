@@ -20,4 +20,9 @@ for size in 5 10 50 100 300; do
         mpiexec -n $n $BIN/parallele-1 $size
         sleep 2
     done
+
+    for n in 1 2 4 6 8; do
+        OMP_NUM_THREADS=$n $BIN/parallele-2 $size
+        sleep 2
+    done
 done

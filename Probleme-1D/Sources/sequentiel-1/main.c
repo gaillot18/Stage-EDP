@@ -1,6 +1,5 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <omp.h>
 # include <sys/time.h>
 
 # include "../../Librairies/sequentiel-1.h"
@@ -101,7 +100,7 @@ int main(int argc, char **argv){
     // ======================================================
     // Fermeture
     // ======================================================
-    printf("Éxecution terminée\n");
+    printf("Exécution terminée\n");
     printf("------------------------------------------------------------\n");
     
     return 0;

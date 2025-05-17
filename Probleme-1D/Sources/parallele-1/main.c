@@ -163,7 +163,7 @@ int main(int argc, char **argv){
     // ======================================================
     # ifdef SORTIE
     if (rang == 0){
-        printf("Éxecution terminée\n");
+        printf("Exécution terminée\n");
         printf("------------------------------------------------------------\n");
     }
     # endif
