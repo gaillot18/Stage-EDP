@@ -6,8 +6,6 @@
 
 # include "../../Librairies/parallele-1.h"
 
-# define SORTIE
-
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
@@ -73,12 +71,10 @@ int main(int argc, char **argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rang);
     MPI_Comm_size(MPI_COMM_WORLD, &nb_cpu);
 
-    # ifdef SORTIE
     if (rang == 0){
         printf("------------------------------------------------------------\n");
         printf("Exécution parallèle (pour %d processus) de : parallele-1\n", nb_cpu);
     }
-    # endif
 
     
 
@@ -161,12 +157,10 @@ int main(int argc, char **argv){
     // ======================================================
     // Fermeture de MPI
     // ======================================================
-    # ifdef SORTIE
     if (rang == 0){
         printf("Exécution terminée\n");
         printf("------------------------------------------------------------\n");
     }
-    # endif
     MPI_Finalize();
 
     return 0;

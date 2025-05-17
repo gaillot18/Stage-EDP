@@ -63,7 +63,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
-void init_u_anc(double **u_anc_div, double param){
+void init_u_anc(double **u_anc_div){
 
     *u_anc_div = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
 
@@ -112,10 +112,9 @@ void calculer_u_jacobi(double *f_div, double *u_div){
     double norme = DBL_MAX;
     double norme_diff = DBL_MAX;
     double *u_anc_div;
-    double param = 0.0;
 
     // Vecteur de départ
-    init_u_anc(&u_anc_div, param);
+    init_u_anc(&u_anc_div);
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
         u_div[i] = 0.0;
     }
@@ -134,7 +133,13 @@ void calculer_u_jacobi(double *f_div, double *u_div){
                 i_reel = i_debut;
                 for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
                     if (i_reel > 0 && i_reel < nb_pt - 1){
-                        u_div[IDX(i, j)] = 0.25 * (u_anc_div[IDX(i - 1, j)] + u_anc_div[IDX(i, j - 1)] + u_anc_div[IDX(i + 1, j)] + u_anc_div[IDX(i, j + 1)] + h_carre * f_div[IDX(i, j)]);
+                        u_div[IDX(i, j)] = 0.25 * (
+                        u_anc_div[IDX(i - 1, j)]
+                        + u_anc_div[IDX(i, j - 1)]
+                        + u_anc_div[IDX(i + 1, j)]
+                        + u_anc_div[IDX(i, j + 1)]
+                        + h_carre * f_div[IDX(i, j)]
+                    );
                     }
                     i_reel ++;
                 }
