@@ -49,13 +49,18 @@ int main(int argc, char **argv){
     double *u = NULL;
     double *u_exact = NULL;
     // Autres résultats
-    double erreur_L2;
-    nb_iterations = 0;
+    double erreur_infty;
     // Fichiers
-    char *nom_fichier_data;
-    char *nom_fichier_txt;
+    const char *entete;
+    double resultats[6];
+    const char *nom_fichier_txt;
     // Paramètres
-    N = 30;
+    if (argc > 1){
+        N = atoi(argv[1]);
+    }
+    else{
+        N = 10;
+    }
     nb_pt = N + 1;
 
 
@@ -125,27 +130,21 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    # ifdef SORTIE
     if (rang == 0){
-        erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-        if (nb_pt <= 100){
-            afficher_vecteur_double(u, nb_pt);
-        }
-        printf("N = %d\nnb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_iterations, erreur_L2, temps);
+        erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
+        printf("N = %d\nnb_iterations, %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_iterations, erreur_infty, temps);
     }
-    # endif
     
 
     
     // ======================================================
-    // Sauvegarde de u dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
     if (rang == 0){
-        nom_fichier_data = (char *)malloc(128 * sizeof(char));
-        nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-        sprintf(nom_fichier_data, "./Textes/parallele-1/resultats%d.data", nb_cpu);
-        sprintf(nom_fichier_txt, "./Textes/parallele-1/resultats%d.txt", nb_cpu);
-        ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
+        nom_fichier_txt = "./Textes/resultats.txt";
+        entete = "version nb_cpu N nb_iterations erreur_infty temps";
+        resultats[0] = 2.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iterations; resultats[4] = erreur_infty; resultats[5] = temps;
+        ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
     }
 
 
@@ -160,8 +159,6 @@ int main(int argc, char **argv){
         free(u_exact);
         free(nb_elements_recus);
         free(deplacements);
-        free(nom_fichier_data);
-        free(nom_fichier_txt);
     }
 
 

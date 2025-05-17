@@ -5,6 +5,7 @@ BIN = ./Binaires
 LIB = ./Librairies
 OBJ = ./Objets
 SRC = ./Sources
+TXT = ./Textes
 
 FCC = Fonctions-communes
 PRL1 = parallele-1
@@ -103,7 +104,7 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean exe kill
 
-all: clean sequentiel-1 parallele-1 sequentiel-2
+all: clean sequentiel-1 parallele-1 #sequentiel-2
 
 sequentiel-1: $(BIN)/$(SQT1)
 
@@ -117,15 +118,15 @@ exe-sequentiel-1:
 
 exe-parallele-1:
 	make $(PRL1)
-	mpiexec -n 1 $(BIN)/$(PRL1)
+	mpiexec -n 3 $(BIN)/$(PRL1)
 
-exe-sequentiel-2:
-	make $(SQT2)
-	$(BIN)/$(SQT2) 2
+#exe-sequentiel-2:
+#make $(SQT2)
+#$(BIN)/$(SQT2) 2
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/*
+	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/* $(TXT)/*.data $(TXT)/*.txt
 
 kill:
 	pkill -9 prog

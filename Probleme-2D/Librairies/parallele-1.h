@@ -6,12 +6,31 @@ extern int nb_pt;
 extern int nb_iterations;
 extern int rang;
 extern int nb_cpu;
-extern int nb_pt_divise;
+extern int nb_pt_div_i;
+extern int nb_pt_div_j;
 extern int i_debut;
 extern int i_fin;
+extern int j_debut;
+extern int j_fin;
 extern int cpu_bord;
 extern int voisin_gauche;
 extern int voisin_droite;
+extern MPI_Comm comm_2D;
+extern int dims[2];
+extern int tore[2];
+extern int coords[2];
+extern int voisins[4];
+//extern int bords[4];
+extern int bord;
+extern int coins[4];
+extern MPI_Datatype ligne;
+extern MPI_Datatype colonne;
+extern MPI_Datatype bloc_send;
+//extern MPI_Datatype bloc_recv;
+//extern MPI_Request requetes[8];
+//extern MPI_Status statuts[8];
+extern int etiquette;
+extern MPI_Status statut;
 
 
 
@@ -19,7 +38,9 @@ extern int voisin_droite;
 // ../../Fonctions-communes/affichage.c
 // ======================================================
 void afficher_matrice_carre_double(double *A, int n);
+void afficher_matrice_double(double *A, int n, int m);
 void afficher_matrice_carre_int(int *A, int n);
+void afficher_matrice_double_int(double *A, int n, int m);
 void afficher_vecteur_double(double *v, int n);
 void afficher_vecteur_int(int *v, int n);
 
@@ -36,6 +57,7 @@ double norme_infty_diff(double *u, double *v, int n);
 double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
+double norme_infty(double *u, int n);
 
 
 
@@ -44,6 +66,7 @@ double carre_norme_L2(double *u, int n);
 // ======================================================
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
 void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
+void ecrire_resultats(double *resultats, const char *entete, int n, const char *nom_fichier);
 
 
 
@@ -51,8 +74,14 @@ void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int
 // ../Source/Parallele/parallele.c
 // ======================================================
 void affichage_ordonne(double *u_divise, char *message);
-//void infos_processus();
-//void infos_topologie();
+void creer_topologie();
+void infos_processus();
+void infos_topologie();
+void creer_types();
+void infos_bord();
+void communiquer(double *u);
+void verifier_communication();
+void regrouper_u(double *u_divise, double *u);
 //void infos_gather(int **deplacements, int **nb_elements_recus);
 
 
@@ -65,4 +94,4 @@ void f_1(double **f);
 //double u_0(double x);
 double u_1(double x, double y);
 void calculer_u_exact(double (*fonction)(double, double), double *u);
-//void calculer_u_jacobi(double *f, double *u);
+void calculer_u_jacobi(double *f, double *u);

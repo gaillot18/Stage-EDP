@@ -67,6 +67,7 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 void calculer_u_jacobi(double *f, double *u){
 
+    nb_iterations = 0;
     int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;

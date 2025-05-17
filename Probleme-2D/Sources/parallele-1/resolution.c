@@ -11,17 +11,28 @@
 # define SORTIE
 
 # define pi 3.14159265358979323846
+# define IDX(i, j) ((j) * (nb_pt_div_i + 2) + (i))
 
 
 
 void f_1(double **f){
 
-    *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    *f = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
     double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        for (int j = 0 ; j < nb_pt ; j ++){
-            (*f)[j * nb_pt + i] = sin(2 * pi * i * h) * sin(2 * pi * j * h);
+    int j_reel = j_debut;
+    int i_reel;
+
+    for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){ // A améliorer
+        (*f)[i] = 0.0;
+    }
+    
+    for (int j = 1 ; j < nb_pt_div_j + 1 ; j ++){
+        i_reel = i_debut;
+        for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
+            (*f)[IDX(i, j)] = sin(2 * pi * i_reel * h) * sin(2 * pi * j_reel * h);
+            i_reel ++;
         }
+        j_reel ++;
     }
 
 }
@@ -46,5 +57,107 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
             u[j * nb_pt + i] = fonction(i * h, j * h);
         }
     }
+
+}
+
+
+
+void init_u_anc(double **u_anc, double param){
+
+    *u_anc = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
+
+    for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
+        (*u_anc)[i] = 0.0;
+    }
+
+}
+
+
+
+double norme_infty_iteration(double *u_div, double *u_anc_div){
+
+    double norme_nume_div = 0.0;
+    double norme_deno_div = 0.0;
+    double norme_nume;
+    double norme_deno;
+    double norme;
+
+    for (int j = 1 ; j < nb_pt_div_j + 1 ; j ++){
+        for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
+            double diff = fabs(u_div[IDX(i, j)] - u_anc_div[IDX(i, j)]);
+            if (diff > norme_nume_div){
+                norme_nume_div = diff;
+            }
+            if (u_anc_div[IDX(i, j)] > norme_deno_div){
+                norme_deno_div = u_anc_div[IDX(i, j)];
+            }
+        }
+    }
+
+    MPI_Allreduce(&norme_nume_div, &norme_nume, 1, MPI_DOUBLE, MPI_MAX, comm_2D);
+    MPI_Allreduce(&norme_deno_div, &norme_deno, 1, MPI_DOUBLE, MPI_MAX, comm_2D);
+    norme = norme_nume / norme_deno;
+    if (rang == 0){
+        //printf("rang %d, norme = %f\n", rang, norme);
+    }
+
+    return norme;
+
+}
+
+
+
+void calculer_u_jacobi(double *f, double *u){
+
+    double h_carre = 1.0 / (N * N);
+    int nb_iteration_max = 1000000;
+    double norme = DBL_MAX;
+    double norme_diff = DBL_MAX;
+    double *u_anc;
+    double *permut;
+    double param = 0.0;
+
+    // Vecteur de départ
+    init_u_anc(&u_anc, param);
+    for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
+        u[i] = 0.0;
+    }
+
+    // Itérations
+    for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
+
+        // Communication
+        communiquer(u_anc);
+
+        // Schéma
+        int j_reel = j_debut;
+        int i_reel;
+        for (int j = 1 ; j < nb_pt_div_j + 1 ; j ++){
+            if (j_reel > 0 && j_reel < nb_pt - 1){
+                i_reel = i_debut;
+                for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
+                    if (i_reel > 0 && i_reel < nb_pt - 1){
+                        u[IDX(i, j)] = 0.25 * (u_anc[IDX(i - 1, j)] + u_anc[IDX(i, j - 1)] + u_anc[IDX(i + 1, j)] + u_anc[IDX(i, j + 1)] + h_carre * f[IDX(i, j)]);
+                    }
+                    i_reel ++;
+                }
+            }
+            j_reel ++;
+        }
+
+        // Test d'arrêt
+        norme = norme_infty_iteration(u, u_anc);
+
+        // Copie
+        for (int j = 1 ; j < nb_pt_div_j + 1 ; j ++){
+            for (int i = 1 ; i < nb_pt_div_i + 1 ; i ++){
+                u_anc[IDX(i, j)] = u[IDX(i, j)];
+            }
+        }
+        nb_iterations ++;
+        MPI_Barrier(comm_2D);
+    }
+    
+    free(u_anc);
 
 }

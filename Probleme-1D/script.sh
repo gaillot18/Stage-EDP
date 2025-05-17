@@ -1,3 +1,5 @@
+#!/bin/bash
+
 BIN="./Binaires"
 
 # Compilation
@@ -6,32 +8,18 @@ make all
 
 # Éxecution
 
-echo EXECUTIONS POUR PROBLEME-1D
-sleep 3
-$BIN/sequentiel-1
-sleep 3
-mpiexec -n 1 $BIN/parallele-1
-sleep 3
-mpiexec -n 2 $BIN/parallele-1
-sleep 3
-mpiexec -n 4 $BIN/parallele-1
-sleep 3
-mpiexec -n 6 $BIN/parallele-1
-sleep 3
-mpiexec -n 8 $BIN/parallele-1
-sleep 3
-$BIN/sequentiel-2
-sleep 1
-$BIN/sequentiel-2 2
-sleep 1
-$BIN/sequentiel-2 3
-sleep 1
-$BIN/sequentiel-2 4
-sleep 1
-$BIN/sequentiel-2 5
-sleep 1
-$BIN/sequentiel-2 10
-sleep 1
-$BIN/sequentiel-2 100
-sleep 1
-$BIN/sequentiel-2 1000
+echo "EXECUTIONS POUR PROBLEME-1D"
+echo " "
+sleep 2
+
+for size in 5 10 50 100 300; do
+    $BIN/sequentiel-1 $size
+    sleep 2
+    $BIN/sequentiel-2 $size
+    sleep 2
+
+    for n in 1 2 4 6 8; do
+        mpiexec -n $n $BIN/parallele-1 $size
+        sleep 2
+    done
+done

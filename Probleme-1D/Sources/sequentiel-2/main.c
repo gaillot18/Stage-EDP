@@ -5,9 +5,6 @@
 
 # include "../../Librairies/sequentiel-2.h"
 
-# define SORTIE 1
-# define EXEMPLE 1
-
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
@@ -33,8 +30,9 @@ int main(int argc, char **argv){
     double erreur_infty;
     double erreur_L2;
     // Fichiers
-    char *nom_fichier_data;
-    char *nom_fichier_txt;
+    const char *entete;
+    double resultats[6];
+    const char *nom_fichier_txt;
     // Paramètres
     if (argc > 1){
         N = atoi(argv[1]);
@@ -50,10 +48,8 @@ int main(int argc, char **argv){
     // ======================================================
     // Initialisation
     // ======================================================
-    # ifdef SORTIE
     printf("------------------------------------------------------------\n");
     printf("Exécution séquentielle de : sequentiel-2\n");
-    # endif
 
 
 
@@ -117,31 +113,23 @@ int main(int argc, char **argv){
     // ======================================================
     erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
     erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
-    # ifdef SORTIE
-    if (nb_pt <= 100){
-        afficher_vecteur_double(u, nb_pt);
-    }
     printf("N = %d\nerreur_L2 = %f\nerreur_infty = %f\ntemps = %f sec\n", N, erreur_L2, erreur_infty, temps);
-    # endif
 
 
 
     // ======================================================
-    // Sauvegarde de u dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
-    nom_fichier_data = (char *)malloc(128 * sizeof(char));
-    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-    sprintf(nom_fichier_data, "./Textes/sequentiel-2/resultats0.data");
-    sprintf(nom_fichier_txt, "./Textes/sequentiel-2/resultats0.txt");
-    ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
+    nom_fichier_txt = "./Textes/resultats.txt";
+    entete = "version nb_cpu N nb_iterations erreur_infty temps";
+    resultats[0] = 3.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = -1.0; resultats[4] = erreur_infty; resultats[5] = temps;
+    ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 
 
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    free(nom_fichier_data);
-    free(nom_fichier_txt);
     free(f);
     free(u_exact);
     free(u);

@@ -31,6 +31,7 @@ void f_1(double **f){
     int nb_pt = N + 1;
     double h = 1.0 / N;
     int i_reel = i_debut;
+
     for (int i = 0 ; i < nb_pt_divise ; i ++){
         (*f)[i] = pi * pi * sin(pi * i_reel * h);
         i_reel ++;
@@ -90,6 +91,7 @@ void init_u_anc(double **u_anc, double param){
 
 void calculer_u_jacobi(double *f, double *u){
 
+    nb_iterations = 0;
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = 500000;
     double norme = DBL_MAX, norme_diff;

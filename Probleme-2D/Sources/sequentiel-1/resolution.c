@@ -55,19 +55,19 @@ void init_u_anc(double **u_anc, double param){
     // Conditions aux bords
     // Ligne j = 0
     for (int i = 0 ; i < nb_pt ; i ++){
-        (*u_anc)[i] = 0;
+        (*u_anc)[i] = 0.0;
     }
     // Ligne j = nb_pt - 1
     for (int i = 0 ; i < nb_pt ; i ++){
-        (*u_anc)[(nb_pt - 1) * nb_pt + i] = 0;
+        (*u_anc)[(nb_pt - 1) * nb_pt + i] = 0.0;
     }
     // Colonne i = 0
     for (int j = 0 ; j < nb_pt ; j ++){
-        (*u_anc)[j * nb_pt] = 0;
+        (*u_anc)[j * nb_pt] = 0.0;
     }
     // Colonne i = nb_pt - 1
     for (int j = 0 ; j < nb_pt ; j ++){
-        (*u_anc)[j * nb_pt + nb_pt - 1] = 0;
+        (*u_anc)[j * nb_pt + nb_pt - 1] = 0.0;
     }
 
     // Paramètre
@@ -83,9 +83,8 @@ void init_u_anc(double **u_anc, double param){
 
 void calculer_u_jacobi(double *f, double *u){
 
-    int nb_pt = N + 1;
     double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 500000;
+    int nb_iteration_max = 1000000;
     double norme = DBL_MAX;
     double *u_anc;
     double param = 0.0;
@@ -94,19 +93,21 @@ void calculer_u_jacobi(double *f, double *u){
     init_u_anc(&u_anc, param);
 
     // Itérations
-    for (int iteration = 0 ; iteration < nb_iteration_max && norme > DBL_EPSILON ; iteration ++){
+    for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
-        for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            for (int j = 1 ; j < nb_pt - 1 ; j ++){
+        for (int j = 1 ; j < nb_pt - 1 ; j ++){
+            for (int i = 1 ; i < nb_pt - 1 ; i ++){
                 u[j * nb_pt + i] = 0.25 * (u_anc[j * nb_pt + i - 1] + u_anc[(j - 1) * nb_pt + i] + u_anc[j * nb_pt + i + 1] + u_anc[(j + 1) * nb_pt + i] + h_carre * f[j * nb_pt + i]);
             }
         }
 
         // Test d'arrêt
-        double norme_diff = carre_norme_L2_diff(u, u_anc, nb_pt * nb_pt);
-        double norme_anc = carre_norme_L2(u_anc, nb_pt * nb_pt);
+        double norme_diff = norme_infty_diff(u, u_anc, nb_pt * nb_pt);
+        double norme_anc = norme_infty(u_anc, nb_pt * nb_pt);
         norme = norme_diff / norme_anc;
+        //printf("norme = %f\n", norme);
+        
 
         // Copie
         for (int i = 0 ; i < nb_pt * nb_pt ; i ++){

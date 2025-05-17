@@ -4,9 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairies/sequentiel-1.h"
-
-# define SORTIE 1
+# include "../../Librairies/parallele-1.h"
 
 // ======================================================
 // Déclarations des variables globales
@@ -14,15 +12,28 @@
 // Variable selon le rang
 int rang;
 int nb_cpu;
-
-int nb_pt_divise;
+int nb_pt_div_i;
+int nb_pt_div_j;
 int i_debut;
 int i_fin;
-
+int j_debut;
+int j_fin;
 int cpu_bord;
 int voisin_gauche;
 int voisin_droite;
-
+// Communicateur 2D
+MPI_Comm comm_2D;
+int dims[2];
+int tore[2];
+int coords[2];
+int voisins[4];
+int bord;
+int coins[4];
+MPI_Datatype ligne;
+MPI_Datatype colonne;
+MPI_Datatype bloc_send;
+int etiquette;
+MPI_Status statut;
 // Variable égale pour chaque rang
 int N;
 int nb_pt;
@@ -36,8 +47,8 @@ int main(int argc, char **argv){
     // Déclarations des variables
     // ======================================================
     // Temps
-    struct timeval temps_debut;
-    struct timeval temps_fin;
+    double temps_debut;
+    double temps_fin;
     double temps;
     // Informations MPI
     int *nb_elements_recus = NULL;
@@ -49,90 +60,122 @@ int main(int argc, char **argv){
     double *u = NULL;
     double *u_exact = NULL;
     // Autres résultats
-    double erreur_L2;
+    double erreur_infty;
     nb_iterations = 0;
     // Fichiers
-    char *nom_fichier_data;
-    char *nom_fichier_txt;
+    const char *entete;
+    double resultats[6];
+    const char *nom_fichier_txt;
     // Paramètres
-    N = 100;
+    if (argc > 1){
+        N = atoi(argv[1]);
+    }
+    else{
+        N = 10;
+    }
     nb_pt = N + 1;
 
 
     // ======================================================
-    // Initialisation
+    // Initialisation de MPI
     // ======================================================
-    # ifdef SORTIE
-    printf("------------------------------------------------------------\n");
-    printf("Exécution séquentielle de : sequentiel-1\n");
-    # endif
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rang);
+    MPI_Comm_size(MPI_COMM_WORLD, &nb_cpu);
+    if (rang == 0){
+        printf("------------------------------------------------------------\n");
+        printf("Exécution parallèle (pour %d processus) de : parallele-1\n", nb_cpu);
+    }
+
+
+
+    // ======================================================
+    // Récupération des informations de chaque processus, création de la topologie et des types
+    // ======================================================
+    creer_topologie();
+    infos_topologie();
+    infos_processus();
+    creer_types();
+    if (rang == 0){
+        printf("Informations de chaque processus :\n");
+    }
+    printf("rang = %d, i_debut = %d, j_debut = %d, nb_pt_div_i = %d, nb_pt_div_j = %d, voisins[gauche] = %d, voisins[haut] = %d, "
+        "voisins[droite] = %d, voisins[bas] = %d\n", rang, i_debut, j_debut, nb_pt_div_i, nb_pt_div_j, voisins[0], voisins[1],
+        voisins[2], voisins[3]);
 
 
 
     // ======================================================
     // Calcul de f et u_exact
     // ======================================================
-    //f_1(&f);
-    //u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    //u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    //calculer_u_exact(u_1, u_exact);
-
+    f_1(&f_divise);
+    u_divise = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
+    if (rang == 0){
+        u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+        u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+        calculer_u_exact(u_1, u_exact);
+    }
+    double *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    
 
 
     // ======================================================
     // Calcul de u avec mesure de temps
     // ======================================================
-    gettimeofday(&temps_debut, NULL);
-    //calculer_u_jacobi(f, u);
-    gettimeofday(&temps_fin, NULL);
-    temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
+    temps_debut = MPI_Wtime();
+    calculer_u_jacobi(f_divise, u_divise);
+    regrouper_u(u_divise, u);
+    temps_fin = MPI_Wtime();
+    temps = temps_fin - temps_debut;
 
 
 
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    //erreur_L2 = norme_L2_diff(u, u_exact, nb_pt * nb_pt);
-    # ifdef SORTIE
-    if (nb_pt <= 10){
-        //afficher_matrice_carre_double(u_exact, nb_pt); printf("\n");
-        //afficher_matrice_carre_double(u, nb_pt);
+    if (rang == 0){
+        erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt); printf("\n");
+        printf("N = %d\nnb_pt * nb_pt = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iterations, erreur_infty, temps);
     }
-    //printf("N = %d\nnb_pt * nb_pt = %d\nnb_iterations = %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iterations, erreur_L2, temps);
-    # endif
 
 
 
     // ======================================================
-    // Sauvegarde de u dans un fichier
+    // Sauvegarde les résultats dans un fichier
     // ======================================================
-    /*
-    nom_fichier_data = (char *)malloc(128 * sizeof(char));
-    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-    sprintf(nom_fichier_data, "./Textes/sequentiel-1/resultats0.data");
-    sprintf(nom_fichier_txt, "./Textes/sequentiel-1/resultats0.txt");
-    ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);*/
+    if (rang == 0){
+        nom_fichier_txt = "./Textes/resultats.txt";
+        entete = "version nb_cpu N nb_iterations erreur_infty temps";
+        resultats[0] = 2.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iterations; resultats[4] = erreur_infty; resultats[5] = temps;
+        ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
+    }
 
 
 
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    //free(nom_fichier_data);
-    //free(nom_fichier_txt);
-    //free(f);
-    //ree(u_exact);
-    //free(u);
+    MPI_Type_free(&ligne);
+    MPI_Type_free(&colonne);
+    MPI_Type_free(&bloc_send);
+    MPI_Comm_free(&comm_2D);
+    free(u_divise);
+    free(f_divise);
+    if (rang == 0){
+        free(u_exact);
+        free(u);
+    }
 
 
 
     // ======================================================
-    // Fermeture
+    // Fermeture de MPI
     // ======================================================
-    # ifdef SORTIE
-    printf("Éxecution terminée\n");
-    printf("------------------------------------------------------------\n");
-    # endif
+    if (rang == 0){
+        printf("Éxecution terminée\n");
+        printf("------------------------------------------------------------\n");
+    }
+    MPI_Finalize();
     
     return 0;
     

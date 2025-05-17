@@ -139,3 +139,20 @@ double carre_norme_L2(double *u, int n){
     return res;
 
 }
+
+
+
+// Norme infinie d'un vecteur
+double norme_infty(double *u, int n){
+
+    double res = 0;
+
+    for (int i = 0 ; i < n ; i ++){
+        if (u[i] > res){
+            res = u[i];
+        }
+    }
+
+    return res;
+
+}

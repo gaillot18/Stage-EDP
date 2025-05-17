@@ -5,8 +5,6 @@
 
 # include "../../Librairies/sequentiel-1.h"
 
-# define SORTIE 1
-
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
@@ -30,23 +28,26 @@ int main(int argc, char **argv){
     double *u;
     double *u_exact;
     // Autres résultats
-    double erreur_L2;
-    nb_iterations = 0;
+    double erreur_infty;
     // Fichiers
-    char *nom_fichier_data;
-    char *nom_fichier_txt;
+    const char *entete;
+    double resultats[6];
+    const char *nom_fichier_txt;
     // Paramètres
-    N = 30;
+    if (argc > 1){
+        N = atoi(argv[1]);
+    }
+    else{
+        N = 10;
+    }
     nb_pt = N + 1;
 
 
     // ======================================================
     // Initialisation
     // ======================================================
-    # ifdef SORTIE
     printf("------------------------------------------------------------\n");
     printf("Exécution séquentielle de : sequentiel-1\n");
-    # endif
 
 
 
@@ -73,32 +74,24 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
-    # ifdef SORTIE
-    if (nb_pt <= 100){
-        afficher_vecteur_double(u, nb_pt);
-    }
-    printf("N = %d\nnb_iterations = %d, erreur_L2 = %f\ntemps = %f sec\n", N, nb_iterations, erreur_L2, temps);
-    # endif
+    erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
+    printf("N = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_iterations, erreur_infty, temps);
 
 
 
     // ======================================================
-    // Sauvegarde de u dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
-    nom_fichier_data = (char *)malloc(128 * sizeof(char));
-    nom_fichier_txt = (char *)malloc(128 * sizeof(char));
-    sprintf(nom_fichier_data, "./Textes/sequentiel-1/resultats0.data");
-    sprintf(nom_fichier_txt, "./Textes/sequentiel-1/resultats0.txt");
-    ecrire_double(nom_fichier_data, nom_fichier_txt, u, nb_pt);
+    nom_fichier_txt = "./Textes/resultats.txt";
+    entete = "version nb_cpu N nb_iterations erreur_infty temps";
+    resultats[0] = 1.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = (double)nb_iterations; resultats[4] = erreur_infty; resultats[5] = temps;
+    ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 
 
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    free(nom_fichier_data);
-    free(nom_fichier_txt);
     free(f);
     free(u_exact);
     free(u);
@@ -108,10 +101,8 @@ int main(int argc, char **argv){
     // ======================================================
     // Fermeture
     // ======================================================
-    # ifdef SORTIE
     printf("Éxecution terminée\n");
     printf("------------------------------------------------------------\n");
-    # endif
     
     return 0;
     

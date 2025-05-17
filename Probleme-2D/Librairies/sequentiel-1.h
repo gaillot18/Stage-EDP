@@ -28,6 +28,7 @@ double norme_infty_diff(double *u, double *v, int n);
 double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
+double norme_infty(double *u, int n);
 
 
 
@@ -36,6 +37,7 @@ double carre_norme_L2(double *u, int n);
 // ======================================================
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
 void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
+void ecrire_resultats(double *resultats, const char *entete, int n, const char *nom_fichier);
 
 
 

@@ -11,6 +11,7 @@ PRL1 = parallele-1
 SQT1 = sequentiel-1
 SQT2 = sequentiel-2
 FCN = Fonctions-numeriques
+TXT = Textes
 
 FLAGS = -g0
 
@@ -117,7 +118,7 @@ exe-sequentiel-1:
 
 exe-parallele-1:
 	make $(PRL1)
-	mpiexec -n 1 $(BIN)/$(PRL1)
+	mpiexec -n 4 $(BIN)/$(PRL1)
 
 exe-sequentiel-2:
 	make $(SQT2)
@@ -125,7 +126,7 @@ exe-sequentiel-2:
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/*
+	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/* $(TXT)/*.data $(TXT)/*.txt
 
 kill:
 	pkill -9 prog
