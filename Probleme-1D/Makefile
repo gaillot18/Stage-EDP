@@ -126,7 +126,7 @@ exe-sequentiel-2:
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/* $(TXT)/*.data $(TXT)/*.txt
+	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
 
 kill:
 	pkill -9 prog

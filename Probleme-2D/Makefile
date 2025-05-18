@@ -145,11 +145,11 @@ exe-sequentiel-1:
 
 exe-parallele-1:
 	make $(PRL1)
-	mpiexec -n 4 $(BIN)/$(PRL1) 100
+	mpiexec -n 10 $(BIN)/$(PRL1) 100
 
 exe-parallele-2:
 	make $(PRL2)
-	OMP_NUM_THREADS=2 $(BIN)/$(PRL2) 500
+	OMP_NUM_THREADS=4 $(BIN)/$(PRL2) 100
 
 #exe-sequentiel-2:
 #make $(SQT2)
@@ -157,7 +157,7 @@ exe-parallele-2:
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(FCC)/$(PRL1)/*.o $(OBJ)/$(FCC)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(SQT1)/*.o $(BIN)/* $(TXT)/*.data $(TXT)/*.txt
+	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(BIN)/* $(TXT)/resultats.txt
 
 kill:
 	pkill -9 prog
