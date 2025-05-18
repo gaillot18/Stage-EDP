@@ -69,15 +69,18 @@ void infos_processus(){
 
 
 
-// Effectuer les communications des cellules fantômes
-void echanger_halos(double *u_div){
+void infos_bornes_boucles(int *i_boucle_debut, int *i_boucle_fin){
 
-    // Envoi gauche, reception droite
-    MPI_Sendrecv(&(u_div[1]), 1, MPI_DOUBLE, voisins[0], etiquette, &(u_div[nb_pt_div + 1]), 1, MPI_DOUBLE, voisins[1], etiquette, comm_1D, &statut);
+    *i_boucle_debut = 1;
+    *i_boucle_fin = nb_pt_div + 1;
 
-    // Envoi droite, reception gauche
-    MPI_Sendrecv(&(u_div[nb_pt_div]), 1, MPI_DOUBLE, voisins[1], etiquette, &(u_div[0]), 1, MPI_DOUBLE, voisins[0], etiquette, comm_1D, &statut);
-    
+    if (i_debut == 0){
+        (*i_boucle_debut) ++;
+    }
+    if (i_fin == nb_pt - 1){
+        (*i_boucle_fin) --;
+    }
+
 }
 
 
@@ -100,4 +103,17 @@ void infos_gather(int **deplacements, int **nb_elements_recus){
 
     }
 
+}
+
+
+
+// Effectuer les communications des cellules fantômes
+void echanger_halos(double *u_div){
+
+    // Envoi gauche, reception droite
+    MPI_Sendrecv(&(u_div[1]), 1, MPI_DOUBLE, voisins[0], etiquette, &(u_div[nb_pt_div + 1]), 1, MPI_DOUBLE, voisins[1], etiquette, comm_1D, &statut);
+
+    // Envoi droite, reception gauche
+    MPI_Sendrecv(&(u_div[nb_pt_div]), 1, MPI_DOUBLE, voisins[1], etiquette, &(u_div[0]), 1, MPI_DOUBLE, voisins[0], etiquette, comm_1D, &statut);
+    
 }

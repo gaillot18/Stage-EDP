@@ -77,14 +77,26 @@ void init_u_anc(double **u_anc){
 
 
 
+void terminaison(double **permut, double **u, double **u_anc){
+
+    if (nb_iterations % 2 != 0){
+        *permut = *u; *u = *u_anc; *u_anc = *permut;
+    }
+
+    free(*u_anc);
+
+}
+
+
+
 void calculer_u_jacobi(double *f, double *u){
 
     nb_iterations = 0;
     int nb_pt = N + 1;
-    double h_carre = 1.0 / (N * N);
+    double h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
-    double *u_anc;
+    double *u_anc; double *permut;
 
     // Vecteur de départ
     init_u_anc(&u_anc);
@@ -100,14 +112,11 @@ void calculer_u_jacobi(double *f, double *u){
         // Test d'arrêt
         norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
 
-        // Copie
-        for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u_anc[i] = u[i];
-        }
-        nb_iterations ++;
+        permut = u; u = u_anc; u_anc = permut; nb_iterations ++;
+        
     }
 
-    free(u_anc);
+    terminaison(&permut, &u, &u_anc);
 
 }
 
@@ -117,13 +126,13 @@ void calculer_u_jacobi(double *f, double *u){
 void calculer_u_gaussseidel(double *f, double *u){
 
     int nb_pt = N + 1;
-    double h_carre = 1.0 / (N * N);
-    int nb_iteration_max = 50000;
-    u[0] = 0;
-    u[nb_pt - 1] = 0;
+    double h_carre = 1.0 / pow(N, 2);
+    int nb_iteration_max = INT_MAX;
+    double *u_anc; double *permut;
+    u[0] = 0; u[nb_pt - 1] = 0;
 
     // Vecteur de départ 
-    double *u_anc = (double *)malloc(nb_pt * sizeof(double));
+    u_anc = (double *)malloc(nb_pt * sizeof(double));
     for (int i = 0 ; i < nb_pt ; i ++){
         u_anc[i] = 0;
     }
@@ -136,14 +145,11 @@ void calculer_u_gaussseidel(double *f, double *u){
             u[i] = 0.5 * (u[i - 1] + u_anc[i + 1] + h_carre * f[i]);
         }
 
-        // Copie
-        for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u_anc[i] = u[i];
-        }
+        permut = u; u = u_anc; u_anc = permut;
+        nb_iterations++;
 
     }
-    nb_iterations = nb_iteration_max;
 
-    free(u_anc);
+    terminaison(&permut, &u, &u_anc);
 
 }

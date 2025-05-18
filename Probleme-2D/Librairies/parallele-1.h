@@ -74,6 +74,7 @@ void creer_types();
 void infos_bord();
 void echanger_halos(double *u_div);
 void verifier_communication();
+void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucle_fin, int *j_boucle_fin);
 void regrouper_u(double *u_divise, double *u);
 
 

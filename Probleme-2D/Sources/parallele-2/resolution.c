@@ -61,12 +61,24 @@ void init_u_anc(double **u_anc){
 
 
 
+void terminaison(double **permut, double **u, double **u_anc){
+
+    if (nb_iterations % 2 != 0){
+        *permut = *u; *u = *u_anc; *u_anc = *permut;
+    }
+
+    free(*u_anc);
+
+}
+
+
+
 void calculer_u_jacobi(double *f, double *u){
 
     double h_carre = 1.0 / (N * N);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
-    double *u_anc;
+    double *u_anc; double *permut;
 
     // Vecteur de départ
     init_u_anc(&u_anc);
@@ -78,24 +90,22 @@ void calculer_u_jacobi(double *f, double *u){
         # pragma omp parallel for schedule(runtime)
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
-                u[j * nb_pt + i] = 0.25 * (u_anc[j * nb_pt + i - 1] + u_anc[(j - 1) * nb_pt + i] + u_anc[j * nb_pt + i + 1] + u_anc[(j + 1) * nb_pt + i] + h_carre * f[j * nb_pt + i]);
+                u[j * nb_pt + i] = 0.25 * (
+                u_anc[j * nb_pt + i - 1]
+                + u_anc[(j - 1) * nb_pt + i]
+                + u_anc[j * nb_pt + i + 1]
+                + u_anc[(j + 1) * nb_pt + i]
+                + h_carre * f[j * nb_pt + i]);
             }
         }
 
         // Test d'arrêt
-        double norme_diff = norme_infty_diff(u, u_anc, nb_pt * nb_pt);
-        double norme_anc = norme_infty(u_anc, nb_pt * nb_pt);
-        norme = norme_diff / norme_anc;
-        //printf("norme = %f\n", norme);
+        norme = norme_infty_diff(u, u_anc, nb_pt * nb_pt) / norme_infty(u_anc, nb_pt * nb_pt);
         
+        permut = u; u = u_anc; u_anc = permut; nb_iterations ++;
 
-        // Copie
-        for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
-            u_anc[i] = u[i];
-        }
-        nb_iterations ++;
     }
 
-    free(u_anc);
+    terminaison(&permut, &u, &u_anc);
 
 }

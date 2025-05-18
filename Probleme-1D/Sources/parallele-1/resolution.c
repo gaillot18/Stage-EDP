@@ -84,7 +84,7 @@ void init_u_div_anc(double **u_div_anc){
 
 
 
-double norme_infty_iteration(double *u_div, double *u_anc_div){
+double norme_infty_iteration(double *u_div, double *u_div_anc){
 
     double norme_nume_div = 0.0;
     double norme_deno_div = 0.0;
@@ -93,12 +93,12 @@ double norme_infty_iteration(double *u_div, double *u_anc_div){
     double norme;
 
     for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
-        double diff = fabs(u_div[i] - u_anc_div[i]);
+        double diff = fabs(u_div[i] - u_div_anc[i]);
         if (diff > norme_nume_div){
             norme_nume_div = diff;
         }
-        if (fabs(u_anc_div[i]) > norme_deno_div){
-            norme_deno_div = fabs(u_anc_div[i]);
+        if (fabs(u_div_anc[i]) > norme_deno_div){
+            norme_deno_div = fabs(u_div_anc[i]);
         }
     }
 
@@ -112,13 +112,26 @@ double norme_infty_iteration(double *u_div, double *u_anc_div){
 
 
 
+void terminaison(double **permut, double **u_div, double **u_div_anc){
+
+    if (nb_iterations % 2 != 0){
+        *permut = *u_div; *u_div = *u_div_anc; *u_div_anc = *permut;
+    }
+
+    free(*u_div_anc);
+
+}
+
+
+
 void calculer_u_jacobi(double *f_div, double *u_div){
 
     nb_iterations = 0;
-    double h_carre = 1.0 / (N * N);
+    double h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
-    double *u_div_anc;
+    int i_boucle_debut, i_boucle_fin;
+    double *u_div_anc; double *permut;
 
     // Vecteur de départ
     init_u_div_anc(&u_div_anc);
@@ -126,31 +139,26 @@ void calculer_u_jacobi(double *f_div, double *u_div){
         u_div[i] = 0.0;
     }
 
+    // Bornes des boucles
+    infos_bornes_boucles(&i_boucle_debut, &i_boucle_fin);
+
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Communication
         echanger_halos(u_div_anc);
 
-        int i_reel = i_debut;
-        for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
-            if (i_reel > 0 && i_reel < nb_pt - 1){
-                u_div[i] = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
-            }
-            i_reel ++;
+        for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
+            u_div[i] = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
         }
 
         // Test d'arrêt
         norme = norme_infty_iteration(u_div, u_div_anc);
 
-        // Copie
-        for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
-            u_div_anc[i] = u_div[i];
-        }
-        nb_iterations ++;
+        permut = u_div; u_div = u_div_anc; u_div_anc = permut; nb_iterations ++;
 
     }
 
-    free(u_div_anc);
+    terminaison(&permut, &u_div, &u_div_anc);
 
 }

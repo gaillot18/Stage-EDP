@@ -62,6 +62,7 @@ void creer_topologie();
 void infos_topologie();
 void infos_processus();
 void echanger_halos(double *u_div);
+void infos_bornes_boucles(int *i_boucle_debut, int *i_boucle_fin);
 void infos_gather(int **deplacements, int **nb_elements_recus);
 
 

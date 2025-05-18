@@ -6,8 +6,6 @@
 
 # include "../../Librairies/parallele-1.h"
 
-# define SORTIE
-
 # define IDX(i, j) ((j) * (nb_pt_div_i + 2) + (i))
 
 
@@ -94,6 +92,28 @@ void creer_types(){
     MPI_Type_commit(&bloc_send);
 
     MPI_Barrier(comm_2D);
+
+}
+
+
+
+void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucle_fin, int *j_boucle_fin){
+
+    *i_boucle_debut = 1; *j_boucle_debut = 1;
+    *i_boucle_fin = nb_pt_div_i + 1; *j_boucle_fin = nb_pt_div_j + 1;
+
+    if (i_debut == 0){
+        (*i_boucle_debut) ++;
+    }
+    if (j_debut == 0){
+        (*j_boucle_debut) ++;
+    }
+    if (i_fin == nb_pt - 1){
+        (*i_boucle_fin) --;
+    }
+    if (j_fin == nb_pt - 1){
+        (*j_boucle_fin) --;
+    }
 
 }
 
