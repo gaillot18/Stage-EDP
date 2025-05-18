@@ -100,7 +100,7 @@ void creer_types(){
 
 
 // Effectuer les communications des cellules fantômes
-void communiquer(double *u_div){
+void echanger_halos(double *u_div){
 
     // Envoi haut, reception bas
     MPI_Sendrecv(&(u_div[IDX(1, nb_pt_div_j)]), 1, ligne, voisins[1], etiquette, &(u_div[IDX(1, 0)]), 1, ligne, voisins[3], etiquette, comm_2D, &statut);
@@ -119,7 +119,7 @@ void communiquer(double *u_div){
 
 
 // Regrouper les parties finales dans un vecteur sur le rang 0
-void regrouper_u(double *u_divise, double *u){
+void regrouper_u(double *u_div, double *u){
 
 
     for (int i = 1 ; i < nb_cpu ; i ++){
@@ -130,7 +130,7 @@ void regrouper_u(double *u_divise, double *u){
             MPI_Send(&nb_pt_div_j, 1, MPI_INT, 0, etiquette, comm_2D);
             MPI_Send(&i_debut, 1, MPI_INT, 0, etiquette, comm_2D);
             MPI_Send(&j_debut, 1, MPI_INT, 0, etiquette, comm_2D);
-            MPI_Send(u_divise, 1, bloc_send, 0, etiquette, comm_2D);
+            MPI_Send(u_div, 1, bloc_send, 0, etiquette, comm_2D);
 
         }
         else if (rang == 0){
@@ -175,7 +175,7 @@ void regrouper_u(double *u_divise, double *u){
         MPI_Type_create_subarray(2, taille_recv, sous_taille_recv, debut_recv, MPI_ORDER_C, MPI_DOUBLE, &bloc_recv);
         MPI_Type_commit(&bloc_recv);
 
-        MPI_Sendrecv(u_divise, 1, bloc_send, 0, etiquette, u, 1, bloc_recv, 0, etiquette, comm_2D, &statut);
+        MPI_Sendrecv(u_div, 1, bloc_send, 0, etiquette, u, 1, bloc_recv, 0, etiquette, comm_2D, &statut);
 
         MPI_Type_free(&bloc_recv);
 

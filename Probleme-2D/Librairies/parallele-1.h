@@ -72,10 +72,9 @@ void infos_processus();
 void infos_topologie();
 void creer_types();
 void infos_bord();
-void communiquer(double *u);
+void echanger_halos(double *u_div);
 void verifier_communication();
 void regrouper_u(double *u_divise, double *u);
-//void infos_gather(int **deplacements, int **nb_elements_recus);
 
 
 

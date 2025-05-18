@@ -123,7 +123,7 @@ void calculer_u_jacobi(double *f_div, double *u_div){
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Communication
-        communiquer(u_anc_div);
+        echanger_halos(u_anc_div);
 
         // Schéma
         int j_reel = j_debut;

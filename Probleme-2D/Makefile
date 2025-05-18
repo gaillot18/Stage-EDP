@@ -145,7 +145,7 @@ exe-sequentiel-1:
 
 exe-parallele-1:
 	make $(PRL1)
-	mpiexec -n 8 $(BIN)/$(PRL1) 100
+	mpiexec -n 4 $(BIN)/$(PRL1) 100
 
 exe-parallele-2:
 	make $(PRL2)

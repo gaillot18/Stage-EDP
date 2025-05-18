@@ -61,7 +61,7 @@ void affichage_ordonne(double *u_div, char *message);
 void creer_topologie();
 void infos_topologie();
 void infos_processus();
-void communiquer(double *u_div);
+void echanger_halos(double *u_div);
 void infos_gather(int **deplacements, int **nb_elements_recus);
 
 

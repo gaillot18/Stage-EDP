@@ -70,7 +70,7 @@ void infos_processus(){
 
 
 // Effectuer les communications des cellules fantômes
-void communiquer(double *u_div){
+void echanger_halos(double *u_div){
 
     // Envoi gauche, reception droite
     MPI_Sendrecv(&(u_div[1]), 1, MPI_DOUBLE, voisins[0], etiquette, &(u_div[nb_pt_div + 1]), 1, MPI_DOUBLE, voisins[1], etiquette, comm_1D, &statut);
