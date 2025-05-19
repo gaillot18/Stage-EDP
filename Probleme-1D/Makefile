@@ -14,14 +14,7 @@ FCN = Fonctions-numeriques
 TXT = Textes
 
 FLAGS = -g0
-
-ifeq ($(USE_MPI),1)
-    COMPILER = $(CCP)
-    MPI_FLAGS = -DUSE_MPI
-else
-    COMPILER = $(CC)
-    MPI_FLAGS =
-endif
+MPI_FLAGS = -DUSE_MPI
 
 .SUFFIXES: .o .c
 

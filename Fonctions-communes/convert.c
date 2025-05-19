@@ -1,5 +1,8 @@
 # include <stdio.h>
 # include <stdlib.h>
+# ifdef USE_MPI
+# include <mpi.h>
+# endif
 
 
 
