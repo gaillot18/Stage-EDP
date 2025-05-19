@@ -12,7 +12,7 @@ echo "EXECUTIONS POUR PROBLEME-2D"
 echo " "
 sleep 1
 
-for size in 100 300 500; do
+for size in 700; do
     $BIN/sequentiel-1 $size
     sleep 1
 

@@ -130,7 +130,7 @@ void calculer_u_jacobi(double *f, double *u){
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
-        # pragma omp parallel for collapse(2) schedule(runtime)
+        # pragma omp parallel for schedule(runtime)
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
                 u[IDX(i, j)] = schema(f, u, u_anc, i, j);
