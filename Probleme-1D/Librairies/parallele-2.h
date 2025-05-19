@@ -1,32 +1,22 @@
 // ======================================================
 // Variables globales
 // ======================================================
+extern int rang;
+extern int nb_cpu;
+extern int nb_pt_div;
+extern int i_debut;
+extern int i_fin;
+extern MPI_Comm comm_1D;
+extern int dims;
+extern int coords;
+extern int voisins[2];
+extern int nb_bord_libre;
+extern int coins[4];
+extern int etiquette;
+extern MPI_Status statut;
 extern int N;
 extern int nb_pt;
 extern int nb_iteration;
-extern int rang;
-extern int nb_cpu;
-extern int nb_pt_div_i;
-extern int nb_pt_div_j;
-extern int i_debut;
-extern int i_fin;
-extern int j_debut;
-extern int j_fin;
-extern MPI_Comm comm_2D;
-extern int dims[2];
-extern int tore[2];
-extern int coords[2];
-extern int voisins[4];
-extern int nb_bord_libre;
-extern int coins[4];
-extern MPI_Datatype ligne;
-extern MPI_Datatype colonne;
-extern MPI_Datatype bloc_send;
-extern int etiquette;
-extern int etiquettes[4];
-extern MPI_Status statut;
-extern MPI_Status statuts[8];
-extern MPI_Request requetes[8];
 
 
 
@@ -34,9 +24,7 @@ extern MPI_Request requetes[8];
 // ../../Fonctions-communes/affichage.c
 // ======================================================
 void afficher_matrice_carre_double(double *A, int n);
-void afficher_matrice_double(double *A, int n, int m);
 void afficher_matrice_carre_int(int *A, int n);
-void afficher_matrice_double_int(double *A, int n, int m);
 void afficher_vecteur_double(double *v, int n);
 void afficher_vecteur_int(int *v, int n);
 
@@ -69,25 +57,22 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ======================================================
 // ../Source/Parallele/parallele.c
 // ======================================================
-void affichage_ordonne(double *u_divise, char *message);
+void affichage_ordonne(double *u_div, char *message);
 void creer_topologie();
-void infos_processus();
 void infos_topologie();
-void creer_types();
-void infos_bord();
+void infos_processus();
 void echanger_halos(double *u_div);
-void test_fin_echange_halos();
-void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucle_fin, int *j_boucle_fin);
-void regrouper_u(double *u_divise, double *u);
+void infos_bornes_boucles(int *i_boucle_debut, int *i_boucle_fin);
+void infos_gather(int **deplacements, int **nb_elements_recus);
 
 
 
 // ======================================================
 // ../Source/sequentiel-1/resolution.c
 // ======================================================
-//void f_0(double **f);
+void f_0(double **f);
 void f_1(double **f);
-//double u_0(double x);
-double u_1(double x, double y);
-void calculer_u_exact(double (*fonction)(double, double), double *u);
+double u_0(double x);
+double u_1(double x);
+void calculer_u_exact(double (*fonction)(double), double *u);
 void calculer_u_jacobi(double *f, double *u);

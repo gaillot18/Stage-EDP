@@ -1,9 +1,10 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairies/parallele-3.h"
+# include "../../Librairies/parallele-2.h"
 
 // ======================================================
 // Déclarations des variables globales
@@ -11,26 +12,16 @@
 // MPI
 int rang;
 int nb_cpu;
-int nb_pt_div_i;
-int nb_pt_div_j;
+int nb_pt_div;
 int i_debut;
 int i_fin;
-int j_debut;
-int j_fin;
-// Communicateur 2D
-MPI_Comm comm_2D;
-int dims[2];
-int coords[2];
-int voisins[4];
+MPI_Comm comm_1D;
+int dims;
+int coords;
+int voisins[2];
 int nb_bord_libre;
-MPI_Datatype ligne;
-MPI_Datatype colonne;
-MPI_Datatype bloc_send;
 int etiquette = 1;
-int etiquettes[4];
 MPI_Status statut;
-MPI_Status statuts[8];
-MPI_Request requetes[8];
 // Variable égale pour chaque rang
 int N;
 int nb_pt;
@@ -72,76 +63,78 @@ int main(int argc, char **argv){
     nb_pt = N + 1;
 
 
+
     // ======================================================
     // Initialisation de MPI
     // ======================================================
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rang);
     MPI_Comm_size(MPI_COMM_WORLD, &nb_cpu);
+
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Exécution parallèle (pour %d processus) de : parallele-3 (Itératif, MPI non bloquant)\n", nb_cpu);
+        printf("Exécution parallèle (pour %d processus) de : parallele-2 (Itératif, MPI)\n", nb_cpu);
     }
 
-
+    
 
     // ======================================================
-    // Récupération des informations de chaque processus, création de la topologie et des types
+    // Récupération des informations de chaque processus
     // ======================================================
     creer_topologie();
     infos_topologie();
     infos_processus();
-    creer_types();
+    infos_gather(&deplacements, &nb_elements_recus);
     if (rang == 0){
         printf("Informations de chaque processus :\n");
     }
-    printf("rang = %d, i_debut = %d, j_debut = %d, nb_pt_div_i = %d, nb_pt_div_j = %d, voisins[gauche] = %d, voisins[haut] = %d, "
-        "voisins[droite] = %d, voisins[bas] = %d\n", rang, i_debut, j_debut, nb_pt_div_i, nb_pt_div_j, voisins[0], voisins[1],
-        voisins[2], voisins[3]);
-
+    printf("rang = %d, i_debut = %d, nb_pt_div = %d, voisins[gauche] = %d, voisins[droite] = %d\n", rang, i_debut, nb_pt_div, voisins[0], voisins[1]);
+    
 
 
     // ======================================================
-    // Calcul de f et u_exact
+    // Calcul de f_divise, u_divise et u_exact
     // ======================================================
     f_1(&f_div);
-    u_div = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
+    u_div = (double *)malloc((nb_pt_div + 2) * sizeof(double));
     if (rang == 0){
-        u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-        u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+        u_exact = (double *)malloc(nb_pt * sizeof(double));
         calculer_u_exact(u_1, u_exact);
     }
     
 
 
     // ======================================================
-    // Calcul de u avec mesure de temps
+    // Calcul de u_divise et u avec mesure de temps
     // ======================================================
     temps_debut = MPI_Wtime();
     calculer_u_jacobi(f_div, u_div);
-    regrouper_u(u_div, u);
+    if (rang == 0){
+        u = (double *)malloc(nb_pt * sizeof(double));
+    }
+    MPI_Gatherv(&(u_div[1]), nb_pt_div, MPI_DOUBLE, u, nb_elements_recus, deplacements, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     temps_fin = MPI_Wtime();
     temps = temps_fin - temps_debut;
-
+    
 
 
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
     if (rang == 0){
-        erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt); printf("\n");
-        printf("N = %d\nnb_pt * nb_pt = %d\nnb_iteration = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iteration, erreur_infty, temps);
+        erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
+        printf("N = %d\nnb_iteration = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_iteration, erreur_infty, temps);
     }
+    
 
-
-
+    
     // ======================================================
-    // Sauvegarde les résultats dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
     if (rang == 0){
         nom_fichier_txt = "./Textes/resultats.txt";
         entete = "version nb_cpu N nb_iteration erreur_infty temps";
-        resultats[0] = 4.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
+        resultats[0] = 3.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
         ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
     }
 
@@ -150,15 +143,13 @@ int main(int argc, char **argv){
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    MPI_Type_free(&ligne);
-    MPI_Type_free(&colonne);
-    MPI_Type_free(&bloc_send);
-    MPI_Comm_free(&comm_2D);
     free(u_div);
     free(f_div);
     if (rang == 0){
-        free(u_exact);
         free(u);
+        free(u_exact);
+        free(nb_elements_recus);
+        free(deplacements);
     }
 
 
@@ -171,7 +162,7 @@ int main(int argc, char **argv){
         printf("------------------------------------------------------------\n");
     }
     MPI_Finalize();
-    
+
     return 0;
-    
+
 }

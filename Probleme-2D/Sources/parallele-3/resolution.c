@@ -7,7 +7,7 @@
 # include <float.h>
 # include <limits.h>
 
-# include "../../Librairies/parallele-1.h"
+# include "../../Librairies/parallele-3.h"
 
 # define pi 3.14159265358979323846
 # define IDX(i, j) ((j) * (nb_pt_div_i + 2) + (i))
@@ -73,7 +73,78 @@ void init_u_anc(double **u_div_anc){
 
 
 
-double norme_infty_iteration(double *u_div, double *u_div_anc){
+static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div, double *u_div_anc, int i, int j){
+
+    double h_carre = 1.0 / pow(N, 2);
+
+    double res = 0.25 * (
+    u_div_anc[IDX(i - 1, j)]
+    + u_div_anc[IDX(i, j - 1)]
+    + u_div_anc[IDX(i + 1, j)]
+    + u_div_anc[IDX(i, j + 1)]
+    + h_carre * f_div[IDX(i, j)]);
+
+    return res;
+
+}
+
+
+
+static inline __attribute__((always_inline)) void calculer_u_jacobi_bords(double *f_div, double *u_div, double *u_div_anc){
+
+
+    // Coins
+    if (j_debut != 0){ 
+        int j = 1;
+        for (int i = 2 ; i < nb_pt_div_i ; i ++){
+            u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+        }
+    }
+    if (j_fin != nb_pt - 1){
+        int j = nb_pt_div_j;
+        for (int i = 2 ; i < nb_pt_div_i ; i ++){
+            u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+        }
+    }
+    if (i_debut != 0){
+        int i = 1 ;
+        for (int j = 2 ; j < nb_pt_div_j ; j ++){
+            u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+        }
+    }
+    if (i_fin != nb_pt - 1){
+        int i = nb_pt_div_i;
+        for (int j = 2 ; j < nb_pt_div_j ; j ++){
+            u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+        }
+    }
+
+    // Coins
+    if (i_debut != 0 && j_debut != 0){
+        int i = 1; int j = 1;
+        u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+    }
+
+    if (i_fin != nb_pt - 1 && j_debut != 0){
+        int i = nb_pt_div_i; int j = 1;
+        u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+    }
+
+    if (i_fin != nb_pt - 1 && j_fin != nb_pt - 1){
+        int i = nb_pt_div_i; int j = nb_pt_div_j;
+        u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+    }
+
+    if (i_debut != 0 && j_fin != nb_pt - 1){
+        int i = 1; int j = nb_pt_div_j;
+        u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+    }
+
+}
+
+
+
+static inline __attribute__((always_inline)) double norme_infty_iteration(double *u_div, double *u_div_anc){
 
     double norme_nume_div = 0.0;
     double norme_deno_div = 0.0;
@@ -105,7 +176,7 @@ double norme_infty_iteration(double *u_div, double *u_div_anc){
 
 void terminaison(double **permut, double **u_div, double **u_div_anc){
 
-    if (nb_iterations % 2 != 0){
+    if (nb_iteration % 2 != 0){
         *permut = *u_div; *u_div = *u_div_anc; *u_div_anc = *permut;
     }
 
@@ -117,8 +188,7 @@ void terminaison(double **permut, double **u_div, double **u_div_anc){
 
 void calculer_u_jacobi(double *f_div, double *u_div){
 
-    nb_iterations = 0;
-    double h_carre = 1.0 / pow(N, 2);
+    nb_iteration = 0;
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX; double norme_diff = DBL_MAX;
     int i_boucle_debut; int j_boucle_debut;
@@ -141,21 +211,22 @@ void calculer_u_jacobi(double *f_div, double *u_div){
         echanger_halos(u_div_anc);
 
         // Schéma
-        for (int j = j_boucle_debut ; j < j_boucle_fin ; j ++){
-            for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
-                    u_div[IDX(i, j)] = 0.25 * (
-                    u_div_anc[IDX(i - 1, j)]
-                    + u_div_anc[IDX(i, j - 1)]
-                    + u_div_anc[IDX(i + 1, j)]
-                    + u_div_anc[IDX(i, j + 1)]
-                    + h_carre * f_div[IDX(i, j)]);
+        for (int j = 2 ; j < nb_pt_div_j ; j ++){
+            for (int i = 2 ; i < nb_pt_div_i ; i ++){
+                    u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
             }
         }
+
+        // Test de communication
+        test_fin_echange_halos();
+
+        // Schéma sur les bords
+        calculer_u_jacobi_bords(f_div, u_div, u_div_anc);
 
         // Test d'arrêt
         norme = norme_infty_iteration(u_div, u_div_anc);
 
-        permut = u_div; u_div = u_div_anc; u_div_anc = permut; nb_iterations ++;
+        permut = u_div; u_div = u_div_anc; u_div_anc = permut; nb_iteration ++;
 
     }
 

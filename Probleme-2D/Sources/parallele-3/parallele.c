@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairies/parallele-1.h"
+# include "../../Librairies/parallele-3.h"
 
 # define IDX(i, j) ((j) * (nb_pt_div_i + 2) + (i))
 
@@ -46,10 +46,10 @@ void infos_topologie(){
     MPI_Cart_shift(comm_2D, 0, 1, &(voisins[0]), &(voisins[2]));
     MPI_Cart_shift(comm_2D, 1, 1, &(voisins[3]), &(voisins[1]));
 
-    bord = 4;
+    nb_bord_libre = 4;
     for (int i = 0 ; i < 4 ; i ++){
         if (voisins[i] == -1){
-            bord --;
+            nb_bord_libre --;
         }
     }
 
@@ -73,6 +73,7 @@ void infos_processus(){
     MPI_Barrier(comm_2D);
 
 }
+
 
 
 // Créer les types dérivés lignes, colonnes et bloc_send
@@ -123,16 +124,29 @@ void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucl
 void echanger_halos(double *u_div){
 
     // Envoi haut, reception bas
-    MPI_Sendrecv(&(u_div[IDX(1, nb_pt_div_j)]), 1, ligne, voisins[1], etiquette, &(u_div[IDX(1, 0)]), 1, ligne, voisins[3], etiquette, comm_2D, &statut);
+    MPI_Irecv(&(u_div[IDX(1, 0)]), 1, ligne, voisins[3], etiquettes[3], comm_2D, &(requetes[0]));
+    MPI_Isend(&(u_div[IDX(1, nb_pt_div_j)]), 1, ligne, voisins[1], etiquettes[1], comm_2D, &(requetes[1]));
 
     // Envoi bas, reception haut
-    MPI_Sendrecv(&(u_div[IDX(1, 1)]), 1, ligne, voisins[3], etiquette, &(u_div[IDX(1, nb_pt_div_j + 1)]), 1, ligne, voisins[1], etiquette, comm_2D, &statut);
+    MPI_Irecv(&(u_div[IDX(1, nb_pt_div_j + 1)]), 1, ligne, voisins[1], etiquettes[1], comm_2D, &(requetes[2]));
+    MPI_Isend(&(u_div[IDX(1, 1)]), 1, ligne, voisins[3], etiquettes[3], comm_2D, &(requetes[3]));
 
     // Envoi gauche, reception droite
-    MPI_Sendrecv(&(u_div[IDX(1, 1)]), 1, colonne, voisins[0], etiquette, &(u_div[IDX(nb_pt_div_i + 1, 1)]), 1, colonne, voisins[2], etiquette, comm_2D, &statut);
+    MPI_Irecv(&(u_div[IDX(nb_pt_div_i + 1, 1)]), 1, colonne, voisins[2], etiquettes[2], comm_2D, &(requetes[4]));
+    MPI_Isend(&(u_div[IDX(1, 1)]), 1, colonne, voisins[0], etiquettes[0], comm_2D, &(requetes[5]));
 
     // Envoi droite, reception gauche
-    MPI_Sendrecv(&(u_div[IDX(nb_pt_div_i, 1)]), 1, colonne, voisins[2], etiquette, &(u_div[IDX(0, 1)]), 1, colonne, voisins[0], etiquette, comm_2D, &statut);
+    MPI_Irecv(&(u_div[IDX(0, 1)]), 1, colonne, voisins[0], etiquettes[0], comm_2D, &(requetes[6]));
+    MPI_Isend(&(u_div[IDX(nb_pt_div_i, 1)]), 1, colonne, voisins[2], etiquettes[2], comm_2D, &(requetes[7]));
+
+}
+
+
+
+// Vérifier que les communications non bloquantes sont terminées
+void test_fin_echange_halos(){
+
+    MPI_Waitall(8, requetes, statuts);
 
 }
 
@@ -140,7 +154,6 @@ void echanger_halos(double *u_div){
 
 // Regrouper les parties finales dans un vecteur sur le rang 0
 void regrouper_u(double *u_div, double *u){
-
 
     for (int i = 1 ; i < nb_cpu ; i ++){
 

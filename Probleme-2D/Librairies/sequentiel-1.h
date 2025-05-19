@@ -3,7 +3,7 @@
 // ======================================================
 extern int N;
 extern int nb_pt;
-extern int nb_iterations;
+extern int nb_iteration;
 
 
 

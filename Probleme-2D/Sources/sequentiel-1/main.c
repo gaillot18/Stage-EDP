@@ -9,7 +9,7 @@
 // ======================================================
 int N;
 int nb_pt;
-int nb_iterations;
+int nb_iteration;
 
 
 
@@ -28,7 +28,6 @@ int main(int argc, char **argv){
     double *u_exact;
     // Autres résultats
     double erreur_infty;
-    nb_iterations = 0;
     // Fichiers
     const char *entete;
     double resultats[6];
@@ -47,7 +46,7 @@ int main(int argc, char **argv){
     // Initialisation
     // ======================================================
     printf("------------------------------------------------------------\n");
-    printf("Exécution séquentielle de : sequentiel-1\n");
+    printf("Exécution séquentielle de : sequentiel-1 (Itératif, séquentiel)\n");
 
 
 
@@ -75,7 +74,7 @@ int main(int argc, char **argv){
     // Affichage d'autres informations
     // ======================================================
     erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
-    printf("N = %d\nnb_pt * nb_pt = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iterations, erreur_infty, temps);
+    printf("N = %d\nnb_pt * nb_pt = %d\nnb_iteration = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iteration, erreur_infty, temps);
 
 
 
@@ -83,8 +82,8 @@ int main(int argc, char **argv){
     // Sauvegarde les résultats dans un fichier
     // ======================================================
     nom_fichier_txt = "./Textes/resultats.txt";
-    entete = "version nb_cpu N nb_iterations erreur_infty temps";
-    resultats[0] = 1.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = (double)nb_iterations; resultats[4] = erreur_infty; resultats[5] = temps;
+    entete = "version nb_cpu N nb_iteration erreur_infty temps";
+    resultats[0] = 1.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
     ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 

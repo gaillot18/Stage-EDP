@@ -15,7 +15,7 @@ SQT1 = sequentiel-1
 SQT2 = sequentiel-2
 FCN = Fonctions-numeriques
 
-FLAGS = -g0
+FLAGS = -g0 -O2
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
@@ -49,49 +49,49 @@ $(OBJ)/$(SQT1)/convert.o: ../$(FCC)/convert.c
 # ======================================================
 # Création de l'exécutable parallele-1
 # ======================================================
-$(BIN)/$(PRL1): $(OBJ)/$(PRL1)/affichage.o $(OBJ)/$(PRL1)/calcul-mat.o $(OBJ)/$(PRL1)/convert.o $(OBJ)/$(PRL1)/resolution.o $(OBJ)/$(PRL1)/parallele.o $(OBJ)/$(PRL1)/main.o
-	$(CCP) $(MPI_FLAGS) $(FLAGS) $^ -o $@
+$(BIN)/$(PRL1): $(OBJ)/$(PRL1)/affichage.o $(OBJ)/$(PRL1)/calcul-mat.o $(OBJ)/$(PRL1)/convert.o $(OBJ)/$(PRL1)/resolution.o $(OBJ)/$(PRL1)/main.o
+	$(CC) $(OMP_FLAGS) $(FLAGS) $^ -o $@
 
 $(OBJ)/$(PRL1)/main.o: $(SRC)/$(PRL1)/main.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL1)/parallele.o: $(SRC)/$(PRL1)/parallele.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(OMP_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL1)/resolution.o: $(SRC)/$(PRL1)/resolution.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(OMP_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL1)/affichage.o: ../$(FCC)/affichage.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL1)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL1)/convert.o: ../$(FCC)/convert.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 
 
 # ======================================================
 # Création de l'exécutable parallele-2
 # ======================================================
-$(BIN)/$(PRL2): $(OBJ)/$(PRL2)/affichage.o $(OBJ)/$(PRL2)/calcul-mat.o $(OBJ)/$(PRL2)/convert.o $(OBJ)/$(PRL2)/resolution.o $(OBJ)/$(PRL2)/main.o
-	$(CC) $(OMP_FLAGS) $(FLAGS) $^ -o $@
+$(BIN)/$(PRL2): $(OBJ)/$(PRL2)/affichage.o $(OBJ)/$(PRL2)/calcul-mat.o $(OBJ)/$(PRL2)/convert.o $(OBJ)/$(PRL2)/resolution.o $(OBJ)/$(PRL2)/parallele.o $(OBJ)/$(PRL2)/main.o
+	$(CCP) $(MPI_FLAGS) $(FLAGS) $^ -o $@
 
 $(OBJ)/$(PRL2)/main.o: $(SRC)/$(PRL2)/main.c
-	$(CC) $(OMP_FLAGS) $(FLAGS) -c $< -o $@
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(PRL2)/parallele.o: $(SRC)/$(PRL2)/parallele.c
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL2)/resolution.o: $(SRC)/$(PRL2)/resolution.c
-	$(CC) $(OMP_FLAGS) $(FLAGS) -c $< -o $@
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL2)/affichage.o: ../$(FCC)/affichage.c
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL2)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(PRL2)/convert.o: ../$(FCC)/convert.c
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
 
 
 
@@ -135,27 +135,23 @@ parallele-3: $(BIN)/$(PRL3)
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1) 100
+	$(BIN)/$(SQT1) 300
 
 exe-parallele-1:
-	make $(PRL1)
-	mpiexec -n 4 $(BIN)/$(PRL1) 100
+	make $(PRL2)
+	OMP_NUM_THREADS=8 $(BIN)/$(PRL1) 500
 
 exe-parallele-2:
-	make $(PRL2)
-	OMP_NUM_THREADS=4 $(BIN)/$(PRL2) 100
+	make $(PRL1)
+	mpiexec -n 4 $(BIN)/$(PRL2) 50
 
 exe-parallele-3:
 	make $(PRL3)
-	mpiexec -n 4 $(BIN)/$(PRL3) 100
-
-#exe-sequentiel-2:
-#make $(SQT2)
-#$(BIN)/$(SQT2) 2
+	mpiexec -n 4 $(BIN)/$(PRL3) 300
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(BIN)/* $(TXT)/resultats.txt
+	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(BIN)/* $(TXT)/resultats.txt
 
 kill:
 	pkill -9 prog

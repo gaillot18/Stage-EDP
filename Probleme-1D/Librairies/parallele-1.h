@@ -2,21 +2,11 @@
 // Variables globales
 // ======================================================
 extern int rang;
+# pragma omp threadprivate(rang)
 extern int nb_cpu;
-extern int nb_pt_div;
-extern int i_debut;
-extern int i_fin;
-extern MPI_Comm comm_1D;
-extern int dims;
-extern int coords;
-extern int voisins[2];
-extern int bord;
-extern int coins[4];
-extern int etiquette;
-extern MPI_Status statut;
 extern int N;
 extern int nb_pt;
-extern int nb_iterations;
+extern int nb_iteration;
 
 
 
@@ -55,20 +45,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/Parallele/parallele.c
-// ======================================================
-void affichage_ordonne(double *u_div, char *message);
-void creer_topologie();
-void infos_topologie();
-void infos_processus();
-void echanger_halos(double *u_div);
-void infos_bornes_boucles(int *i_boucle_debut, int *i_boucle_fin);
-void infos_gather(int **deplacements, int **nb_elements_recus);
-
-
-
-// ======================================================
-// ../Source/sequentiel-1/resolution.c
+// ../Source/parallele-1/resolution.c
 // ======================================================
 void f_0(double **f);
 void f_1(double **f);
@@ -76,3 +53,4 @@ double u_0(double x);
 double u_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
 void calculer_u_jacobi(double *f, double *u);
+void calculer_u_gaussseidel(double *f, double *u);

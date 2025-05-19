@@ -48,7 +48,7 @@ int main(int argc, char **argv){
     // Initialisation
     // ======================================================
     printf("------------------------------------------------------------\n");
-    printf("Exécution séquentielle de : sequentiel-2\n");
+    printf("Exécution séquentielle de : sequentiel-2 (Directe, séquentiel)\n");
 
 
 
@@ -121,7 +121,7 @@ int main(int argc, char **argv){
     // ======================================================
     nom_fichier_txt = "./Textes/resultats.txt";
     entete = "version nb_cpu N nb_iterations erreur_infty temps";
-    resultats[0] = 3.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = -1.0; resultats[4] = erreur_infty; resultats[5] = temps;
+    resultats[0] = 4.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = -1.0; resultats[4] = erreur_infty; resultats[5] = temps;
     ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 

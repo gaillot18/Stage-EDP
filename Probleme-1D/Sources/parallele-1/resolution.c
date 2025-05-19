@@ -1,15 +1,11 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <string.h>
 # include <sys/time.h>
 # include <math.h>
-# include <mpi.h>
 # include <float.h>
 # include <limits.h>
 
 # include "../../Librairies/parallele-1.h"
-
-# define SORTIE
 
 # define pi 3.14159265358979323846
 
@@ -17,8 +13,8 @@
 
 void f_0(double **f){
 
-    *f = (double *)malloc((nb_pt_div + 2) * sizeof(double));
-    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
+    *f = (double *)malloc(nb_pt * sizeof(double));
+    for (int i = 0 ; i < nb_pt ; i ++){
         (*f)[i] = 1;
     }
 
@@ -28,13 +24,10 @@ void f_0(double **f){
 
 void f_1(double **f){
 
-    *f = (double *)malloc((nb_pt_div + 2) * sizeof(double));
+    *f = (double *)malloc(nb_pt* sizeof(double));
     double h = 1.0 / N;
-    int i_reel = i_debut;
-    
-    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
-        (*f)[i] = pi * pi * sin(pi * i_reel * h);
-        i_reel ++;
+    for (int i = 0 ; i < nb_pt ; i ++){
+        (*f)[i] = pi * pi * sin(pi * i * h);
     }
 
 }
@@ -72,38 +65,47 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
-void init_u_div_anc(double **u_div_anc){
+void init_u_anc(double **u_anc){
 
-    *u_div_anc = (double *)malloc((nb_pt_div + 2) * sizeof(double));
+    *u_anc = (double *)malloc(nb_pt * sizeof(double));
     
-    for (int i = 0 ; i < nb_pt_div + 2 ; i ++){
-        (*u_div_anc)[i] = 0.0;
+    for (int i = 0 ; i < nb_pt + 2 ; i ++){
+        (*u_anc)[i] = 0.0;
     }
 
 }
 
 
 
-double norme_infty_iteration(double *u_div, double *u_div_anc){
+static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i){
 
-    double norme_nume_div = 0.0;
-    double norme_deno_div = 0.0;
+    double h_carre = 1.0 / pow(N, 2);
+
+    double res = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
+
+    return res;
+
+}
+
+
+
+static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
+
     double norme_nume;
     double norme_deno;
     double norme;
 
-    for (int i = 1 ; i < nb_pt_div + 1 ; i ++){
-        double diff = fabs(u_div[i] - u_div_anc[i]);
-        if (diff > norme_nume_div){
-            norme_nume_div = diff;
+    # pragma omp parallel for schedule (runtime)
+    for (int i = 1 ; i < nb_pt ; i ++){
+        double diff = fabs(u[i] - u[i]);
+        if (diff > norme_nume){
+            norme_nume = diff;
         }
-        if (fabs(u_div_anc[i]) > norme_deno_div){
-            norme_deno_div = fabs(u_div_anc[i]);
+        if (fabs(u_anc[i]) > norme_deno){
+            norme_deno = fabs(u_anc[i]);
         }
     }
 
-    MPI_Allreduce(&norme_nume_div, &norme_nume, 1, MPI_DOUBLE, MPI_MAX, comm_1D);
-    MPI_Allreduce(&norme_deno_div, &norme_deno, 1, MPI_DOUBLE, MPI_MAX, comm_1D);
     norme = norme_nume / norme_deno;
 
     return norme;
@@ -112,53 +114,77 @@ double norme_infty_iteration(double *u_div, double *u_div_anc){
 
 
 
-void terminaison(double **permut, double **u_div, double **u_div_anc){
+void terminaison(double **permut, double **u, double **u_anc){
 
-    if (nb_iterations % 2 != 0){
-        *permut = *u_div; *u_div = *u_div_anc; *u_div_anc = *permut;
+    if (nb_iteration % 2 != 0){
+        *permut = *u; *u = *u_anc; *u_anc = *permut;
     }
 
-    free(*u_div_anc);
+    free(*u_anc);
 
 }
 
 
 
-void calculer_u_jacobi(double *f_div, double *u_div){
+void calculer_u_jacobi(double *f, double *u){
 
-    nb_iterations = 0;
-    double h_carre = 1.0 / pow(N, 2);
+    nb_iteration = 0;
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
-    int i_boucle_debut, i_boucle_fin;
-    double *u_div_anc; double *permut;
+    double *u_anc; double *permut;
 
     // Vecteur de départ
-    init_u_div_anc(&u_div_anc);
-    for (int i = 0 ; i < nb_pt_div + 2 ; i ++){
-        u_div[i] = 0.0;
-    }
-
-    // Bornes des boucles
-    infos_bornes_boucles(&i_boucle_debut, &i_boucle_fin);
+    init_u_anc(&u_anc);
 
     // Itérations
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
-        // Communication
-        echanger_halos(u_div_anc);
-
-        for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
-            u_div[i] = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
+        // Schéma
+        # pragma omp parallel for schedule(runtime)
+        for (int i = 1 ; i < nb_pt - 1 ; i ++){
+            u[i] = schema(f, u, u_anc, i);
         }
 
         // Test d'arrêt
-        norme = norme_infty_iteration(u_div, u_div_anc);
+        norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
 
-        permut = u_div; u_div = u_div_anc; u_div_anc = permut; nb_iterations ++;
+        permut = u; u = u_anc; u_anc = permut; nb_iteration ++;
+        
+    }
+
+    terminaison(&permut, &u, &u_anc);
+
+}
+
+
+
+// Test de Gauss-Seidel sans calcul de la norme
+void calculer_u_gaussseidel(double *f, double *u){
+
+    double h_carre = 1.0 / pow(N, 2);
+    int nb_iteration_max = INT_MAX;
+    double *u_anc; double *permut;
+    u[0] = 0; u[nb_pt - 1] = 0;
+
+    // Vecteur de départ 
+    u_anc = (double *)malloc(nb_pt * sizeof(double));
+    for (int i = 0 ; i < nb_pt ; i ++){
+        u_anc[i] = 0;
+    }
+
+    // Itérations
+    for (int iteration = 0 ; iteration < nb_iteration_max ; iteration ++){
+
+        // Schéma
+        for (int i = 1 ; i < nb_pt - 1 ; i ++){
+            u[i] = 0.5 * (u[i - 1] + u_anc[i + 1] + h_carre * f[i]);
+        }
+
+        permut = u; u = u_anc; u_anc = permut;
+        nb_iteration++;
 
     }
 
-    terminaison(&permut, &u_div, &u_div_anc);
+    terminaison(&permut, &u, &u_anc);
 
 }

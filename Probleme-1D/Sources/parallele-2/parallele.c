@@ -4,7 +4,7 @@
 # include <sys/time.h>
 # include <mpi.h>
 
-# include "../../Librairies/parallele-1.h"
+# include "../../Librairies/parallele-2.h"
 
 
 
@@ -43,10 +43,10 @@ void infos_topologie(){
 
     MPI_Cart_shift(comm_1D, 0, 1, &(voisins[0]), &(voisins[1]));
 
-    bord = 2;
+    nb_bord_libre = 2;
     for (int i = 0 ; i < 2 ; i ++){
         if (voisins[i] == -1){
-            bord --;
+            nb_bord_libre --;
         }
     }
 

@@ -77,9 +77,45 @@ void init_u_anc(double **u_anc){
 
 
 
+static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i){
+
+    double h_carre = 1.0 / pow(N, 2);
+
+    double res = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
+
+    return res;
+
+}
+
+
+
+static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
+
+    double norme_nume;
+    double norme_deno;
+    double norme;
+
+    for (int i = 1 ; i < nb_pt ; i ++){
+        double diff = fabs(u[i] - u[i]);
+        if (diff > norme_nume){
+            norme_nume = diff;
+        }
+        if (fabs(u_anc[i]) > norme_deno){
+            norme_deno = fabs(u_anc[i]);
+        }
+    }
+
+    norme = norme_nume / norme_deno;
+
+    return norme;
+
+}
+
+
+
 void terminaison(double **permut, double **u, double **u_anc){
 
-    if (nb_iterations % 2 != 0){
+    if (nb_iteration % 2 != 0){
         *permut = *u; *u = *u_anc; *u_anc = *permut;
     }
 
@@ -91,9 +127,7 @@ void terminaison(double **permut, double **u, double **u_anc){
 
 void calculer_u_jacobi(double *f, double *u){
 
-    nb_iterations = 0;
-    int nb_pt = N + 1;
-    double h_carre = 1.0 / pow(N, 2);
+    nb_iteration = 0;
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     double *u_anc; double *permut;
@@ -106,13 +140,13 @@ void calculer_u_jacobi(double *f, double *u){
 
         // Schéma
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u[i] = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
+            u[i] = schema(f, u, u_anc, i);
         }
 
         // Test d'arrêt
         norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
 
-        permut = u; u = u_anc; u_anc = permut; nb_iterations ++;
+        permut = u; u = u_anc; u_anc = permut; nb_iteration ++;
         
     }
 
@@ -125,7 +159,6 @@ void calculer_u_jacobi(double *f, double *u){
 // Test de Gauss-Seidel sans calcul de la norme
 void calculer_u_gaussseidel(double *f, double *u){
 
-    int nb_pt = N + 1;
     double h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double *u_anc; double *permut;
@@ -146,7 +179,7 @@ void calculer_u_gaussseidel(double *f, double *u){
         }
 
         permut = u; u = u_anc; u_anc = permut;
-        nb_iterations++;
+        nb_iteration++;
 
     }
 

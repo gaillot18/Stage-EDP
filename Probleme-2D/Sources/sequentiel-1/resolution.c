@@ -9,6 +9,7 @@
 # include "../../Librairies/sequentiel-1.h"
 
 # define pi 3.14159265358979323846
+# define IDX(i, j) ((j) * nb_pt + (i))
 
 
 
@@ -18,7 +19,7 @@ void f_1(double **f){
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
         for (int j = 0 ; j < nb_pt ; j ++){
-            (*f)[j * nb_pt + i] = sin(2 * pi * i * h) * sin(2 * pi * j * h);
+            (*f)[IDX(i, j)] = sin(2 * pi * i * h) * sin(2 * pi * j * h);
         }
     }
 
@@ -41,7 +42,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
     double h = 1.0 / N;
     for (int i = 0 ; i < nb_pt ; i ++){
         for (int j = 0 ; j < nb_pt ; j ++){
-            u[j * nb_pt + i] = fonction(i * h, j * h);
+            u[IDX(i, j)] = fonction(i * h, j * h);
         }
     }
 
@@ -61,9 +62,50 @@ void init_u_anc(double **u_anc){
 
 
 
+static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i, int j){
+
+    double h_carre = 1.0 / pow(N, 2);
+
+    double res = 0.25 * (
+    u_anc[IDX(i - 1, j)]
+    + u_anc[IDX(i, j - 1)]
+    + u_anc[IDX(i + 1, j)]
+    + u_anc[IDX(i, j + 1)]
+    + h_carre * f[IDX(i, j)]);
+
+    return res;
+
+}
+
+
+
+static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
+
+    double norme_nume = 0.0;
+    double norme_deno = 0.0;
+    double norme;
+
+    for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
+        double diff = fabs(u[i] - u_anc[i]);
+        if (diff > norme_nume){
+            norme_nume = diff;
+        }
+        if (fabs(u_anc[i]) > norme_deno){
+            norme_deno = fabs(u_anc[i]);
+        }
+    }
+
+    norme = norme_nume / norme_deno;
+
+    return norme;
+
+}
+
+
+
 void terminaison(double **permut, double **u, double **u_anc){
 
-    if (nb_iterations % 2 != 0){
+    if (nb_iteration % 2 != 0){
         *permut = *u; *u = *u_anc; *u_anc = *permut;
     }
 
@@ -89,19 +131,14 @@ void calculer_u_jacobi(double *f, double *u){
         // Schéma
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
-                u[j * nb_pt + i] = 0.25 * (
-                u_anc[j * nb_pt + i - 1]
-                + u_anc[(j - 1) * nb_pt + i]
-                + u_anc[j * nb_pt + i + 1]
-                + u_anc[(j + 1) * nb_pt + i]
-                + h_carre * f[j * nb_pt + i]);
+                u[IDX(i, j)] = schema(f, u, u_anc, i, j);
             }
         }
 
         // Test d'arrêt
-        norme = norme_infty_diff(u, u_anc, nb_pt * nb_pt) / norme_infty(u_anc, nb_pt * nb_pt);
+        norme = norme_infty_iteration(u, u_anc);
         
-        permut = u; u = u_anc; u_anc = permut; nb_iterations ++;
+        permut = u; u = u_anc; u_anc = permut; nb_iteration ++;
 
     }
 
