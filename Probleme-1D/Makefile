@@ -14,7 +14,7 @@ SQT2 = sequentiel-2
 FCN = Fonctions-numeriques
 TXT = Textes
 
-FLAGS = -g0 -O2
+FLAGS = -g0 -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 

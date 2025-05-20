@@ -72,7 +72,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
     }
 
     for (int i = 0; i < n; i++) {
-        fprintf(descripteur, "%20.6f", resultats[i]);
+        fprintf(descripteur, "%20.8f", resultats[i]);
     }
     fprintf(descripteur, "\n");
 

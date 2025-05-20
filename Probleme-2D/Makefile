@@ -15,7 +15,7 @@ SQT1 = sequentiel-1
 SQT2 = sequentiel-2
 FCN = Fonctions-numeriques
 
-FLAGS = -g0 -O2
+FLAGS = -g0 -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
@@ -135,7 +135,7 @@ parallele-3: $(BIN)/$(PRL3)
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1) 300
+	$(BIN)/$(SQT1) 500
 
 exe-parallele-1:
 	make $(PRL2)
@@ -143,11 +143,11 @@ exe-parallele-1:
 
 exe-parallele-2:
 	make $(PRL1)
-	mpiexec -n 4 $(BIN)/$(PRL2) 50
+	mpiexec -n 4 $(BIN)/$(PRL2) 500
 
 exe-parallele-3:
 	make $(PRL3)
-	mpiexec -n 4 $(BIN)/$(PRL3) 300
+	mpiexec -n 4 $(BIN)/$(PRL3) 500
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt

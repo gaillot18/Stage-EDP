@@ -13,6 +13,8 @@
 
 # define pi 3.14159265358979323846
 
+double h_carre;
+
 
 
 void f_0(double **f){
@@ -86,8 +88,6 @@ void init_u_div_anc(double **u_div_anc){
 
 static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div, double *u_div_anc, int i){
 
-    double h_carre = 1.0 / pow(N, 2);
-
     double res = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
 
     return res;
@@ -139,6 +139,7 @@ void terminaison(double **permut, double **u_div, double **u_div_anc){
 void calculer_u_jacobi(double *f_div, double *u_div){
 
     nb_iteration = 0;
+    h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     int i_boucle_debut, i_boucle_fin;

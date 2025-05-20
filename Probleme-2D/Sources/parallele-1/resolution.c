@@ -11,6 +11,8 @@
 # define pi 3.14159265358979323846
 # define IDX(i, j) ((j) * (nb_pt) + (i))
 
+double h_carre;
+
 
 
 void f_1(double **f){
@@ -64,8 +66,6 @@ void init_u_anc(double **u_anc){
 
 static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i, int j){
 
-    double h_carre = 1.0 / pow(N, 2);
-
     double res = 0.25 * (
     u_anc[IDX(i - 1, j)]
     + u_anc[IDX(i, j - 1)]
@@ -118,7 +118,8 @@ void terminaison(double **permut, double **u, double **u_anc){
 
 void calculer_u_jacobi(double *f, double *u){
 
-    double h_carre = 1.0 / (N * N);
+    nb_iteration = 0;
+    h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     double *u_anc; double *permut;

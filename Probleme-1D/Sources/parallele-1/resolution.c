@@ -9,6 +9,8 @@
 
 # define pi 3.14159265358979323846
 
+double h_carre;
+
 
 
 void f_0(double **f){
@@ -79,8 +81,6 @@ void init_u_anc(double **u_anc){
 
 static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i){
 
-    double h_carre = 1.0 / pow(N, 2);
-
     double res = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
 
     return res;
@@ -91,13 +91,13 @@ static inline __attribute__((always_inline)) double schema(double *f, double *u,
 
 static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
 
-    double norme_nume;
-    double norme_deno;
+    double norme_nume = 0.0;
+    double norme_deno = 0.0;
     double norme;
 
     # pragma omp parallel for schedule (runtime)
     for (int i = 1 ; i < nb_pt ; i ++){
-        double diff = fabs(u[i] - u[i]);
+        double diff = fabs(u[i] - u_anc[i]);
         if (diff > norme_nume){
             norme_nume = diff;
         }
@@ -129,6 +129,7 @@ void terminaison(double **permut, double **u, double **u_anc){
 void calculer_u_jacobi(double *f, double *u){
 
     nb_iteration = 0;
+    h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double norme = DBL_MAX;
     double *u_anc; double *permut;
@@ -161,7 +162,7 @@ void calculer_u_jacobi(double *f, double *u){
 // Test de Gauss-Seidel sans calcul de la norme
 void calculer_u_gaussseidel(double *f, double *u){
 
-    double h_carre = 1.0 / pow(N, 2);
+    h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
     double *u_anc; double *permut;
     u[0] = 0; u[nb_pt - 1] = 0;
