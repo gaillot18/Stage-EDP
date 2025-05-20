@@ -73,7 +73,7 @@ int main(int argc, char **argv){
 
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Exécution parallèle (pour %d processus) de : parallele-2 (Itératif, MPI)\n", nb_cpu);
+        printf("Exécution parallèle (pour %d processus) de : parallele-2 (version 3 - méthode itérative - MPI)\n", nb_cpu);
     }
 
     

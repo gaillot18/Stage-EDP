@@ -58,7 +58,7 @@ int main(int argc, char **argv){
         }
     }
     printf("------------------------------------------------------------\n");
-    printf("Exécution parallèle (pour %d processus) de : parallele-1 (Itératif, OpenMP)\n", nb_cpu);
+    printf("Exécution parallèle (pour %d processus) de : parallele-1 (version 2 - méthode itérative - OpenMP)\n", nb_cpu);
 
 
 

@@ -48,7 +48,7 @@ int main(int argc, char **argv){
     // Initialisation
     // ======================================================
     printf("------------------------------------------------------------\n");
-    printf("Exécution séquentielle de : sequentiel-2 (Directe, séquentiel)\n");
+    printf("Exécution séquentielle de : sequentiel-2 (version 4 - méthode directe - séquentiel)\n");
 
 
 

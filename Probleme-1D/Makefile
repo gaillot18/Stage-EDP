@@ -23,7 +23,7 @@ OMP_FLAGS = -fopenmp
 
 
 # ======================================================
-# Création de l'exécutable sequentiel-1
+# Création de l'exécutable sequentiel-1 - version 1
 # ======================================================
 $(BIN)/$(SQT1): $(OBJ)/$(SQT1)/affichage.o $(OBJ)/$(SQT1)/calcul-mat.o $(OBJ)/$(SQT1)/convert.o $(OBJ)/$(SQT1)/resolution.o $(OBJ)/$(SQT1)/main.o
 	$(CC) $(FLAGS) $^ -o $@
@@ -46,7 +46,7 @@ $(OBJ)/$(SQT1)/convert.o: ../$(FCC)/convert.c
 
 
 # ======================================================
-# Création de l'exécutable parallele-1
+# Création de l'exécutable parallele-1 - version 2
 # ======================================================
 $(BIN)/$(PRL1): $(OBJ)/$(PRL1)/affichage.o $(OBJ)/$(PRL1)/calcul-mat.o $(OBJ)/$(PRL1)/convert.o $(OBJ)/$(PRL1)/resolution.o $(OBJ)/$(PRL1)/main.o
 	$(CC) $(OMP_FLAGS) $(FLAGS) $^ -o $@
@@ -69,7 +69,7 @@ $(OBJ)/$(PRL1)/convert.o: ../$(FCC)/convert.c
 
 
 # ======================================================
-# Création de l'exécutable parallele-2
+# Création de l'exécutable parallele-2 - version 3
 # ======================================================
 $(BIN)/$(PRL2): $(OBJ)/$(PRL2)/affichage.o $(OBJ)/$(PRL2)/calcul-mat.o $(OBJ)/$(PRL2)/convert.o $(OBJ)/$(PRL2)/resolution.o $(OBJ)/$(PRL2)/parallele.o $(OBJ)/$(PRL2)/main.o
 	$(CCP) $(MPI_FLAGS) $(FLAGS) $^ -o $@
@@ -95,7 +95,7 @@ $(OBJ)/$(PRL2)/convert.o: ../$(FCC)/convert.c
 
 
 # ======================================================
-# Création de l'exécutable sequentiel-2
+# Création de l'exécutable sequentiel-2 - version 4
 # ======================================================
 $(BIN)/$(SQT2): $(OBJ)/$(SQT2)/affichage.o $(OBJ)/$(SQT2)/calcul-mat.o $(OBJ)/$(SQT2)/convert.o $(OBJ)/$(SQT2)/resolution.o $(OBJ)/$(SQT2)/affichage-struct.o $(OBJ)/$(SQT2)/main.o
 	$(CC) $(FLAGS) $^ -o $@

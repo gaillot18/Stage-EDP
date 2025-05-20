@@ -1,17 +1,12 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
-# include <omp.h>
 
-# include "../../Librairies/parallele-1.h"
+# include "../../Librairies/sequentiel-2.h"
 
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
-// OpenMP
-int nb_cpu;
-int rang;
-// Variable égale pour chaque rang
 int N;
 int nb_pt;
 int nb_iteration;
@@ -50,15 +45,8 @@ int main(int argc, char **argv){
     // ======================================================
     // Initialisation
     // ======================================================
-    # pragma omp parallel
-    {
-        rang = omp_get_thread_num();
-        if (rang == 0){
-            nb_cpu = omp_get_num_threads();
-        }
-    }
     printf("------------------------------------------------------------\n");
-    printf("Exécution parallèle (pour %d processus) de : parallele-1 (version 2 - méthode itérative - OpenMP)\n", nb_cpu);
+    printf("Exécution séquentielle de : sequentiel-2 (version 5 - méthode directe - séquentiel)\n");
 
 
 
@@ -66,8 +54,8 @@ int main(int argc, char **argv){
     // Calcul de f et u_exact
     // ======================================================
     f_1(&f);
-    u = (double *)malloc(nb_pt * sizeof(double));
-    u_exact = (double *)malloc(nb_pt * sizeof(double));
+    //u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     calculer_u_exact(u_1, u_exact);
 
 
@@ -76,7 +64,7 @@ int main(int argc, char **argv){
     // Calcul de u avec mesure de temps
     // ======================================================
     gettimeofday(&temps_debut, NULL);
-    calculer_u_jacobi(f, u);
+    //calculer_u_jacobi(f, u);
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
@@ -85,18 +73,18 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
-    printf("N = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_iteration, erreur_infty, temps);
+    //erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
+    //printf("N = %d\nnb_pt * nb_pt = %d\nnb_iteration = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iteration, erreur_infty, temps);
 
 
 
     // ======================================================
-    // Sauvegarde des résultats dans un fichier
+    // Sauvegarde les résultats dans un fichier
     // ======================================================
-    nom_fichier_txt = "./Textes/resultats.txt";
-    entete = "version nb_cpu N nb_iteration erreur_infty temps";
-    resultats[0] = 2.0; resultats[1] = (double)nb_cpu; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
-    ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
+    //nom_fichier_txt = "./Textes/resultats.txt";
+    //entete = "version nb_cpu N nb_iteration erreur_infty temps";
+    //resultats[0] = 5.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
+    //ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 
 
@@ -105,7 +93,7 @@ int main(int argc, char **argv){
     // ======================================================
     free(f);
     free(u_exact);
-    free(u);
+    //free(u);
 
 
 

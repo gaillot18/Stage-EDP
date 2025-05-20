@@ -92,7 +92,7 @@ static inline __attribute__((always_inline)) double schema(double *f_div, double
 
 static inline __attribute__((always_inline)) void calculer_u_jacobi_bords(double *f_div, double *u_div, double *u_div_anc){
 
-    // Coins
+    // Bords sauf coins
     if (j_debut != 0){ 
         int j = 1;
         for (int i = 2 ; i < nb_pt_div_i ; i ++){

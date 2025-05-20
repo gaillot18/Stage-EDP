@@ -9,7 +9,7 @@
 # include "../../Librairies/sequentiel-1.h"
 
 # define pi 3.14159265358979323846
-# define IDX(i, j) ((j) * nb_pt + (i))
+# define IDX(i, j) ((j) * (nb_pt) + (i))
 
 double h_carre;
 
