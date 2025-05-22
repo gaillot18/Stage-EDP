@@ -3,22 +3,26 @@
 
 # include "../../Librairies/sequentiel-2.h"
 
+# define IDX(i, j) ((i) * ((N) - 1) + (j))
+# define idx_max ((N) - 1)
+
+
 
 // Afficher une structure mat_2bandes (compressée)
 void afficher_mat_2bandes(struct mat_2bandes *A){
     
-    printf("n = %d\n", A -> n);
+    printf("N = %d\n", A -> N);
 
-    int n = A -> n;
+    int N = A -> N;
 
     printf("diag      =");
-    for (int i = 0 ; i < n ; i ++){
+    for (int i = 0 ; i < idx_max ; i ++){
         printf("%10.6f ", (A -> diag)[i]);
     }
     printf("\n");
 
     printf("sous_diag =");
-    for (int i = 0 ; i < n - 1 ; i ++){
+    for (int i = 0 ; i < idx_max - 1 ; i ++){
         printf("%10.6f ", (A -> sous_diag)[i]);
     }
     printf("\n");
@@ -26,14 +30,15 @@ void afficher_mat_2bandes(struct mat_2bandes *A){
 }
 
 
+
 // Afficher une strucutre mat_2bandes (décompressée) (esthétique : pas utile pour les calculs)
 void afficher_mat_2bandes_totale(struct mat_2bandes *A){
 
-    int n = A -> n;
+    int N = A -> N;
     double zero = 0.0;
 
-    for (int i = 0 ; i < n ; i ++){
-        for (int j = 0 ; j < n ; j ++){
+    for (int i = 0 ; i < idx_max ; i ++){
+        for (int j = 0 ; j < idx_max ; j ++){
             if (i == j){
                 printf("%10.6f ", (A -> diag)[i]);
             }
@@ -51,23 +56,24 @@ void afficher_mat_2bandes_totale(struct mat_2bandes *A){
 }
 
 
+
 // Convertir une structure mat_2bandes en matrice carré
 void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B){
 
-    int n = A -> n;
+    int N = A -> N;
     double zero = 0.0;
 
-    *B = (double *)malloc(n * n * sizeof(double));
-    for (int i = 0 ; i < n ; i ++){
-        for (int j = 0 ; j < n ; j ++){
+    *B = (double *)malloc(idx_max * idx_max * sizeof(double));
+    for (int i = 0 ; i < idx_max ; i ++){
+        for (int j = 0 ; j < idx_max; j ++){
             if (i == j){
-                (*B)[i * n + j] = (A -> diag)[i];
+                (*B)[IDX(i, j)] = (A -> diag)[i];
             }
             else if (i == j + 1){
-                (*B)[i * n + j] = (A -> sous_diag)[j];
+                (*B)[IDX(i, j)] = (A -> sous_diag)[j];
             }
             else{
-                (*B)[i * n + j] = zero;
+                (*B)[IDX(i, j)] = zero;
             }
         }
     }
@@ -75,23 +81,24 @@ void mat_2bandes_vers_mat(struct mat_2bandes *A, double **B){
 }
 
 
+
 // Convertir une structure mat_2bandes en matrice carré (transposée)
 void mat_2bandes_vers_mat_trans(struct mat_2bandes *A, double **B){
 
-    int n = A -> n;
+    int N = A -> N;
     double zero = 0.0;
 
-    *B = (double *)malloc(n * n * sizeof(double));
-    for (int i = 0 ; i < n ; i ++){
-        for (int j = 0 ; j < n ; j ++){
+    *B = (double *)malloc(idx_max * idx_max * sizeof(double));
+    for (int i = 0 ; i < idx_max ; i ++){
+        for (int j = 0 ; j < idx_max ; j ++){
             if (i == j){
-                (*B)[i * n + j] = (A -> diag)[i];
+                (*B)[IDX(i, j)] = (A -> diag)[i];
             }
             else if (i == j + 1){
-                (*B)[j * n + i] = (A -> sous_diag)[j];
+                (*B)[IDX(j, i)] = (A -> sous_diag)[j];
             }
             else{
-                (*B)[i * n + j] = zero;
+                (*B)[IDX(i, j)] = zero;
             }
         }
     }

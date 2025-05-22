@@ -10,7 +10,7 @@ extern int nb_pt;
 // Structures
 // ======================================================
 struct mat_2bandes{
-    int n;
+    int N;
     double *diag; // taille n
     double *sous_diag; // taille n - 1
 };
@@ -52,7 +52,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/sequentiel-2/affichage.c
+// ../Source/sequentiel-2/affichage-struct.c
 // ======================================================
 void afficher_mat_2bandes(struct mat_2bandes *A);
 void afficher_mat_2bandes_totale(struct mat_2bandes *A);
@@ -68,8 +68,10 @@ void f_0(double **f);
 void f_1(double **f);
 double u_0(double x);
 double u_1(double x);
+void init_mat_2bandes(struct mat_2bandes *A);
+void liberer_mat_2bandes(struct mat_2bandes *A);
 void calculer_u_exact(double (*fonction)(double), double *u);
-void calculer_cholesky_tridiag(double alpha, double beta, int n, struct mat_2bandes *L);
+void calculer_cholesky(struct mat_2bandes *L);
 void resoudre_cholesky_descente(struct mat_2bandes *L, double *f, double *y);
 void resoudre_cholesky_remontee(struct mat_2bandes *L, double *y, double *u);
 void resoudre_cholesky(double *f, double *u);

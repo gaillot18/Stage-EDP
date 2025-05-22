@@ -3,7 +3,17 @@
 // ======================================================
 extern int N;
 extern int nb_pt;
-extern int nb_iteration;
+
+
+
+// ======================================================
+// Structures
+// ======================================================
+struct mat_Nbandes{
+    int N;
+    double **diags;
+};
+
 
 
 
@@ -29,6 +39,8 @@ double carre_norme_L2_diff(double *u, double *v, int n);
 double norme_L2(double *u, int n);
 double carre_norme_L2(double *u, int n);
 double norme_infty(double *u, int n);
+void extraire_interieur(double *A, double *A_int, int n);
+void inserer_interieur(double *A_int, double *A, int n);
 
 
 
@@ -42,10 +54,24 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
+// ../Source/sequentiel-2/affichage-struct.c
+// ======================================================
+void afficher_mat_Nbandes(struct mat_Nbandes *A);
+void afficher_mat_Nbandes_totale(struct mat_Nbandes *A);
+void mat_Nbandes_vers_mat(struct mat_Nbandes *A, double **B);
+void mat_Nbandes_vers_mat_trans(struct mat_Nbandes *A, double **B);
+
+
+
+// ======================================================
 // ../Source/parallele-1/resolution.c
 // ======================================================
 //void f_0(double **f);
 void f_1(double **f);
 //double u_0(double x);
 double u_1(double x, double y);
+void init_mat_Nbandes(struct mat_Nbandes *A);
+void liberer_mat_Nbandes(struct mat_Nbandes *A);
+void calculer_cholesky(struct mat_Nbandes *L);
 void calculer_u_exact(double (*fonction)(double, double), double *u);
+void resoudre_cholesky(double *f, double *u);

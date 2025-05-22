@@ -14,21 +14,24 @@ echo " "
 sleep 1
 
 for size in 5 10 50 100 300 500 700; do
-    $BIN/sequentiel-1 $size
+    #$BIN/sequentiel-1 $size
     #sleep 1
 
-    for n in 1 2 4 6 8; do
-        OMP_NUM_THREADS=$n $BIN/parallele-1 $size
+    #for n in 1 2 4 6 8; do
+        #OMP_NUM_THREADS=$n $BIN/parallele-1 $size
         #sleep 1
-    done
+    #done
 
-    for n in 1 2 4 6 8; do
-        mpiexec -n $n $BIN/parallele-2 $size
+    #for n in 1 2 4 6 8; do
+        #mpiexec -n $n $BIN/parallele-2 $size
         #sleep 1
-    done
+    #done
 
-    for n in 1 2 4 6 8; do
-        mpiexec -n $n $BIN/parallele-3 $size
+    #for n in 1 2 4 6 8; do
+        #mpiexec -n $n $BIN/parallele-3 $size
         #sleep 1
-    done
+    #done
+
+    $BIN/sequentiel-2 $size
+    #sleep 1
 done

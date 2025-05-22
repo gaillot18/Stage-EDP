@@ -156,3 +156,33 @@ double norme_infty(double *u, int n){
     return res;
 
 }
+
+
+
+// Extraire l'intérieur d'une matrice
+void extraire_interieur(double *A, double *A_int, int n){
+
+    int idx = 0;
+    for (int i = 1 ; i < n - 1 ; i ++){
+        for (int j = 1 ; j < n - 1 ; j ++){
+            A_int[idx] = A[i * n + j];
+            idx ++;
+        }
+    }
+
+}
+
+
+
+// Mettre l'intérieur d'une matrice
+void inserer_interieur(double *A_int, double *A, int n){
+
+    int idx = 0;
+    for (int i = 1 ; i < n - 1 ; i ++){
+        for (int j = 1 ; j < n - 1 ; j ++){
+            A[i * n + j] = A_int[idx];
+            idx ++;
+        }
+    }
+
+}

@@ -124,13 +124,16 @@ $(OBJ)/$(PRL3)/convert.o: ../$(FCC)/convert.c
 # ======================================================
 # Création de l'exécutable sequentiel-2 - version 5
 # ======================================================
-$(BIN)/$(SQT2): $(OBJ)/$(SQT2)/affichage.o $(OBJ)/$(SQT2)/calcul-mat.o $(OBJ)/$(SQT2)/convert.o $(OBJ)/$(SQT2)/resolution.o $(OBJ)/$(SQT2)/main.o
+$(BIN)/$(SQT2): $(OBJ)/$(SQT2)/affichage.o $(OBJ)/$(SQT2)/calcul-mat.o $(OBJ)/$(SQT2)/convert.o $(OBJ)/$(SQT2)/resolution.o $(OBJ)/$(SQT2)/affichage-struct.o $(OBJ)/$(SQT2)/main.o
 	$(CC) $(FLAGS) $^ -o $@
 
 $(OBJ)/$(SQT2)/main.o: $(SRC)/$(SQT2)/main.c
 	$(CC) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(SQT2)/resolution.o: $(SRC)/$(SQT2)/resolution.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT2)/affichage-struct.o: $(SRC)/$(SQT2)/affichage-struct.c
 	$(CC) $(FLAGS) -c $< -o $@
 
 $(OBJ)/$(SQT2)/affichage.o: ../$(FCC)/affichage.c
@@ -179,7 +182,6 @@ exe-sequentiel-2:
 	$(BIN)/$(SQT2) 500
 
 clean:
-	rm -f ./texte/*.data ./texte/*.txt
 	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
 
 kill:

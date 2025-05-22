@@ -59,27 +59,25 @@ int main(int argc, char **argv){
     {
         printf("\n-------------------------\n");
         printf("Illustration de la structure mat_2bandes (exemple pour N petit) :\n");
-        int N = 7;
+
+        N = 7;
         int nb_pt = N + 1;
-        double h = 1.0 / N;
-        double alpha = 2.0 / (h * h);
-        double beta = - 1.0 / (h * h);
+
         struct mat_2bandes L;
+        double *A;
 
-        calculer_cholesky_tridiag(alpha, beta, nb_pt - 2, &L);
+        init_mat_2bandes(&L);
+        calculer_cholesky(&L);
 
-        printf("alpha = %10.6f, beta = %10.6f\n", alpha, beta);
-        printf("\nStructure mat2_bandes :\n");
+        printf("\nStructure mat_2andes :\n");
         afficher_mat_2bandes(&L);
 
-        double *A;
         mat_2bandes_vers_mat(&L, &A);
         printf("\nMatrice réelle correspondante :\n");
         afficher_matrice_carre_double(A, nb_pt - 2);
 
         free(A);
-        free(L.diag);
-        free(L.sous_diag);
+        liberer_mat_2bandes(&L);
         printf("-------------------------\n\n");
 
         return 0;

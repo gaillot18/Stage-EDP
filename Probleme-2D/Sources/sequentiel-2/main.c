@@ -9,7 +9,6 @@
 // ======================================================
 int N;
 int nb_pt;
-int nb_iteration;
 
 
 
@@ -37,7 +36,8 @@ int main(int argc, char **argv){
         N = atoi(argv[1]);
     }
     else{
-        N = 10;
+        // Si pas d'argument, alors on affiche juste l'illustration de la strucutre mat_Nbandes
+        N = 0;
     }
     nb_pt = N + 1;
 
@@ -51,10 +51,43 @@ int main(int argc, char **argv){
 
 
     // ======================================================
+    // Illustration de la structure mat_2bandes
+    // ======================================================
+    if (N == 0)
+    {
+        printf("\n-------------------------\n");
+        printf("Illustration de la structure mat_Nbandes (exemple pour N petit) :\n");
+
+        N = 4;
+        nb_pt = N + 1;
+
+        struct mat_Nbandes L;
+        double *A;
+
+        init_mat_Nbandes(&L);
+        calculer_cholesky(&L);
+
+        printf("\nStructure mat_Nbandes :\n");
+        afficher_mat_Nbandes(&L);
+
+        mat_Nbandes_vers_mat(&L, &A);
+        printf("\nMatrice réelle correspondante :\n");
+        afficher_matrice_carre_double(A, (nb_pt - 2) * (nb_pt - 2));
+
+        free(A);
+        liberer_mat_Nbandes(&L);
+        printf("-------------------------\n\n");
+
+        return 0;
+    }
+
+
+
+    // ======================================================
     // Calcul de f et u_exact
     // ======================================================
     f_1(&f);
-    //u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     calculer_u_exact(u_1, u_exact);
 
@@ -64,7 +97,7 @@ int main(int argc, char **argv){
     // Calcul de u avec mesure de temps
     // ======================================================
     gettimeofday(&temps_debut, NULL);
-    //calculer_u_jacobi(f, u);
+    resoudre_cholesky(f, u);
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
@@ -73,18 +106,17 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    //erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
-    //printf("N = %d\nnb_pt * nb_pt = %d\nnb_iteration = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, nb_iteration, erreur_infty, temps);
-
+    erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
+    printf("N = %d\nnb_pt * nb_pt = %d\nerreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, erreur_infty, temps);
 
 
     // ======================================================
     // Sauvegarde les résultats dans un fichier
     // ======================================================
-    //nom_fichier_txt = "./Textes/resultats.txt";
-    //entete = "version nb_cpu N nb_iteration erreur_infty temps";
-    //resultats[0] = 5.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = (double)nb_iteration; resultats[4] = erreur_infty; resultats[5] = temps;
-    //ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
+    nom_fichier_txt = "./Textes/resultats.txt";
+    entete = "version nb_cpu N nb_iteration erreur_infty temps";
+    resultats[0] = 5.0; resultats[1] = -1.0; resultats[2] = (double)N; resultats[3] = -1.0; resultats[4] = erreur_infty; resultats[5] = temps;
+    ecrire_resultats(resultats, entete, 6, nom_fichier_txt);
 
 
 
@@ -93,7 +125,7 @@ int main(int argc, char **argv){
     // ======================================================
     free(f);
     free(u_exact);
-    //free(u);
+    free(u);
 
 
 
