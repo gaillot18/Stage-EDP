@@ -120,7 +120,7 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 
 
-.PHONY: clean exe kill
+.PHONY: clean exe
 
 all: clean sequentiel-1 parallele-1 parallele-2 sequentiel-2
 
@@ -151,6 +151,3 @@ exe-sequentiel-2:
 clean:
 	rm -f ./texte/*.data ./texte/*.txt
 	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
-
-kill:
-	pkill -9 prog

@@ -1,6 +1,10 @@
 CC = clang
 CCP = mpicc
 
+CPPFLAGS := -I/opt/homebrew/opt/llvm/include -I/opt/homebrew/opt/suite-sparse/include/suitesparse
+LDFLAGS = -L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/suite-sparse/lib 
+LDLIBS = -lcholmod
+
 BIN = ./Binaires
 LIB = ./Librairies
 OBJ = ./Objets
@@ -8,11 +12,13 @@ SRC = ./Sources
 TXT = ./Textes
 
 FCC = Fonctions-communes
+BS = base
 PRL1 = parallele-1
 PRL2 = parallele-2
 PRL3 = parallele-3
 SQT1 = sequentiel-1
 SQT2 = sequentiel-2
+SQT3 = sequentiel-3
 FCN = Fonctions-numeriques
 
 FLAGS = -g0 -O3
@@ -20,6 +26,28 @@ MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
 .SUFFIXES: .o .c
+
+
+# ======================================================
+# Création de l'exécutable base - version 0
+# ======================================================
+$(BIN)/$(BS): $(OBJ)/$(BS)/affichage.o $(OBJ)/$(BS)/calcul-mat.o $(OBJ)/$(BS)/convert.o $(OBJ)/$(BS)/resolution.o $(OBJ)/$(BS)/main.o
+	$(CC) $(FLAGS) $^ -o $@
+
+$(OBJ)/$(BS)/main.o: $(SRC)/$(BS)/main.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/resolution.o: $(SRC)/$(BS)/resolution.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/affichage.o: ../$(FCC)/affichage.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/calcul-mat.o: ../$(FCC)/calcul-mat.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/convert.o: ../$(FCC)/convert.c
+	$(CC) $(FLAGS) -c $< -o $@
 
 
 
@@ -147,9 +175,37 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 
 
-.PHONY: clean exe kill
+# ======================================================
+# Création de l'exécutable sequentiel-3 - version 6
+# ======================================================
+$(BIN)/$(SQT3): $(OBJ)/$(SQT3)/affichage.o $(OBJ)/$(SQT3)/calcul-mat.o $(OBJ)/$(SQT3)/convert.o $(OBJ)/$(SQT3)/resolution.o $(OBJ)/$(SQT3)/affichage-struct.o $(OBJ)/$(SQT3)/main.o
+	$(CC) $(FLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-all: clean sequentiel-1 parallele-1 parallele-2 parallele-3 sequentiel-2
+$(OBJ)/$(SQT3)/main.o: $(SRC)/$(SQT3)/main.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT3)/resolution.o: $(SRC)/$(SQT3)/resolution.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT3)/affichage-struct.o: $(SRC)/$(SQT3)/affichage-struct.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT3)/affichage.o: ../$(FCC)/affichage.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT3)/calcul-mat.o: ../$(FCC)/calcul-mat.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJ)/$(SQT3)/convert.o: ../$(FCC)/convert.c
+	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
+
+
+
+.PHONY: clean
+
+all: clean base sequentiel-1 parallele-1 parallele-2 parallele-3 sequentiel-2 sequentiel-3
+
+base : $(BIN)/$(BS)
 
 sequentiel-1: $(BIN)/$(SQT1)
 
@@ -160,6 +216,12 @@ parallele-2: $(BIN)/$(PRL2)
 parallele-3: $(BIN)/$(PRL3)
 
 sequentiel-2: $(BIN)/$(SQT2)
+
+sequentiel-3: $(BIN)/$(SQT3)
+
+exe-base:
+	make $(BS)
+	$(BIN)/$(BS)
 
 exe-sequentiel-1:
 	make $(SQT1)
@@ -175,14 +237,15 @@ exe-parallele-2:
 
 exe-parallele-3:
 	make $(PRL3)
-	mpiexec -n 4 $(BIN)/$(PRL3) 500
+	mpiexec -n 4 $(BIN)/$(PRL3) 100
 
 exe-sequentiel-2:
 	make $(SQT2)
-	$(BIN)/$(SQT2) 500
+	$(BIN)/$(SQT2) 50
+
+exe-sequentiel-3:
+	make $(SQT3)
+	$(BIN)/$(SQT3) 5000
 
 clean:
-	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
-
-kill:
-	pkill -9 prog
+	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(OBJ)/$(SQT3)/*.o $(BIN)/* $(TXT)/resultats.txt

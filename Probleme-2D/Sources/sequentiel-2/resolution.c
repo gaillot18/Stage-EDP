@@ -89,7 +89,6 @@ void init_mat_Nbandes(struct mat_Nbandes *A){
 void liberer_mat_Nbandes(struct mat_Nbandes *A){
 
     int N = A -> N;
-
     for (int i = 0 ; i < N ; i ++){
         free((A -> diags)[i]);
     }
@@ -128,8 +127,8 @@ void calculer_cholesky(struct mat_Nbandes *L){
     h_carre = 1.0 / pow(N, 2);
     double alpha = 4.0 / h_carre;
 
-    for (int j = 0 ; j < (N - 1) * (N - 1) ; j ++){
-        for (int d = 0 ; d < N && j + d < (N - 1) * (N - 1) ; d ++){
+    for (int j = 0 ; j < idx_max ; j ++){
+        for (int d = 0 ; d < N && j + d < idx_max ; d ++){
 
             int i = d + j;
 

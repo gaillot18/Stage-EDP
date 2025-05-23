@@ -13,7 +13,7 @@ echo "EXECUTIONS POUR PROBLEME-2D"
 echo " "
 sleep 1
 
-for size in 5 10 50 100 300 500 700; do
+for size in 1000 1500 2000 2500 3000 3500 4000 4500 5000 5500; do
     #$BIN/sequentiel-1 $size
     #sleep 1
 
@@ -32,6 +32,9 @@ for size in 5 10 50 100 300 500 700; do
         #sleep 1
     #done
 
-    $BIN/sequentiel-2 $size
+    #$BIN/sequentiel-2 $size
+    #sleep 1
+
+    $BIN/sequentiel-3 $size
     #sleep 1
 done
