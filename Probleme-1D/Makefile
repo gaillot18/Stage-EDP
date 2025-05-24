@@ -7,6 +7,7 @@ OBJ = ./Objets
 SRC = ./Sources
 
 FCC = Fonctions-communes
+BS = base
 PRL1 = parallele-1
 PRL2 = parallele-2
 SQT1 = sequentiel-1
@@ -19,6 +20,29 @@ MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
 .SUFFIXES: .o .c
+
+
+
+# ======================================================
+# Création de l'exécutable base - version 0
+# ======================================================
+$(BIN)/$(BS): $(OBJ)/$(BS)/affichage.o $(OBJ)/$(BS)/calcul-mat.o $(OBJ)/$(BS)/convert.o $(OBJ)/$(BS)/resolution.o $(OBJ)/$(BS)/main.o
+	$(CC) $(FLAGS) $^ -o $@
+
+$(OBJ)/$(BS)/main.o: $(SRC)/$(BS)/main.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/resolution.o: $(SRC)/$(BS)/resolution.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/affichage.o: ../$(FCC)/affichage.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/calcul-mat.o: ../$(FCC)/calcul-mat.c
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(OBJ)/$(BS)/convert.o: ../$(FCC)/convert.c
+	$(CC) $(FLAGS) -c $< -o $@
 
 
 
@@ -122,7 +146,9 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean exe
 
-all: clean sequentiel-1 parallele-1 parallele-2 sequentiel-2
+all: clean base sequentiel-1 parallele-1 parallele-2 sequentiel-2
+
+base : $(BIN)/$(BS)
 
 sequentiel-1: $(BIN)/$(SQT1)
 
@@ -131,6 +157,10 @@ parallele-1: $(BIN)/$(PRL1)
 parallele-2: $(BIN)/$(PRL2)
 
 sequentiel-2: $(BIN)/$(SQT2)
+
+exe-base:
+	make $(BS)
+	$(BIN)/$(BS) 5
 
 exe-sequentiel-1:
 	make $(SQT1)
@@ -146,7 +176,7 @@ exe-parallele-2:
 
 exe-sequentiel-2:
 	make $(SQT2)
-	$(BIN)/$(SQT2)
+	$(BIN)/$(SQT2) 10
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt

@@ -77,7 +77,7 @@ int main(int argc, char **argv){
     MPI_Comm_size(MPI_COMM_WORLD, &nb_cpu);
     if (rang == 0){
         printf("------------------------------------------------------------\n");
-        printf("Exécution parallèle (pour %d processus) de : parallele-2 (version 3 - méthode itérative - MPI bloquant\n", nb_cpu);
+        printf("Exécution parallèle (pour %d processus) de : parallele-2 (version 3 - méthode itérative - MPI bloquant)\n", nb_cpu);
     }
 
 

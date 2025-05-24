@@ -54,8 +54,8 @@ int main(int argc, char **argv){
     // Calcul de f et u_exact
     // ======================================================
     f_1(&f);
-    u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    u = (double *)malloc(nb_pt * sizeof(double));
+    u_exact = (double *)malloc(nb_pt * sizeof(double));
     calculer_u_exact(u_1, u_exact);
 
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv){
     // ======================================================
     // Affichage d'autres informations
     // ======================================================
-    erreur_infty = norme_infty_diff(u, u_exact, nb_pt * nb_pt);
+    erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
     printf("N = %d\nnb_pt * nb_pt = %d\nerreur_infty = %f\ntemps = %f sec\n", N, nb_pt * nb_pt, erreur_infty, temps);
 
 

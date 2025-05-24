@@ -221,7 +221,7 @@ sequentiel-3: $(BIN)/$(SQT3)
 
 exe-base:
 	make $(BS)
-	$(BIN)/$(BS)
+	$(BIN)/$(BS) 500
 
 exe-sequentiel-1:
 	make $(SQT1)
@@ -241,11 +241,11 @@ exe-parallele-3:
 
 exe-sequentiel-2:
 	make $(SQT2)
-	$(BIN)/$(SQT2) 50
+	$(BIN)/$(SQT2) 500
 
 exe-sequentiel-3:
 	make $(SQT3)
-	$(BIN)/$(SQT3) 5000
+	$(BIN)/$(SQT3) 500
 
 clean:
 	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(OBJ)/$(SQT3)/*.o $(BIN)/* $(TXT)/resultats.txt
