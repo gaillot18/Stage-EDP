@@ -1,2 +1,0 @@
-             version              nb_cpu                   N       nb_iterations        erreur_infty               temps
-          2.00000000          8.00000000        500.00000000     171980.00000000          0.00000015         14.44886400

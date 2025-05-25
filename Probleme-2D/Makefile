@@ -1,7 +1,7 @@
 CC = clang
 CCP = mpicc
 
-CPPFLAGS := -I/opt/homebrew/opt/llvm/include -I/opt/homebrew/opt/suite-sparse/include/suitesparse
+CPPFLAGS = -I/opt/homebrew/opt/llvm/include -I/opt/homebrew/opt/suite-sparse/include/suitesparse
 LDFLAGS = -L/opt/homebrew/opt/llvm/lib -L/opt/homebrew/opt/suite-sparse/lib 
 LDLIBS = -lcholmod
 
@@ -21,7 +21,7 @@ SQT2 = sequentiel-2
 SQT3 = sequentiel-3
 FCN = Fonctions-numeriques
 
-FLAGS = -g0 -O3
+FLAGS = -g0 -Wall -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
@@ -228,12 +228,12 @@ exe-sequentiel-1:
 	$(BIN)/$(SQT1) 500
 
 exe-parallele-1:
-	make $(PRL2)
+	make $(PRL1)
 	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 500
 
 exe-parallele-2:
-	make $(PRL1)
-	mpiexec -n 4 $(BIN)/$(PRL2) 500
+	make $(PRL2)
+	mpiexec -n 8 $(BIN)/$(PRL2) 700
 
 exe-parallele-3:
 	make $(PRL3)

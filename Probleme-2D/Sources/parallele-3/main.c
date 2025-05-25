@@ -47,9 +47,6 @@ int main(int argc, char **argv){
     double temps_debut;
     double temps_fin;
     double temps;
-    // Informations MPI
-    int *nb_elements_recus = NULL;
-    int *deplacements = NULL;
     // Buffers MPI
     double *f_div;
     double *u_div;

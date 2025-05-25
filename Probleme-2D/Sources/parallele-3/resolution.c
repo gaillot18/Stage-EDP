@@ -190,7 +190,7 @@ void calculer_u_jacobi(double *f_div, double *u_div){
     nb_iteration = 0;
     h_carre = 1.0 / pow(N, 2);
     int nb_iteration_max = INT_MAX;
-    double norme = DBL_MAX; double norme_diff = DBL_MAX;
+    double norme = DBL_MAX;
     int i_boucle_debut; int j_boucle_debut;
     int i_boucle_fin; int j_boucle_fin;
     double *u_div_anc; double *permut;

@@ -69,5 +69,5 @@ void f_1(double **f);
 double u_1(double x, double y);
 void calculer_u_exact(double (*fonction)(double, double), double *u);
 void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets);
-cholmod_sparse *creer_cholmod_sparse(int *offsets, int *lignes, double *valeurs, cholmod_common *c);
+cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs, cholmod_common *c);
 void resoudre(cholmod_sparse *A, double *f, cholmod_common *c, double *u);

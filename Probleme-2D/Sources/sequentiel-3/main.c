@@ -79,7 +79,7 @@ int main(int argc, char **argv){
     // ======================================================
     gettimeofday(&temps_debut, NULL);
     construire_matrice_creuse(&lignes, &valeurs, &offsets);
-    cholmod_sparse *A = creer_cholmod_sparse(offsets, lignes, valeurs, &c);
+    cholmod_sparse *A = cholmod_sparse *init_matrice_creuse(offsets, lignes, valeurs, &c);
     resoudre(A, f, &c, u);
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
@@ -106,9 +106,7 @@ int main(int argc, char **argv){
     // ======================================================
     // Libérations de la mémoire
     // ======================================================
-    free(lignes);
-    free(valeurs);
-    free(offsets);
+    cholmod_free_sparse(&A, &c);
     free(f);
     free(u_exact);
     free(u);

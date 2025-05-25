@@ -116,7 +116,7 @@ void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
     *valeurs = (double *)malloc(nb_elements * sizeof(double));
     *offsets = (int *)malloc((idx_max + 1) * sizeof(int));
     int *source_ligne; double *source_valeur;
-    int idx = 0; int taille; int offset;
+    int idx = 0; int offset;
     (*offsets)[0] = 0;
 
     for (int j = 0 ; j < idx_max ; j ++){
@@ -181,17 +181,21 @@ void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
 
 
-cholmod_sparse *creer_cholmod_sparse(int *offsets, int *lignes, double *valeurs, cholmod_common *c){
+cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs, cholmod_common *c){
 
     cholmod_sparse *A = cholmod_allocate_sparse(idx_max, idx_max, nb_elements, 1, 1, 0, CHOLMOD_REAL, c);
 
-    A -> p = offsets;
-    A -> i = lignes;
-    A -> x = valeurs;
+    memcpy(A -> p, offsets, (idx_max + 1) * sizeof(int));
+    memcpy(A -> i, lignes, nb_elements * sizeof(int));
+    memcpy(A -> x, valeurs, nb_elements * sizeof(double));
     A -> nzmax = nb_elements;
     A -> stype = 1;
     A -> nrow = idx_max;
     A -> ncol = idx_max;
+
+    free(lignes);
+    free(valeurs);
+    free(offsets);
 
     return A;
 
