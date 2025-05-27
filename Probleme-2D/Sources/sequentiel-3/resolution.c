@@ -181,9 +181,9 @@ void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
 
 
-cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs, cholmod_common *c){
+cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
-    cholmod_sparse *A = cholmod_allocate_sparse(idx_max, idx_max, nb_elements, 1, 1, 0, CHOLMOD_REAL, c);
+    cholmod_sparse *A = cholmod_allocate_sparse(idx_max, idx_max, nb_elements, 1, 1, 0, CHOLMOD_REAL, &c);
 
     memcpy(A -> p, offsets, (idx_max + 1) * sizeof(int));
     memcpy(A -> i, lignes, nb_elements * sizeof(int));
@@ -203,30 +203,30 @@ cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs, 
 
 
 
-void resoudre(cholmod_sparse *A, double *f, cholmod_common *c, double *u){
+void resoudre(cholmod_sparse *A, double *f, double *u){
 
     h_carre = 1.0 / pow(N, 2);
-    double *f_int = (double *)malloc(A->nrow * sizeof(double));
-    double *u_int = (double *)malloc(A->nrow * sizeof(double));
+    double *f_int = (double *)malloc(idx_max * sizeof(double));
+    double *u_int = (double *)malloc(idx_max * sizeof(double));
 
     extraire_interieur(f, f_int, nb_pt);
     extraire_interieur(u, u_int, nb_pt);
 
-    cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, c);
+    cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
     memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
 
-    cholmod_factor *L = cholmod_analyze(A, c);
-    cholmod_factorize(A, L, c);
+    cholmod_factor *L = cholmod_analyze(A, &c);
+    cholmod_factorize(A, L, &c);
 
-    cholmod_dense *u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, c);
+    cholmod_dense *u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
 
     memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
 
     inserer_interieur(u_int, u, nb_pt);
 
-    cholmod_free_factor(&L, c);
-    cholmod_free_dense(&f_dense, c);
-    cholmod_free_dense(&u_dense, c);
+    cholmod_free_factor(&L, &c);
+    cholmod_free_dense(&f_dense, &c);
+    cholmod_free_dense(&u_dense, &c);
 
     free(f_int);
     free(u_int);

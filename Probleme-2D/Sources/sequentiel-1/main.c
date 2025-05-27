@@ -79,7 +79,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Sauvegarde les résultats dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
     nom_fichier_txt = "./Textes/resultats.txt";
     entete = "version nb_cpu N nb_iteration erreur_infty temps";

@@ -13,6 +13,7 @@
 // ======================================================
 int N;
 int nb_pt;
+cholmod_common c;
 
 
 
@@ -36,7 +37,6 @@ int main(int argc, char **argv){
     double resultats[6];
     const char *nom_fichier_txt;
     // Cholmod
-    cholmod_common c;
     int *lignes;
     double *valeurs;
     int *offsets;
@@ -79,8 +79,8 @@ int main(int argc, char **argv){
     // ======================================================
     gettimeofday(&temps_debut, NULL);
     construire_matrice_creuse(&lignes, &valeurs, &offsets);
-    cholmod_sparse *A = cholmod_sparse *init_matrice_creuse(offsets, lignes, valeurs, &c);
-    resoudre(A, f, &c, u);
+    cholmod_sparse *A = init_matrice_creuse(offsets, lignes, valeurs);
+    resoudre(A, f, u);
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Sauvegarde les résultats dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
     nom_fichier_txt = "./Textes/resultats.txt";
     entete = "version nb_cpu N nb_iteration erreur_infty temps";

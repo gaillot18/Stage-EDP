@@ -3,16 +3,7 @@
 // ======================================================
 extern int N;
 extern int nb_pt;
-
-
-
-// ======================================================
-// Structures
-// ======================================================
-struct mat_Nbandes{
-    int N;
-    double **diags;
-};
+extern cholmod_common c;
 
 
 
@@ -63,11 +54,9 @@ void afficher_cholmod_totale(cholmod_sparse *A);
 // ======================================================
 // ../Source/parallele-1/resolution.c
 // ======================================================
-//void f_0(double **f);
 void f_1(double **f);
-//double u_0(double x);
 double u_1(double x, double y);
 void calculer_u_exact(double (*fonction)(double, double), double *u);
 void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets);
-cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs, cholmod_common *c);
-void resoudre(cholmod_sparse *A, double *f, cholmod_common *c, double *u);
+cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs);
+void resoudre(cholmod_sparse *A, double *f, double *u);

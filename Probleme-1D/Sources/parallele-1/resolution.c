@@ -147,7 +147,7 @@ void calculer_u_jacobi(double *f, double *u){
         }
 
         // Test d'arrêt
-        norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
+        norme = norme_infty_iteration(u, u_anc);
 
         permut = u; u = u_anc; u_anc = permut; nb_iteration ++;
         

@@ -5,6 +5,7 @@ BIN = ./Binaires
 LIB = ./Librairies
 OBJ = ./Objets
 SRC = ./Sources
+TXT = ./Textes
 
 FCC = Fonctions-communes
 BS = base
@@ -12,10 +13,8 @@ PRL1 = parallele-1
 PRL2 = parallele-2
 SQT1 = sequentiel-1
 SQT2 = sequentiel-2
-FCN = Fonctions-numeriques
-TXT = Textes
 
-FLAGS = -g0 -O3
+FLAGS = -g0 -Wall -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
 
@@ -144,7 +143,7 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 
 
 
-.PHONY: clean exe
+.PHONY: clean
 
 all: clean base sequentiel-1 parallele-1 parallele-2 sequentiel-2
 

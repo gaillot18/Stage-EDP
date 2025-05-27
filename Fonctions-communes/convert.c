@@ -51,14 +51,14 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
     fseek(descripteur, 0, SEEK_END);
     long taille = ftell(descripteur);
-    if (taille == 0) {
+    if (taille == 0){
         const char *p = entete;
         int colonne = 0;
-        while (*p && colonne < n) {
+        while (*p && colonne < n){
             char nom[64] = {0};
             int i = 0;
-            while (*p && *p != ' ' && i < 63) {
-                nom[i++] = *p++;
+            while (*p && *p != ' ' && i < 63){
+                nom[i ++] = *p ++;
             }
             nom[i] = '\0';
 
@@ -66,12 +66,12 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
             while (*p == ' ') p++;
 
-            colonne++;
+            colonne ++;
         }
         fprintf(descripteur, "\n");
     }
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0 ; i < n ; i ++){
         fprintf(descripteur, "%20.8f", resultats[i]);
     }
     fprintf(descripteur, "\n");

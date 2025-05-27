@@ -133,7 +133,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Sauvegarde les résultats dans un fichier
+    // Sauvegarde des résultats dans un fichier
     // ======================================================
     if (rang == 0){
         nom_fichier_txt = "./Textes/resultats.txt";

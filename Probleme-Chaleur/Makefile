@@ -30,23 +30,6 @@ OMP_FLAGS = -fopenmp
 # ======================================================
 # Création de l'exécutable base - version 0
 # ======================================================
-$(BIN)/$(BS): $(OBJ)/$(BS)/affichage.o $(OBJ)/$(BS)/calcul-mat.o $(OBJ)/$(BS)/convert.o $(OBJ)/$(BS)/resolution.o $(OBJ)/$(BS)/main.o
-	$(CC) $(FLAGS) $^ -o $@
-
-$(OBJ)/$(BS)/main.o: $(SRC)/$(BS)/main.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(BS)/resolution.o: $(SRC)/$(BS)/resolution.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(BS)/affichage.o: ../$(FCC)/affichage.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(BS)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(BS)/convert.o: ../$(FCC)/convert.c
-	$(CC) $(FLAGS) -c $< -o $@
 
 
 
@@ -202,7 +185,7 @@ $(OBJ)/$(SQT3)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean
 
-all: clean base sequentiel-1 parallele-1 parallele-2 parallele-3 sequentiel-2 sequentiel-3
+all: clean sequentiel-1
 
 base : $(BIN)/$(BS)
 
@@ -224,7 +207,7 @@ exe-base:
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1) 500
+	$(BIN)/$(SQT1) 5 2 10
 
 exe-parallele-1:
 	make $(PRL1)
