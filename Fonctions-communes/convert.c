@@ -29,12 +29,11 @@ void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichi
 
 
 // Écrire un tableau de doubles dans un fichier data
-void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n){
+void ecrire_double(char *nom_fichier_data, double *t, int n){
 
-    FILE *descripteur = fopen(nom_fichier_data, "wb");
+    FILE *descripteur = fopen(nom_fichier_data, "ab");
     fwrite(t, sizeof(double), n, descripteur);
     fclose(descripteur);
-    convertir_data_vers_txt(nom_fichier_data, nom_fichier_txt);
 
 }
 

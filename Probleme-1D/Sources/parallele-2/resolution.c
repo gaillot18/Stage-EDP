@@ -86,7 +86,7 @@ void init_u_div_anc(double **u_div_anc){
 
 
 
-static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div, double *u_div_anc, int i){
+static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div_anc, int i){
 
     double res = 0.5 * ((u_div_anc[i - 1] + u_div_anc[i + 1]) + h_carre * f_div[i]);
 
@@ -161,7 +161,7 @@ void calculer_u_jacobi(double *f_div, double *u_div){
         echanger_halos(u_div_anc);
 
         for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
-            u_div[i] = schema(f_div, u_div, u_div_anc, i);
+            u_div[i] = schema(f_div, u_div_anc, i);
         }
 
         // Test d'arrêt

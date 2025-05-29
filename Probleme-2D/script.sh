@@ -13,18 +13,18 @@ echo "EXECUTIONS POUR PROBLEME-2D"
 echo " "
 sleep 1
 
-for size in 700; do
+for size in 300; do
     #$BIN/base $size
 
-    #$BIN/sequentiel-1 $size
-
-    #for n in 1 2 4 6 8; do
-        #OMP_NUM_THREADS=$n $BIN/parallele-1 $size
-    #done
+    $BIN/sequentiel-1 $size
 
     for n in 1 2 4 6 8; do
-        mpiexec -n $n $BIN/parallele-2 $size
+        OMP_NUM_THREADS=$n $BIN/parallele-1 $size
     done
+
+    #for n in 1 2 4 6 8; do
+        #mpiexec -n $n $BIN/parallele-2 $size
+    #done
 
     #for n in 1 2 4 6 8; do
         #mpiexec -n $n $BIN/parallele-3 $size

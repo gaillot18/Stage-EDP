@@ -141,13 +141,13 @@ void calculer_u_jacobi(double *f, double *u){
     for (int iteration = 0 ; iteration < nb_iteration_max && norme > 1e-10 ; iteration ++){
 
         // Schéma
-        # pragma omp parallel for schedule(static, nb_pt / nb_cpu)
+        # pragma omp parallel for schedule(runtime)
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
             u[i] = schema(f, u, u_anc, i);
         }
 
         // Test d'arrêt
-        norme = norme_infty_iteration(u, u_anc);
+        norme = norme_infty_diff(u, u_anc, nb_pt) / norme_infty(u_anc, nb_pt);
 
         permut = u; u = u_anc; u_anc = permut; nb_iteration ++;
         

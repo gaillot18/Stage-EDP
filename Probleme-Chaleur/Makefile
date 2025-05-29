@@ -185,7 +185,7 @@ $(OBJ)/$(SQT3)/convert.o: ../$(FCC)/convert.c
 
 .PHONY: clean
 
-all: clean sequentiel-1
+all: clean sequentiel-1 parallele-1
 
 base : $(BIN)/$(BS)
 
@@ -207,11 +207,12 @@ exe-base:
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1) 5 2 10
+	rm -f $(TXT)/$(SQT1)/*.bin
+	$(BIN)/$(SQT1) 0 1 100 1 40000
 
 exe-parallele-1:
 	make $(PRL1)
-	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 500
+	OMP_NUM_THREADS=6 $(BIN)/$(PRL1) 0 1 150 1 100000
 
 exe-parallele-2:
 	make $(PRL2)

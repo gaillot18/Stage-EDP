@@ -71,7 +71,7 @@ void init_u_anc(double **u_anc){
 
     *u_anc = (double *)malloc(nb_pt * sizeof(double));
     
-    for (int i = 0 ; i < nb_pt + 2 ; i ++){
+    for (int i = 0 ; i < nb_pt ; i ++){
         (*u_anc)[i] = 0.0;
     }
 
@@ -79,7 +79,7 @@ void init_u_anc(double **u_anc){
 
 
 
-static inline __attribute__((always_inline)) double schema(double *f, double *u, double *u_anc, int i){
+static inline __attribute__((always_inline)) double schema(double *f, double *u_anc, int i){
 
     double res = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
 
@@ -141,7 +141,7 @@ void calculer_u_jacobi(double *f, double *u){
 
         // Schéma
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
-            u[i] = schema(f, u, u_anc, i);
+            u[i] = schema(f, u_anc, i);
         }
 
         // Test d'arrêt

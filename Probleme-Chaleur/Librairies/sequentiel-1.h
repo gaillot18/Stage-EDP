@@ -1,6 +1,7 @@
 // ======================================================
 // Variables globales
 // ======================================================
+extern double L;
 extern int N;
 extern double h;
 extern double T;
@@ -10,6 +11,7 @@ extern int nb_pt;
 extern double a;
 extern double alpha;
 extern double beta;
+extern double lambda;
 
 
 
@@ -42,7 +44,7 @@ double norme_infty(double *u, int n);
 // ../../Fonctions-communes/convert.c
 // ======================================================
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
-void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
+void ecrire_double(char *nom_fichier_data, double *t, int n);
 void ecrire_resultats(double *resultats, const char *entete, int n, const char *nom_fichier);
 
 
@@ -51,7 +53,8 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ../Source/parallele-1/resolution.c
 // ======================================================
 //void f_1(double **f);
-double f_source(double x, double y, double t);
+//double f_source(double x, double y, double t);
 double u_1(double x, double y, double t);
 void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k);
-void calculer_u(double (*fonction)(double, double, double), double *u);
+void calculer_u(double *u);
+double calculer_u_u_exact(double *u);

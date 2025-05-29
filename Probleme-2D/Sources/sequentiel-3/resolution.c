@@ -22,8 +22,8 @@ void f_1(double **f){
 
     *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        for (int j = 0 ; j < nb_pt ; j ++){
+    for (int j = 0 ; j < nb_pt ; j ++){
+        for (int i = 0 ; i < nb_pt ; i ++){
             (*f)[IDX(i, j)] = sin(2 * pi * i * h) * sin(2 * pi * j * h);
         }
     }
@@ -45,8 +45,8 @@ double u_1(double x, double y){
 void calculer_u_exact(double (*fonction)(double, double), double *u){
 
     double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        for (int j = 0 ; j < nb_pt ; j ++){
+    for (int j = 0 ; j < nb_pt ; j ++){
+        for (int i = 0 ; i < nb_pt ; i ++){
             u[IDX(i, j)] = fonction(i * h, j * h);
         }
     }

@@ -177,16 +177,13 @@ $(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 # ======================================================
 # Création de l'exécutable sequentiel-3 - version 6
 # ======================================================
-$(BIN)/$(SQT3): $(OBJ)/$(SQT3)/affichage.o $(OBJ)/$(SQT3)/calcul-mat.o $(OBJ)/$(SQT3)/convert.o $(OBJ)/$(SQT3)/resolution.o $(OBJ)/$(SQT3)/affichage-struct.o $(OBJ)/$(SQT3)/main.o
+$(BIN)/$(SQT3): $(OBJ)/$(SQT3)/affichage.o $(OBJ)/$(SQT3)/calcul-mat.o $(OBJ)/$(SQT3)/convert.o $(OBJ)/$(SQT3)/resolution.o $(OBJ)/$(SQT3)/main.o
 	$(CC) $(FLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 $(OBJ)/$(SQT3)/main.o: $(SRC)/$(SQT3)/main.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(OBJ)/$(SQT3)/resolution.o: $(SRC)/$(SQT3)/resolution.c
-	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT3)/affichage-struct.o: $(SRC)/$(SQT3)/affichage-struct.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(OBJ)/$(SQT3)/affichage.o: ../$(FCC)/affichage.c

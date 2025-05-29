@@ -53,8 +53,8 @@ double u_1(double x, double y){
 void calculer_u_exact(double (*fonction)(double, double), double *u){
 
     double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        for (int j = 0 ; j < nb_pt ; j ++){
+    for (int j = 0 ; j < nb_pt ; j ++){
+        for (int i = 0 ; i < nb_pt ; i ++){
             u[j * nb_pt + i] = fonction(i * h, j * h);
         }
     }
@@ -75,7 +75,7 @@ void init_u_anc(double **u_div_anc){
 
 
 
-static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div, double *u_div_anc, int i, int j){
+static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div_anc, int i, int j){
 
     double res = 0.25 * (
     u_div_anc[IDX(i - 1, j)]
@@ -160,7 +160,7 @@ void calculer_u_jacobi(double *f_div, double *u_div){
         // Schéma
         for (int j = j_boucle_debut ; j < j_boucle_fin ; j ++){
             for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
-                    u_div[IDX(i, j)] = schema(f_div, u_div, u_div_anc, i, j);
+                    u_div[IDX(i, j)] = schema(f_div, u_div_anc, i, j);
             }
         }
 
