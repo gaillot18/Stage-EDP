@@ -6,7 +6,7 @@
 # include "../../Librairies/sequentiel-1.h"
 
 # define pi 3.14159265358979323846
-# define EXACTE
+//# define EXACTE
 
 // ======================================================
 // Déclarations des variables globales

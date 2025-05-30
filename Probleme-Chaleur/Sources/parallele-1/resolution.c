@@ -114,6 +114,7 @@ void calculer_u(double *u){
             }
 
             # ifdef ECRITURE
+            # pragma omp single
             ecrire_double("Textes/parallele-1/resultats.bin", u, nb_pt * nb_pt);
             # endif
             permut = u; u = u_anc; u_anc = permut;
@@ -148,10 +149,6 @@ double calculer_u_u_exact(double *u){
                     u[IDX(i, j)] = schema(f, u_anc, i, j, k);
                 }
             }
-
-            # ifdef ECRITURE
-            ecrire_double("Textes/parallele-1/resultats.bin", u, nb_pt * nb_pt);
-            # endif
 
             # pragma omp single
             {

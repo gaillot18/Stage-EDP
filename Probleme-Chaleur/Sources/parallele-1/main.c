@@ -7,7 +7,7 @@
 # include "../../Librairies/parallele-1.h"
 
 # define pi 3.14159265358979323846
-# define EXACTE
+//# define EXACTE
 
 // ======================================================
 // Déclarations des variables globales
@@ -15,7 +15,6 @@
 // OpenMP
 int nb_cpu;
 int rang;
-int N;
 // Variable égale pour chaque rang
 double L;
 int N;

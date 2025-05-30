@@ -217,15 +217,15 @@ sequentiel-3: $(BIN)/$(SQT3)
 
 exe-base:
 	make $(BS)
-	$(BIN)/$(BS) 500
+	$(BIN)/$(BS) 50
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1) 500
+	$(BIN)/$(SQT1) 300
 
 exe-parallele-1:
 	make $(PRL1)
-	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 500
+	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 300
 
 exe-parallele-2:
 	make $(PRL2)

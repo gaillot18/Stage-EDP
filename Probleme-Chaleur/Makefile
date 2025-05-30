@@ -208,11 +208,11 @@ exe-base:
 exe-sequentiel-1:
 	make $(SQT1)
 	rm -f $(TXT)/$(SQT1)/*.bin
-	$(BIN)/$(SQT1) 0 1 100 1 40000
+	$(BIN)/$(SQT1) 0 1 200 1 160000
 
 exe-parallele-1:
 	make $(PRL1)
-	OMP_NUM_THREADS=6 $(BIN)/$(PRL1) 0 1 150 1 100000
+	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 200 1 160000
 
 exe-parallele-2:
 	make $(PRL2)
