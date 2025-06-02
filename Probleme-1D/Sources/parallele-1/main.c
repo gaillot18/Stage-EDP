@@ -83,7 +83,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Affichage d'autres informations
+    // Affichage des informations du problème et des résultats
     // ======================================================
     erreur_infty = norme_infty_diff(u, u_exact, nb_pt);
     printf("N = %d\nnb_iterations = %d, erreur_infty = %f\ntemps = %f sec\n", N, nb_iteration, erreur_infty, temps);

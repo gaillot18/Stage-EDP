@@ -8,7 +8,7 @@
 # define pi 3.14159265358979323846
 # define idx_max (((N) - 1) * ((N) - 1))
 # define nb_elements (((N) - 3) * (5 * (N) + 1) + 12)
-# define EXACTE
+//# define EXACTE
 //# define ECRITURE
 
 // ======================================================
@@ -23,7 +23,7 @@ double T;
 int N_t;
 double h_t;
 int nb_pt;
-double a = 1.0;
+double a;
 double alpha;
 double beta;
 double lambda;
@@ -37,9 +37,11 @@ int main(int argc, char **argv){
     // Déclarations des variables
     // ======================================================
     // Temps
+    # ifndef EXACTE
     struct timeval temps_debut;
     struct timeval temps_fin;
-    double temps;
+    # endif
+    double temps = -1.0;
     // Buffers
     double *u;
     // Autres résultats
@@ -66,6 +68,7 @@ int main(int argc, char **argv){
         N = L / h;
         N_t = T / h_t;
     }
+    a = 1.0;
     nb_pt = N + 1;
     alpha = 1.0 + (4 * a * h_t / pow(h, 2));
     beta = - a * h_t / pow(h, 2);
@@ -108,10 +111,9 @@ int main(int argc, char **argv){
     // ======================================================
     // Calcul de u avec mesure de temps
     // ======================================================
-    gettimeofday(&temps_debut, NULL);
-    gettimeofday(&temps_fin, NULL);
     # ifndef EXACTE
     {
+        gettimeofday(&temps_debut, NULL);
         # ifdef ECRITURE
         descripteur = fopen(nom_fichier_bin, "ab");
         # endif
@@ -121,20 +123,22 @@ int main(int argc, char **argv){
         # ifdef ECRITURE
         fclose(descripteur);
         # endif
+        gettimeofday(&temps_fin, NULL);
+        temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
     }
     # endif
-    temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;
 
 
 
     // ======================================================
-    // Affichage d'autres informations
+    // Affichage des informations du problème et des résultats
     // ======================================================
     printf("L = %f, N = %d, nb_pt = %d, nb_pt * nb_pt = %d, h = %f\n", L, N, nb_pt, nb_pt * nb_pt, h);
     printf("T = %f, N_t = %d, h_t = %f\n", T, N_t, h_t);
     printf("alpha = %f, beta = %f\n", alpha, beta);
     printf("erreur_infty = %f\n", erreur_infty);
     printf("temps = %f\n", temps);
+    printf("taille fichier (si écriture) = %f Go\n", sizeof(double) * nb_pt * nb_pt * (N_t + 1) * 1e-9);
 
     
 

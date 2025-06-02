@@ -119,7 +119,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Affichage d'autres informations
+    // Affichage des informations du problème et des résultats
     // ======================================================
     if (rang == 0){
         erreur_infty = norme_infty_diff(u, u_exact, nb_pt);

@@ -89,8 +89,9 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_d
 
 
 
-static inline __attribute__((always_inline)) void ecrire_double_iteration(double *u, int k){
+static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u, int k){
 
+    MPI_Barrier(comm_2D);
     MPI_Offset offset = (MPI_Offset)(k * nb_pt * nb_pt) * sizeof(double);
 
     int tailles_globales[2] = {nb_pt, nb_pt};
@@ -106,6 +107,7 @@ static inline __attribute__((always_inline)) void ecrire_double_iteration(double
     MPI_File_write_all(descripteur, u, 1, bloc_send, MPI_STATUS_IGNORE);
 
     MPI_Type_free(&vue_fichier);
+    MPI_Barrier(comm_2D);
 
 }
 
@@ -170,7 +172,7 @@ void calculer_u(double *u_div){
 
 
 // Calculer u_div et u_div_exact en même temps pour avoir l'erreur à chaque itération
-__attribute__((unused)) double calculer_u_u_exact(double *u_div){
+double calculer_u_u_exact(double *u_div){
 
     double *u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));

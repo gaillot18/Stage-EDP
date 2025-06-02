@@ -106,7 +106,7 @@ int main(int argc, char **argv){
 
 
     // ======================================================
-    // Affichage d'autres informations
+    // Affichage des informations du problème et des résultats
     // ======================================================
     erreur_L2 = norme_L2_diff(u, u_exact, nb_pt);
     erreur_infty = norme_infty_diff(u, u_exact, nb_pt);

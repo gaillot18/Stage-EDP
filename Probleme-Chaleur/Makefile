@@ -23,6 +23,15 @@ SQT3 = sequentiel-3
 FLAGS = -g0 -Wall -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
+ifneq ($(EXACTE),0)
+  FLAGS += -DEXACTE
+endif
+ifneq ($(ECRITURE),0)
+  FLAGS += -DECRITURE
+endif
+ifneq ($(ARRET),0)
+  FLAGS += -DARRET
+endif
 
 .SUFFIXES: .o .c
 
@@ -138,22 +147,22 @@ sequentiel-2: $(BIN)/$(SQT2)
 exe-sequentiel-1:
 	make $(SQT1)
 	rm -f $(TXT)/$(SQT1)/*
-	$(BIN)/$(SQT1) 0 1 50 1 10000
+	$(BIN)/$(SQT1) 0 1 200 1 160000
 
 exe-parallele-1:
 	make $(PRL1)
 	rm -f $(TXT)/$(PRL1)/*
-	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 50 1 10000
+	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 200 1 160000
 
 exe-parallele-2:
 	make $(PRL2)
 	rm -f $(TXT)/$(PRL2)/*
-	mpiexec -n 8 $(BIN)/$(PRL2) 0 1 50 1 10000
+	mpiexec -n 4 $(BIN)/$(PRL2) 0 1 200 1 160000
 
 exe-sequentiel-2:
 	make $(SQT2)
 	rm -f $(TXT)/$(SQT2)/*
-	$(BIN)/$(SQT2) 0 1 200 1 16000
+	$(BIN)/$(SQT2) 0 1 400 1 400
 
 clean:
 	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt

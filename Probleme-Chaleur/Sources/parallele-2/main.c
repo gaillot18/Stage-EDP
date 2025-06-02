@@ -44,7 +44,7 @@ double T;
 int N_t;
 double h_t;
 int nb_pt;
-double a = 1.0;
+double a;
 double alpha;
 double beta;
 double lambda;
@@ -57,9 +57,11 @@ int main(int argc, char **argv){
     // Déclarations des variables
     // ======================================================
     // Temps
+    # ifndef EXACTE
     double temps_debut;
     double temps_fin;
-    double temps;
+    # endif
+    double temps = -1.0;
     // Buffers MPI
     double *u_div;
     // Autres résultats
@@ -86,6 +88,7 @@ int main(int argc, char **argv){
         N = L / h;
         N_t = T / h_t;
     }
+    a = 1.0;
     nb_pt = N + 1;
     alpha = 1.0 - (4 * a * h_t / pow(h, 2));
     beta = a * h_t / pow(h, 2);
@@ -102,6 +105,7 @@ int main(int argc, char **argv){
         printf("------------------------------------------------------------\n");
         printf("Exécution parallèle (pour %d processus) de : parallele-2 (version 3 - schéma explicite - MPI bloquant)\n", nb_cpu);
     }
+    # ifdef ARRET
     if (beta > 0.25){
         if (rang == 0){
             printf("beta = %f > 1/4\n", beta);
@@ -111,6 +115,7 @@ int main(int argc, char **argv){
         MPI_Finalize();
         return 0;
     }
+    # endif
 
 
 
@@ -145,9 +150,9 @@ int main(int argc, char **argv){
     // ======================================================
     // Calcul de u_div avec mesure de temps
     // ======================================================
-    temps_debut = MPI_Wtime();
     # ifndef EXACTE
     {
+        temps_debut = MPI_Wtime();
         # ifdef ECRITURE
         MPI_File_open(comm_2D, nom_fichier_bin, MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &descripteur);
         # endif
@@ -155,15 +160,15 @@ int main(int argc, char **argv){
         # ifdef ECRITURE
         MPI_File_close(&descripteur);
         # endif
+        temps_fin = MPI_Wtime();
+        temps = temps_fin - temps_debut;
     }
     # endif
-    temps_fin = MPI_Wtime();
-    temps = temps_fin - temps_debut;
 
 
 
     // ======================================================
-    // Affichage d'autres informations
+    // Affichage des informations du problème et des résultats
     // ======================================================
     if (rang == 0){
         printf("L = %f, N = %d, nb_pt = %d, nb_pt * nb_pt = %d, h = %f\n", L, N, nb_pt, nb_pt * nb_pt, h);
@@ -171,6 +176,7 @@ int main(int argc, char **argv){
         printf("alpha = %f, beta = %f\n", alpha, beta);
         printf("erreur_infty = %f\n", erreur_infty);
         printf("temps = %f\n", temps);
+        printf("taille fichier (si écriture) = %f Go\n", sizeof(double) * nb_pt * nb_pt * (N_t + 1) * 1e-9);
     }
 
 

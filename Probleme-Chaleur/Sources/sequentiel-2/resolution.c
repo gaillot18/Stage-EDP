@@ -1,6 +1,5 @@
 # include <stdio.h>
 # include <stdlib.h>
-# include <omp.h>
 # include <sys/time.h>
 # include <math.h>
 # include <float.h>
@@ -27,12 +26,12 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
-static inline __attribute__((always_inline)) void calculer_f(double t, double *u, double *f){
+static inline __attribute__((always_inline)) void calculer_b(double t, double *u, double *b){
 
     for (int i = 0 ; i < idx_max ; i ++){
         int x = i % (N - 1);
         int y = i / (N - 1);
-        f[i] = u[i] + h_t * f_source(x, y, t + 1);
+        b[i] = u[i] + h_t * f_source(x, y, t + 1);
     }
 
 }
@@ -230,7 +229,7 @@ cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
 
 // Écrire dans le fichier
-static inline __attribute__((always_inline)) void ecrire_double_iteration(double *u){
+static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u){
 
     fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
 
@@ -240,12 +239,12 @@ static inline __attribute__((always_inline)) void ecrire_double_iteration(double
 
 void resoudre(cholmod_sparse *A, double *u){
 
-    double *f_int = (double *)malloc(idx_max * sizeof(double));
+    double *b_int = (double *)malloc(idx_max * sizeof(double));
     double *u_int = (double *)malloc(idx_max * sizeof(double));
 
     init_u_zero(u_zero, u);
 
-    cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
+    cholmod_dense *b_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
     cholmod_dense *u_dense;
     cholmod_factor *L = cholmod_analyze(A, &c);
     cholmod_factorize(A, L, &c);
@@ -257,11 +256,11 @@ void resoudre(cholmod_sparse *A, double *u){
         # endif
 
         extraire_interieur(u, u_int, nb_pt);
-        calculer_f(k + 1, u_int, f_int);
+        calculer_b(k + 1, u_int, b_int);
 
-        memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
+        memcpy(b_dense -> x, b_int, A -> nrow * sizeof(double));
 
-        u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
+        u_dense = cholmod_solve(CHOLMOD_A, L, b_dense, &c);
 
         memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
 
@@ -274,9 +273,9 @@ void resoudre(cholmod_sparse *A, double *u){
     # endif
 
     cholmod_free_factor(&L, &c);
-    cholmod_free_dense(&f_dense, &c);
+    cholmod_free_dense(&b_dense, &c);
     cholmod_free_dense(&u_dense, &c);
-    free(f_int);
+    free(b_int);
     free(u_int);
 
 
@@ -284,16 +283,16 @@ void resoudre(cholmod_sparse *A, double *u){
 
 
 
-__attribute__((unused)) double resoudre_calculer_u_exact(cholmod_sparse *A, double *u){
+double resoudre_calculer_u_exact(cholmod_sparse *A, double *u){
 
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double erreur_infty_k; double erreur_infty = 0.0;
-    double *f_int = (double *)malloc(idx_max * sizeof(double));
+    double *b_int = (double *)malloc(idx_max * sizeof(double));
     double *u_int = (double *)malloc(idx_max * sizeof(double));
 
     init_u_zero(u_zero, u);
 
-    cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
+    cholmod_dense *b_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
     cholmod_dense *u_dense;
     cholmod_factor *L = cholmod_analyze(A, &c);
     cholmod_factorize(A, L, &c);
@@ -301,11 +300,11 @@ __attribute__((unused)) double resoudre_calculer_u_exact(cholmod_sparse *A, doub
     for (int k = 1 ; k <= N_t ; k ++){
 
         extraire_interieur(u, u_int, nb_pt);
-        calculer_f(k + 1, u_int, f_int);
+        calculer_b(k + 1, u_int, b_int);
 
-        memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
+        memcpy(b_dense -> x, b_int, A -> nrow * sizeof(double));
 
-        u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
+        u_dense = cholmod_solve(CHOLMOD_A, L, b_dense, &c);
 
         memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
 
@@ -320,9 +319,9 @@ __attribute__((unused)) double resoudre_calculer_u_exact(cholmod_sparse *A, doub
     }
 
     cholmod_free_factor(&L, &c);
-    cholmod_free_dense(&f_dense, &c);
+    cholmod_free_dense(&b_dense, &c);
     cholmod_free_dense(&u_dense, &c);
-    free(f_int);
+    free(b_int);
     free(u_int);
     free(u_exact);
 

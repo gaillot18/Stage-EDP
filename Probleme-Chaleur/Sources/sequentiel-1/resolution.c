@@ -82,7 +82,7 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_a
 
 
 // Écrire dans le fichier
-static inline __attribute__((always_inline)) void ecrire_double_iteration(double *u){
+static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u){
 
     fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
 
@@ -139,7 +139,7 @@ void calculer_u(double *u){
 
 
 // Calculer u et u_exact en même temps pour avoir l'erreur à chaque itération
-__attribute__((unused)) double calculer_u_u_exact(double *u){
+double calculer_u_u_exact(double *u){
 
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double erreur_infty_k; double erreur_infty = 0.0;
