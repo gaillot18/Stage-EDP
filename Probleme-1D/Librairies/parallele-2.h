@@ -55,7 +55,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/Parallele/parallele.c
+// ../Source/parallele-2/parallele.c
 // ======================================================
 void affichage_ordonne(double *u_div, char *message);
 void creer_topologie();
@@ -68,7 +68,7 @@ void infos_gather(int **deplacements, int **nb_elements_recus);
 
 
 // ======================================================
-// ../Source/sequentiel-1/resolution.c
+// ../Source/parallele-2/resolution.c
 // ======================================================
 void f_0(double **f);
 void f_1(double **f);

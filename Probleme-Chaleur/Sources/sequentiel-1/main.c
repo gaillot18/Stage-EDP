@@ -7,10 +7,13 @@
 
 # define pi 3.14159265358979323846
 //# define EXACTE
+//# define ECRITURE
 
 // ======================================================
 // Déclarations des variables globales
 // ======================================================
+FILE *descripteur;
+const char *nom_fichier_bin;
 double L;
 int N;
 double h;
@@ -39,6 +42,7 @@ int main(int argc, char **argv){
     // Autres résultats
     double erreur_infty;
     // Fichiers
+    nom_fichier_bin = "Textes/sequentiel-1/resultats.bin";
     const char *entete;
     double resultats[8];
     const char *nom_fichier_txt;
@@ -97,7 +101,15 @@ int main(int argc, char **argv){
     // ======================================================
     gettimeofday(&temps_debut, NULL);
     # ifndef EXACTE
-    calculer_u(u);
+    {
+        # ifdef ECRITURE
+        descripteur = fopen(nom_fichier_bin, "ab");
+        # endif
+        calculer_u(u);
+        # ifdef ECRITURE
+        fclose(descripteur);
+        # endif
+    }
     # endif
     gettimeofday(&temps_fin, NULL);
     temps = (temps_fin.tv_sec - temps_debut.tv_sec) + (temps_fin.tv_usec - temps_debut.tv_usec) / (double)1000000;

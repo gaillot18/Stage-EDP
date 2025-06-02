@@ -27,11 +27,6 @@ OMP_FLAGS = -fopenmp
 .SUFFIXES: .o .c
 
 
-# ======================================================
-# Création de l'exécutable base - version 0
-# ======================================================
-
-
 
 # ======================================================
 # Création de l'exécutable sequentiel-1 - version 1
@@ -106,88 +101,31 @@ $(OBJ)/$(PRL2)/convert.o: ../$(FCC)/convert.c
 
 
 # ======================================================
-# Création de l'exécutable parallele-3 - version 4
+# Création de l'exécutable sequentiel-2 - version 4
 # ======================================================
-$(BIN)/$(PRL3): $(OBJ)/$(PRL3)/affichage.o $(OBJ)/$(PRL3)/calcul-mat.o $(OBJ)/$(PRL3)/convert.o $(OBJ)/$(PRL3)/resolution.o $(OBJ)/$(PRL3)/parallele.o $(OBJ)/$(PRL3)/main.o
-	$(CCP) $(MPI_FLAGS) $(FLAGS) $^ -o $@
-
-$(OBJ)/$(PRL3)/main.o: $(SRC)/$(PRL3)/main.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL3)/parallele.o: $(SRC)/$(PRL3)/parallele.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL3)/resolution.o: $(SRC)/$(PRL3)/resolution.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL3)/affichage.o: ../$(FCC)/affichage.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL3)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(PRL3)/convert.o: ../$(FCC)/convert.c
-	$(CCP) $(MPI_FLAGS) $(FLAGS) -c $< -o $@
-
-
-
-# ======================================================
-# Création de l'exécutable sequentiel-2 - version 5
-# ======================================================
-$(BIN)/$(SQT2): $(OBJ)/$(SQT2)/affichage.o $(OBJ)/$(SQT2)/calcul-mat.o $(OBJ)/$(SQT2)/convert.o $(OBJ)/$(SQT2)/resolution.o $(OBJ)/$(SQT2)/affichage-struct.o $(OBJ)/$(SQT2)/main.o
-	$(CC) $(FLAGS) $^ -o $@
-
-$(OBJ)/$(SQT2)/main.o: $(SRC)/$(SQT2)/main.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT2)/resolution.o: $(SRC)/$(SQT2)/resolution.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT2)/affichage-struct.o: $(SRC)/$(SQT2)/affichage-struct.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT2)/affichage.o: ../$(FCC)/affichage.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT2)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
-	$(CC) $(FLAGS) -c $< -o $@
-
-
-
-# ======================================================
-# Création de l'exécutable sequentiel-3 - version 6
-# ======================================================
-$(BIN)/$(SQT3): $(OBJ)/$(SQT3)/affichage.o $(OBJ)/$(SQT3)/calcul-mat.o $(OBJ)/$(SQT3)/convert.o $(OBJ)/$(SQT3)/resolution.o $(OBJ)/$(SQT3)/affichage-struct.o $(OBJ)/$(SQT3)/main.o
+$(BIN)/$(SQT2): $(OBJ)/$(SQT2)/affichage.o $(OBJ)/$(SQT2)/calcul-mat.o $(OBJ)/$(SQT2)/convert.o $(OBJ)/$(SQT2)/resolution.o $(OBJ)/$(SQT2)/main.o
 	$(CC) $(FLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-$(OBJ)/$(SQT3)/main.o: $(SRC)/$(SQT3)/main.c
+$(OBJ)/$(SQT2)/main.o: $(SRC)/$(SQT2)/main.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
-$(OBJ)/$(SQT3)/resolution.o: $(SRC)/$(SQT3)/resolution.c
+$(OBJ)/$(SQT2)/resolution.o: $(SRC)/$(SQT2)/resolution.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
-$(OBJ)/$(SQT3)/affichage-struct.o: $(SRC)/$(SQT3)/affichage-struct.c
+$(OBJ)/$(SQT2)/affichage.o: ../$(FCC)/affichage.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
-$(OBJ)/$(SQT3)/affichage.o: ../$(FCC)/affichage.c
+$(OBJ)/$(SQT2)/calcul-mat.o: ../$(FCC)/calcul-mat.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
-$(OBJ)/$(SQT3)/calcul-mat.o: ../$(FCC)/calcul-mat.c
-	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(OBJ)/$(SQT3)/convert.o: ../$(FCC)/convert.c
+$(OBJ)/$(SQT2)/convert.o: ../$(FCC)/convert.c
 	$(CC) $(FLAGS) $(CPPFLAGS) -c $< -o $@
 
 
 
 .PHONY: clean
 
-all: clean sequentiel-1 parallele-1
-
-base : $(BIN)/$(BS)
+all: clean sequentiel-1 parallele-1 parallele-2 sequentiel-2
 
 sequentiel-1: $(BIN)/$(SQT1)
 
@@ -195,40 +133,27 @@ parallele-1: $(BIN)/$(PRL1)
 
 parallele-2: $(BIN)/$(PRL2)
 
-parallele-3: $(BIN)/$(PRL3)
-
 sequentiel-2: $(BIN)/$(SQT2)
-
-sequentiel-3: $(BIN)/$(SQT3)
-
-exe-base:
-	make $(BS)
-	$(BIN)/$(BS) 500
 
 exe-sequentiel-1:
 	make $(SQT1)
-	rm -f $(TXT)/$(SQT1)/*.bin
-	$(BIN)/$(SQT1) 0 1 200 1 160000
+	rm -f $(TXT)/$(SQT1)/*
+	$(BIN)/$(SQT1) 0 1 50 1 10000
 
 exe-parallele-1:
 	make $(PRL1)
-	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 200 1 160000
+	rm -f $(TXT)/$(PRL1)/*
+	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 50 1 10000
 
 exe-parallele-2:
 	make $(PRL2)
-	mpiexec -n 8 $(BIN)/$(PRL2) 700
-
-exe-parallele-3:
-	make $(PRL3)
-	mpiexec -n 4 $(BIN)/$(PRL3) 100
+	rm -f $(TXT)/$(PRL2)/*
+	mpiexec -n 8 $(BIN)/$(PRL2) 0 1 50 1 10000
 
 exe-sequentiel-2:
 	make $(SQT2)
-	$(BIN)/$(SQT2) 500
-
-exe-sequentiel-3:
-	make $(SQT3)
-	$(BIN)/$(SQT3) 500
+	rm -f $(TXT)/$(SQT2)/*
+	$(BIN)/$(SQT2) 0 1 200 1 16000
 
 clean:
-	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(OBJ)/$(SQT3)/*.o $(BIN)/* $(TXT)/resultats.txt
+	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt

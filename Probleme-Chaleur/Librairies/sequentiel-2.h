@@ -1,8 +1,20 @@
 // ======================================================
 // Variables globales
 // ======================================================
+extern FILE *descripteur;
+extern const char *nom_fichier_bin;
+extern double L;
 extern int N;
+extern double h;
+extern double T;
+extern int N_t;
+extern double h_t;
 extern int nb_pt;
+extern double a;
+extern double alpha;
+extern double beta;
+extern double lambda;
+extern cholmod_common c;
 
 
 
@@ -37,16 +49,15 @@ void inserer_interieur(double *A_int, double *A, int n);
 // ../../Fonctions-communes/convert.c
 // ======================================================
 void convertir_data_vers_txt(const char *nom_fichier_data, const char *nom_fichier_txt);
-void ecrire_double(char *nom_fichier_data, char *nom_fichier_txt, double *t, int n);
+void ecrire_double(char *nom_fichier_data, double *t, int n);
 void ecrire_resultats(double *resultats, const char *entete, int n, const char *nom_fichier);
 
 
 
 // ======================================================
-// ../Source/base/resolution.c
+// ../Source/sequentiel-2/resolution.c
 // ======================================================
-void f_1(double **f);
-double u_1(double x, double y);
-void calculer_u_exact(double (*fonction)(double, double), double *u);
-double *construire_matrice();
-void resoudre_gauss(double *A, double *f, double *u);
+void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets);
+cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs);
+void resoudre(cholmod_sparse *A, double *u);
+double resoudre_calculer_u_exact(cholmod_sparse *A, double *u);

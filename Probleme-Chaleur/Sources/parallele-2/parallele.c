@@ -22,7 +22,7 @@ void affichage_ordonne(double *u_divise, char *message){
 
 
 
-// Créer la topologie cartésienne 2D du domaine [0, 1] x [0, 1]
+// Créer la topologie cartésienne 2D du domaine [0, L] x [0, L]
 void creer_topologie(){
 
     int tore[2] = {0, 0};
@@ -139,7 +139,6 @@ void echanger_halos(double *u_div){
 
 
 
-// Regrouper les parties finales dans un vecteur sur le rang 0
 void regrouper_u(double *u_div, double *u){
 
     for (int i = 1 ; i < nb_cpu ; i ++){

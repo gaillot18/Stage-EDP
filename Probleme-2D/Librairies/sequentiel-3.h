@@ -7,7 +7,6 @@ extern cholmod_common c;
 
 
 
-
 // ======================================================
 // ../../Fonctions-communes/affichage.c
 // ======================================================
@@ -45,14 +44,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/sequentiel-2/affichage-struct.c
-// ======================================================
-void afficher_cholmod_totale(cholmod_sparse *A);
-
-
-
-// ======================================================
-// ../Source/parallele-1/resolution.c
+// ../Source/sequentiel-3/resolution.c
 // ======================================================
 void f_1(double **f);
 double u_1(double x, double y);

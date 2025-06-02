@@ -43,7 +43,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/parallele-1/resolution.c
+// ../Source/base/resolution.c
 // ======================================================
 void f_0(double **f);
 void f_1(double **f);

@@ -7,34 +7,19 @@
 # include <limits.h>
 # include <cholmod.h>
 
-# include "../../Librairies/sequentiel-3.h"
+# include "../../Librairies/sequentiel-2.h"
 
 # define pi 3.14159265358979323846
 # define IDX(i, j) ((j) * (nb_pt) + (i))
 # define idx_max (((N) - 1) * ((N) - 1))
 # define nb_elements (((N) - 3) * (5 * (N) + 1) + 12)
-
-double h_carre;
-
-
-
-void f_1(double **f){
-
-    *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    double h = 1.0 / N;
-    for (int j = 0 ; j < nb_pt ; j ++){
-        for (int i = 0 ; i < nb_pt ; i ++){
-            (*f)[IDX(i, j)] = sin(2 * pi * i * h) * sin(2 * pi * j * h);
-        }
-    }
-
-}
+//# define ECRITURE
 
 
 
-double u_1(double x, double y){
+static inline __attribute__((always_inline)) double f_source(double x, double y, double t){
 
-    double res = 1.0 / (8 * pow(pi, 2)) * sin(2 * pi * x) * sin(2 * pi * y);
+    double res = (-lambda + 2 * a * pow(pi, 2)) * sin(pi * x) * sin(pi * y) * exp(-lambda * t);
 
     return res;
 
@@ -42,9 +27,52 @@ double u_1(double x, double y){
 
 
 
-void calculer_u_exact(double (*fonction)(double, double), double *u){
+static inline __attribute__((always_inline)) void calculer_f(double t, double *u, double *f){
 
-    double h = 1.0 / N;
+    for (int i = 0 ; i < idx_max ; i ++){
+        int x = i % (N - 1);
+        int y = i / (N - 1);
+        f[i] = u[i] + h_t * f_source(x, y, t + 1);
+    }
+
+}
+
+
+
+double u_1(double x, double y, double t){
+
+    double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
+
+    return res;
+
+}
+
+
+
+void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k){
+
+    for (int j = 0 ; j < nb_pt ; j ++){
+        for (int i = 0 ; i < nb_pt ; i ++){
+            u[IDX(i, j)] = fonction(i * h, j * h, k * h_t);
+        }
+    }
+
+}
+
+
+
+double u_zero(double x, double y){
+
+    double res = sin(pi * x) * sin(pi * y);
+
+    return res;
+
+}
+
+
+
+void init_u_zero(double (*fonction)(double, double), double *u){
+
     for (int j = 0 ; j < nb_pt ; j ++){
         for (int i = 0 ; i < nb_pt ; i ++){
             u[IDX(i, j)] = fonction(i * h, j * h);
@@ -83,33 +111,31 @@ static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
 void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
-    h_carre = 1.0 / pow(N, 2);
-
-    double val_coin_bas_gauche[3] = {4 / h_carre, -1 / h_carre, -1 / h_carre}; // 1
+    double val_coin_bas_gauche[3] = {alpha, beta, beta}; // 1
     int lig_coin_bas_gauche[3] = {0, 1, N - 1};
 
-    double val_coin_haut_droite[3] = {-1 / h_carre, -1 / h_carre, 4 / h_carre}; // 3
+    double val_coin_haut_droite[3] = {beta, beta, alpha}; // 3
     int lig_coin_haut_droite[3] = {-N + 1, -1, 0};
 
-    double val_coin_bas_droite[3] = {-1 / h_carre, 4 / h_carre, -1 / h_carre}; // 4
+    double val_coin_bas_droite[3] = {beta, alpha, beta}; // 4
     int lig_coin_bas_droite[3] = {-1, 0, N - 1};
 
-    double val_coin_haut_gauche[3] = {-1 / h_carre, 4 / h_carre, -1 / h_carre}; // 2
+    double val_coin_haut_gauche[3] = {beta, alpha, beta}; // 2
     int lig_coin_haut_gauche[3] = {-N + 1, 0, 1};
 
-    double val_bord_bas[4] = {-1 / h_carre, 4 / h_carre, -1 / h_carre, -1 / h_carre}; // -4
+    double val_bord_bas[4] = {beta, alpha, beta, beta}; // -4
     int lig_bord_bas[4] = {-1, 0, 1, N - 1};
 
-    double val_bord_gauche[4] = {-1 / h_carre, 4 / h_carre, -1 / h_carre, -1 / h_carre}; // -1
+    double val_bord_gauche[4] = {beta, alpha, beta, beta}; // -1
     int lig_bord_gauche[4] = {-N + 1, 0, 1, N - 1};
 
-    double val_bord_haut[4] = {-1 / h_carre, -1 / h_carre, 4 / h_carre, -1 / h_carre}; // -2
+    double val_bord_haut[4] = {beta, beta, alpha, beta}; // -2
     int lig_bord_haut[4] = {-N + 1, -1, 0, 1};
 
-    double val_bord_droite[4] = {-1 / h_carre, -1 / h_carre, 4 / h_carre, -1 / h_carre}; // -3
+    double val_bord_droite[4] = {beta, beta, alpha, beta}; // -3
     int lig_bord_droite[4] = {-N + 1, -1, 0, N - 1};
 
-    double val_interieur[5] = {-1 / h_carre, -1 / h_carre, 4 / h_carre, -1 / h_carre, -1 / h_carre}; // 0
+    double val_interieur[5] = {beta, beta, alpha, beta, beta}; // 0
     int lig_interieur[5] = {-N + 1, -1, 0, 1, N - 1};
 
     *lignes = (int *)malloc(nb_elements * sizeof(int));
@@ -203,34 +229,103 @@ cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
 
 
-void resoudre(cholmod_sparse *A, double *f, double *u){
+// Écrire dans le fichier
+static inline __attribute__((always_inline)) void ecrire_double_iteration(double *u){
 
-    h_carre = 1.0 / pow(N, 2);
+    fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
+
+}
+
+
+
+void resoudre(cholmod_sparse *A, double *u){
+
     double *f_int = (double *)malloc(idx_max * sizeof(double));
     double *u_int = (double *)malloc(idx_max * sizeof(double));
-    for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
-        u[i] = 0.0;
-    }
 
-    extraire_interieur(f, f_int, nb_pt);
-    extraire_interieur(u, u_int, nb_pt);
+    init_u_zero(u_zero, u);
 
     cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
-    memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
-
+    cholmod_dense *u_dense;
     cholmod_factor *L = cholmod_analyze(A, &c);
     cholmod_factorize(A, L, &c);
 
-    cholmod_dense *u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
+    for (int k = 1 ; k <= N_t ; k ++){
 
-    memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
+        # ifdef ECRITURE
+        ecrire_double_iteration(u);
+        # endif
 
-    inserer_interieur(u_int, u, nb_pt);
+        extraire_interieur(u, u_int, nb_pt);
+        calculer_f(k + 1, u_int, f_int);
+
+        memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
+
+        u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
+
+        memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
+
+        inserer_interieur(u_int, u, nb_pt);
+
+    }
+
+    # ifdef ECRITURE
+    ecrire_double_iteration(u);
+    # endif
 
     cholmod_free_factor(&L, &c);
     cholmod_free_dense(&f_dense, &c);
     cholmod_free_dense(&u_dense, &c);
     free(f_int);
     free(u_int);
+
+
+}
+
+
+
+__attribute__((unused)) double resoudre_calculer_u_exact(cholmod_sparse *A, double *u){
+
+    double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
+    double erreur_infty_k; double erreur_infty = 0.0;
+    double *f_int = (double *)malloc(idx_max * sizeof(double));
+    double *u_int = (double *)malloc(idx_max * sizeof(double));
+
+    init_u_zero(u_zero, u);
+
+    cholmod_dense *f_dense = cholmod_allocate_dense(A -> nrow, 1, A -> nrow, CHOLMOD_REAL, &c);
+    cholmod_dense *u_dense;
+    cholmod_factor *L = cholmod_analyze(A, &c);
+    cholmod_factorize(A, L, &c);
+
+    for (int k = 1 ; k <= N_t ; k ++){
+
+        extraire_interieur(u, u_int, nb_pt);
+        calculer_f(k + 1, u_int, f_int);
+
+        memcpy(f_dense -> x, f_int, A -> nrow * sizeof(double));
+
+        u_dense = cholmod_solve(CHOLMOD_A, L, f_dense, &c);
+
+        memcpy(u_int, u_dense -> x, A -> nrow * sizeof(double));
+
+        inserer_interieur(u_int, u, nb_pt);
+
+        calculer_u_exact(u_1, u_exact, k);
+        erreur_infty_k = norme_infty_diff(u_exact, u, nb_pt * nb_pt);
+        if (erreur_infty_k > erreur_infty){
+            erreur_infty = erreur_infty_k;
+        }
+
+    }
+
+    cholmod_free_factor(&L, &c);
+    cholmod_free_dense(&f_dense, &c);
+    cholmod_free_dense(&u_dense, &c);
+    free(f_int);
+    free(u_int);
+    free(u_exact);
+
+    return erreur_infty;
 
 }

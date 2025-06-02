@@ -3,6 +3,8 @@
 // ======================================================
 extern int rang;
 # pragma omp threadprivate(rang)
+extern FILE *descripteur;
+extern const char *nom_fichier_bin;
 extern double L;
 extern int N;
 extern double h;
@@ -54,9 +56,6 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ======================================================
 // ../Source/parallele-1/resolution.c
 // ======================================================
-//void f_1(double **f);
-//double f_source(double x, double y, double t);
 double u_1(double x, double y, double t);
-void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k);
 void calculer_u(double *u);
 double calculer_u_u_exact(double *u);

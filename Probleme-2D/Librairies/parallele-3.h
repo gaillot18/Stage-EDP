@@ -67,7 +67,7 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 
 
 // ======================================================
-// ../Source/Parallele/parallele.c
+// ../Source/parallele-3/parallele.c
 // ======================================================
 void affichage_ordonne(double *u_divise, char *message);
 void creer_topologie();
@@ -78,12 +78,12 @@ void infos_bord();
 void echanger_halos(double *u_div);
 void test_fin_echange_halos();
 void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucle_fin, int *j_boucle_fin);
-void regrouper_u(double *u_divise, double *u);
+void regrouper_u(double *u_div, double *u);
 
 
 
 // ======================================================
-// ../Source/sequentiel-1/resolution.c
+// ../Source/parallele-3/resolution.c
 // ======================================================
 void f_1(double **f);
 double u_1(double x, double y);

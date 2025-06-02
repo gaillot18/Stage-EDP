@@ -64,7 +64,7 @@ void mat_Nbandes_vers_mat_trans(struct mat_Nbandes *A, double **B);
 
 
 // ======================================================
-// ../Source/parallele-1/resolution.c
+// ../Source/sequentiel-2/resolution.c
 // ======================================================
 void f_1(double **f);
 double u_1(double x, double y);

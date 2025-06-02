@@ -81,6 +81,15 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_a
 
 
 
+// Écrire dans le fichier
+static inline __attribute__((always_inline)) void ecrire_double_iteration(double *u){
+
+    fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
+
+}
+
+
+
 void terminaison(double **permut, double **u, double **u_anc){
 
     if (N_t % 2 != 0){
@@ -98,8 +107,15 @@ void calculer_u(double *u){
 
     double *u_anc; double *permut;
     init_u_zero(u_zero, &u_anc);
+    for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
+        u[i] = 0.0;
+    }
 
     for (int k = 1 ; k <= N_t ; k ++){
+
+        # ifdef ECRITURE
+        ecrire_double_iteration(u_anc);
+        # endif
 
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
@@ -108,12 +124,13 @@ void calculer_u(double *u){
             }
         }
 
-        # ifdef ECRITURE
-        ecrire_double("Textes/parallele-1/resultats.bin", u, nb_pt * nb_pt);
-        # endif
         permut = u; u = u_anc; u_anc = permut;
 
     }
+
+    # ifdef ECRITURE
+    ecrire_double_iteration(u);
+    # endif
 
     terminaison(&permut, &u, &u_anc);
 
@@ -122,12 +139,16 @@ void calculer_u(double *u){
 
 
 // Calculer u et u_exact en même temps pour avoir l'erreur à chaque itération
-double calculer_u_u_exact(double *u){
+__attribute__((unused)) double calculer_u_u_exact(double *u){
 
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double erreur_infty_k; double erreur_infty = 0.0;
     double *u_anc; double *permut;
     init_u_zero(u_zero, &u_anc);
+    for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
+        u[i] = 0.0;
+    }
+
 
     for (int k = 1 ; k <= N_t ; k ++){
 

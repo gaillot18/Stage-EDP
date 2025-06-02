@@ -229,7 +229,7 @@ exe-parallele-1:
 
 exe-parallele-2:
 	make $(PRL2)
-	mpiexec -n 8 $(BIN)/$(PRL2) 700
+	mpiexec -n 8 $(BIN)/$(PRL2) 300
 
 exe-parallele-3:
 	make $(PRL3)
