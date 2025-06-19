@@ -17,6 +17,15 @@ SQT2 = sequentiel-2
 FLAGS = -g0 -Wall -O3
 MPI_FLAGS = -DUSE_MPI
 OMP_FLAGS = -fopenmp
+ifneq ($(EXACTE),0)
+  FLAGS += -DEXACTE
+endif
+ifneq ($(ECRITURE),0)
+  FLAGS += -DECRITURE
+endif
+ifneq ($(ARRET),0)
+  FLAGS += -DARRET
+endif
 
 .SUFFIXES: .o .c
 
@@ -53,7 +62,7 @@ sequentiel-1: $(BIN)/$(SQT1)
 
 exe-sequentiel-1:
 	make $(SQT1)
-	$(BIN)/$(SQT1)
+	$(BIN)/$(SQT1) 0 1 200 1 200
 
 clean:
 	rm -f ./texte/*.data ./texte/*.txt

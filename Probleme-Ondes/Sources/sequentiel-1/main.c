@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <math.h>
 
 # include "../../Librairies/sequentiel-1.h"
 
@@ -66,6 +67,14 @@ int main(int argc, char **argv){
     // ======================================================
     printf("------------------------------------------------------------\n");
     printf("Exécution séquentielle de : sequentiel-1 (version 1 - méthode itérative - séquentiel)\n");
+    # ifdef ARRET
+    if (c * h_t / h > 1){
+        printf("c * h_t / h = %f > 1\n", c * h_t / h);
+        printf("Exécution terminée\n");
+        printf("------------------------------------------------------------\n");
+        return 0;
+    }
+    # endif
 
 
 
@@ -101,11 +110,14 @@ int main(int argc, char **argv){
 
 
 
-        // ======================================================
+    // ======================================================
     // Affichage des informations du problème et des résultats
     // ======================================================
     printf("L = %f, N = %d, nb_pt = %d, nb_pt * nb_pt = %d, h = %f\n", L, N, nb_pt, nb_pt, h);
     printf("T = %f, N_t = %d, h_t = %f\n", T, N_t, h_t);
+    if (erreur_infty > 10000){ // Pour éviter d'afficher des nombres trop large dans le fichier lorsque l'erreur est clairement trop élevée
+        erreur_infty = INFINITY;
+    }
     printf("erreur_infty = %f\n", erreur_infty);
     printf("temps = %f\n", temps);
     printf("taille fichier (si écriture) = %f Go\n", sizeof(double) * nb_pt * (N_t + 1) * 1e-9);

@@ -16,7 +16,7 @@ double const_1;
 
 double u_0(double x){
 
-    double res = 0.0;
+    double res = sin(pi * x);
 
     return res;
 
@@ -26,7 +26,7 @@ double u_0(double x){
 
 double u_1(double x){
 
-    double res = sin(pi * x);
+    double res = 0.0;
 
     return res;
 
@@ -54,15 +54,31 @@ void calculer_u_exact(double (*fonction)(double, double), double *u, int k){
 
 
 
-void init_u_init(double (*fonction)(double), double **u_anc){
+void init_u_0(double (*fonction)(double), double **u_anc_1){
 
-    *u_anc = (double *)malloc(nb_pt * sizeof(double));
+    *u_anc_1 = (double *)malloc(nb_pt * sizeof(double));
 
-    for (int i = 0 ; i < nb_pt ; i ++){
-        (*u_anc)[i] = fonction(i * h);
+    (*u_anc_1)[0] = 0.0; (*u_anc_1)[nb_pt - 1] = 0.0;
+
+    for (int i = 1 ; i < nb_pt - 1; i ++){
+        (*u_anc_1)[i] = fonction(i * h);
     }
 
 }
+
+
+
+void init_u_1(double (*fonction)(double), double *u_anc_1, double **u_anc_0){
+    *u_anc_0 = (double *)malloc(nb_pt * sizeof(double));
+
+    (*u_anc_0)[0] = 0.0;
+    (*u_anc_0)[nb_pt - 1] = 0.0;
+
+    for (int i = 1; i < nb_pt - 1; i++) {
+        (*u_anc_0)[i] = u_anc_1[i] + h_t * fonction(i * h);
+    }
+}
+
 
 
 
@@ -86,14 +102,19 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
 
 
 
-void terminaison(double **u, double **u_anc_0, double **u_anc_1){
+void terminaison(double **permut, double **u, double **u_anc_0, double **u_anc_1){
+
+    int nb_permut = 0;
 
     if (N_t % 3 == 1){
-        *u_anc_1 = *u_anc_0; *u_anc_0 = *u; *u = *u_anc_1;
-        *u_anc_1 = *u_anc_0; *u_anc_0 = *u; *u = *u_anc_1;
+        nb_permut = 2;
     }
     else if (N_t % 3 == 2){
-        *u_anc_1 = *u_anc_0; *u_anc_0 = *u; *u = *u_anc_1;
+        nb_permut = 1;
+    }
+
+    for (int i = 0 ; i < nb_permut ; i ++){
+        *permut = *u_anc_1; *u_anc_1 = *u_anc_0; *u_anc_0 = *u; *u = *permut;
     }
 
     free(*u_anc_0); free(*u_anc_1);
@@ -106,8 +127,8 @@ void terminaison(double **u, double **u_anc_0, double **u_anc_1){
 void calculer_u(double *u){
 
     const_1 = pow(c, 2) * pow(h_t, 2) / pow(h, 2);
-    double *u_anc_0; double *u_anc_1;
-    init_u_init(u_0, &u_anc_1); init_u_init(u_1, &u_anc_0);
+    double *u_anc_0; double *u_anc_1; double *permut;
+    init_u_0(u_0, &u_anc_1); init_u_1(u_1, u_anc_1, &u_anc_0);
     for (int i = 0 ; i < nb_pt ; i ++){
         u[i] = 0.0;
     }
@@ -115,14 +136,14 @@ void calculer_u(double *u){
     for (int k = 1 ; k <= N_t ; k ++){
 
         # ifdef ECRITURE
-        ecrire_double_iteration(u_anc);
+        ecrire_double_iteration(u_anc_0);
         # endif
 
         for (int i = 1 ; i < nb_pt - 1 ; i ++){
             u[i] = schema(u_anc_0, u_anc_1, i, k);
         }
 
-        u_anc_1 = u_anc_0; u_anc_0 = u; u = u_anc_1;
+        permut = u_anc_1; u_anc_1 = u_anc_0; u_anc_0 = u; u = permut;
 
     }
 
@@ -130,7 +151,7 @@ void calculer_u(double *u){
     ecrire_double_iteration(u);
     # endif
 
-    terminaison(&u, &u_anc_0, &u_anc_1);
+    terminaison(&permut, &u, &u_anc_0, &u_anc_1);
 
 }
 
@@ -143,8 +164,8 @@ double calculer_u_u_exact(double *u){
     double erreur_infty_k; double erreur_infty = 0.0;
 
     const_1 = pow(c, 2) * pow(h_t, 2) / pow(h, 2);
-    double *u_anc_0; double *u_anc_1;
-    init_u_init(u_0, &u_anc_1); init_u_init(u_1, &u_anc_0);
+    double *u_anc_0; double *u_anc_1; double *permut;
+    init_u_0(u_0, &u_anc_1); init_u_1(u_1, u_anc_1, &u_anc_0);
     for (int i = 0 ; i < nb_pt ; i ++){
         u[i] = 0.0;
     }
@@ -161,11 +182,11 @@ double calculer_u_u_exact(double *u){
             erreur_infty = erreur_infty_k;
         }
 
-        u_anc_1 = u_anc_0; u_anc_0 = u; u = u_anc_1;
+        permut = u_anc_1; u_anc_1 = u_anc_0; u_anc_0 = u; u = permut;
 
     }
 
-    terminaison(&u, &u_anc_0, &u_anc_1);
+    terminaison(&permut, &u, &u_anc_0, &u_anc_1);
     free(u_exact);
     
     return erreur_infty;

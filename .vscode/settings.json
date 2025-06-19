@@ -6,6 +6,8 @@
         "float.h": "c",
         "time.h": "c",
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "queue": "c",
+        "stack": "c"
     }
 }
