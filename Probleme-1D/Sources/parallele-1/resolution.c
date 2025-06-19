@@ -89,7 +89,7 @@ static inline __attribute__((always_inline)) double schema(double *f, double *u,
 
 
 
-static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
+static inline __attribute__((always_inline, unused)) double norme_infty_iteration(double *u, double *u_anc){
 
     double norme_nume = 0.0;
     double norme_deno = 0.0;
