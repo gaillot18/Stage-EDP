@@ -244,4 +244,4 @@ exe-sequentiel-3:
 	$(BIN)/$(SQT3) 500
 
 clean:
-	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(OBJ)/$(SQT3)/*.o $(BIN)/* $(TXT)/resultats.txt
+	rm -f $(OBJ)/$(BS)/*.o $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(PRL3)/*.o $(OBJ)/$(SQT2)/*.o $(OBJ)/$(SQT3)/*.o $(BIN)/* $(TXT)/resultats.txt

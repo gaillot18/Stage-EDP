@@ -145,21 +145,25 @@ parallele-2: $(BIN)/$(PRL2)
 sequentiel-2: $(BIN)/$(SQT2)
 
 exe-sequentiel-1:
+	make clean
 	make $(SQT1)
 	rm -f $(TXT)/$(SQT1)/*
 	$(BIN)/$(SQT1) 0 1 200 1 160000
 
 exe-parallele-1:
+	make clean
 	make $(PRL1)
 	rm -f $(TXT)/$(PRL1)/*
 	OMP_NUM_THREADS=4 $(BIN)/$(PRL1) 0 1 200 1 160000
 
 exe-parallele-2:
+	make clean
 	make $(PRL2)
 	rm -f $(TXT)/$(PRL2)/*
 	mpiexec -n 4 $(BIN)/$(PRL2) 0 1 200 1 160000
 
 exe-sequentiel-2:
+	make clean
 	make $(SQT2)
 	rm -f $(TXT)/$(SQT2)/*
 	$(BIN)/$(SQT2) 0 1 400 1 400

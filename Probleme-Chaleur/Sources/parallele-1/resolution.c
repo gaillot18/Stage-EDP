@@ -9,7 +9,6 @@
 
 # define pi 3.14159265358979323846
 # define IDX(i, j) ((j) * (nb_pt) + (i))
-//# define ECRITURE
 
 
 
@@ -23,7 +22,7 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
-double u_1(double x, double y, double t){
+double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
 
@@ -172,7 +171,7 @@ double calculer_u_u_exact(double *u){
 
             # pragma omp single
             {
-                calculer_u_exact(u_1, u_exact, k);
+                calculer_u_exact(u_e, u_exact, k);
                 erreur_infty_k = norme_infty_diff(u_exact, u, nb_pt * nb_pt);
                 if (erreur_infty_k > erreur_infty){
                     erreur_infty = erreur_infty_k;

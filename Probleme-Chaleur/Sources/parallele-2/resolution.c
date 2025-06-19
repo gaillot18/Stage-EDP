@@ -5,12 +5,12 @@
 # include <float.h>
 # include <limits.h>
 # include <mpi.h>
+# include <stdint.h>
 
 # include "../../Librairies/parallele-2.h"
 
 # define pi 3.14159265358979323846
 # define IDX(i, j) ((j) * (nb_pt_div_i + 2) + (i))
-//# define ECRITURE
 
 
 
@@ -24,7 +24,7 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
-double u_1(double x, double y, double t){
+double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
 
@@ -91,15 +91,13 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_d
 
 static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u, int k){
 
-    MPI_Barrier(comm_2D);
-    MPI_Offset offset = (MPI_Offset)(k * nb_pt * nb_pt) * sizeof(double);
-
-    int tailles_globales[2] = {nb_pt, nb_pt};
-    int tailles_locales[2]  = {nb_pt_div_j, nb_pt_div_i};
-    int starts[2] = {j_debut, i_debut};
+    uint64_t offset = (uint64_t)k * (uint64_t)nb_pt * (uint64_t)nb_pt * (uint64_t)sizeof(double);
+    int taille[2] = {nb_pt, nb_pt};
+    int sous_taille[2]  = {nb_pt_div_j, nb_pt_div_i};
+    int debut[2] = {j_debut, i_debut};
 
     MPI_Datatype vue_fichier;
-    MPI_Type_create_subarray(2, tailles_globales, tailles_locales, starts, MPI_ORDER_C, MPI_DOUBLE, &vue_fichier);
+    MPI_Type_create_subarray(2, taille, sous_taille, debut, MPI_ORDER_C, MPI_DOUBLE, &vue_fichier);
     MPI_Type_commit(&vue_fichier);
 
     MPI_File_set_view(descripteur, offset, MPI_DOUBLE, vue_fichier, "native", MPI_INFO_NULL);
@@ -107,7 +105,6 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
     MPI_File_write_all(descripteur, u, 1, bloc_send, MPI_STATUS_IGNORE);
 
     MPI_Type_free(&vue_fichier);
-    MPI_Barrier(comm_2D);
 
 }
 
@@ -203,7 +200,7 @@ double calculer_u_u_exact(double *u_div){
 
         regrouper_u(u_div, u);
         if (rang == 0){
-            calculer_u_exact(u_1, u_exact, k);
+            calculer_u_exact(u_e, u_exact, k);
             erreur_infty_k = norme_infty_diff(u_exact, u, nb_pt * nb_pt);
             if (erreur_infty_k > erreur_infty){
                 erreur_infty = erreur_infty_k;

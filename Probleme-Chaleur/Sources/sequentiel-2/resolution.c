@@ -12,7 +12,6 @@
 # define IDX(i, j) ((j) * (nb_pt) + (i))
 # define idx_max (((N) - 1) * ((N) - 1))
 # define nb_elements (((N) - 3) * (5 * (N) + 1) + 12)
-//# define ECRITURE
 
 
 
@@ -26,19 +25,35 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
-static inline __attribute__((always_inline)) void calculer_b(double t, double *u, double *b){
+static inline __attribute__((always_inline)) double f_source_2(double x, double y, double t){
+
+    double res = 0.0;
+
+    if (x >= 0.1 && x <= 0.9 && y >= 0.8 && y <= 0.9 && t <= 0.5){
+        res = 100.0;
+        //printf("x = %f, y = %f, t = %f\n", x, y, t);
+    }
+
+    return res;
+
+}
+
+
+
+static inline __attribute__((always_inline)) void calculer_b(double k, double *u, double *b){
 
     for (int i = 0 ; i < idx_max ; i ++){
-        int x = i % (N - 1);
-        int y = i / (N - 1);
-        b[i] = u[i] + h_t * f_source(x, y, t + 1);
+        double x = (i % (N - 1) + 1) * h;
+        double y = (i / (N - 1) + 1) * h;
+        double t = k / N_t;
+        b[i] = u[i] + h_t * f_source(x, y, t);
     }
 
 }
 
 
 
-double u_1(double x, double y, double t){
+double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
 
@@ -63,6 +78,16 @@ void calculer_u_exact(double (*fonction)(double, double, double), double *u, int
 double u_zero(double x, double y){
 
     double res = sin(pi * x) * sin(pi * y);
+
+    return res;
+
+}
+
+
+
+double u_zero_2(double x, double y){
+
+    double res = 50.0;
 
     return res;
 
@@ -310,7 +335,7 @@ double resoudre_calculer_u_exact(cholmod_sparse *A, double *u){
 
         inserer_interieur(u_int, u, nb_pt);
 
-        calculer_u_exact(u_1, u_exact, k);
+        calculer_u_exact(u_e, u_exact, k);
         erreur_infty_k = norme_infty_diff(u_exact, u, nb_pt * nb_pt);
         if (erreur_infty_k > erreur_infty){
             erreur_infty = erreur_infty_k;

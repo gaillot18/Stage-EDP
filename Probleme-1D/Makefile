@@ -178,5 +178,4 @@ exe-sequentiel-2:
 	$(BIN)/$(SQT2) 10
 
 clean:
-	rm -f ./texte/*.data ./texte/*.txt
-	rm -f $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
+	rm -f $(OBJ)/$(BS)/*.o $(OBJ)/$(SQT1)/*.o $(OBJ)/$(PRL1)/*.o $(OBJ)/$(PRL2)/*.o $(OBJ)/$(SQT2)/*.o $(BIN)/* $(TXT)/resultats.txt
