@@ -11,8 +11,8 @@ extern int nb_pt;
 // ======================================================
 struct mat_2bandes{
     int N;
-    double *diag; // taille n
-    double *sous_diag; // taille n - 1
+    double *diag; // taille N - 1
+    double *sous_diag; // taille N - 2
 };
 
 

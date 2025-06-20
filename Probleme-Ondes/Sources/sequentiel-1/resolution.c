@@ -69,6 +69,7 @@ void init_u_0(double (*fonction)(double), double **u_anc_1){
 
 
 void init_u_1(double (*fonction)(double), double *u_anc_1, double **u_anc_0){
+    
     *u_anc_0 = (double *)malloc(nb_pt * sizeof(double));
 
     (*u_anc_0)[0] = 0.0;

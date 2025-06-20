@@ -4,19 +4,18 @@ BIN="./Binaires"
 
 # Compilation
 
-make all EXACTE=1 ECRITURE=0 ARRET=0
+make all EXACTE=0 ECRITURE=0 ARRET=1
 
 # Exécution
 
 echo " "
-echo "EXECUTIONS POUR PROBLEME-ONDES (calcul des erreurs)"
+echo "EXECUTIONS POUR PROBLEME-ONDES (mesure du temps)"
 echo " "
 sleep 1
 
-for h in 0.01 0.005 0.002 0.001; do
-    for h_t in 0.01 0.005 0.002 0.001; do
 
-        $BIN/sequentiel-1 1 1 $h 1 $h_t
+for N in 5000 10000 20000; do
 
-    done
+    $BIN/sequentiel-1 0 1 $N 1 $N
+
 done
