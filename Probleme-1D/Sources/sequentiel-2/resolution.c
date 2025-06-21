@@ -13,6 +13,7 @@ double h_carre;
 
 
 
+// f dont on connait la solution exacte (1)
 void f_0(double **f){
 
     *f = (double *)malloc(nb_pt * sizeof(double));
@@ -24,19 +25,8 @@ void f_0(double **f){
 
 
 
-void f_1(double **f){
-
-    *f = (double *)malloc(nb_pt* sizeof(double));
-    double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        (*f)[i] = pi * pi * sin(pi * i * h);
-    }
-
-}
-
-
-
-double u_0(double x){
+// Solution exacte (1)
+double u_e_0(double x){
 
     double res = 0.5 * x * (1 - x);
 
@@ -46,7 +36,21 @@ double u_0(double x){
 
 
 
-double u_1(double x){
+// f dont on connait la solution exacte (2)
+void f_1(double **f){
+
+    *f = (double *)malloc(nb_pt * sizeof(double));
+    double h = 1.0 / N;
+    for (int i = 0 ; i < nb_pt ; i ++){
+        (*f)[i] = pi * pi * sin(pi * i * h);
+    }
+
+}
+
+
+
+// Solution exacte (2)
+double u_e_1(double x){
 
     double res = sin(pi * x);
 
@@ -56,6 +60,7 @@ double u_1(double x){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double), double *u){
 
     double h = 1.0 / N;
@@ -67,6 +72,7 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
+// Allouer une structure mat_2bandes
 void init_mat_2bandes(struct mat_2bandes *A){
 
     A -> N = N;
@@ -77,6 +83,7 @@ void init_mat_2bandes(struct mat_2bandes *A){
 
 
 
+// Libérer une structure mat_2bandes
 void liberer_mat_2bandes(struct mat_2bandes *A){
 
     free(A -> diag);
@@ -86,8 +93,7 @@ void liberer_mat_2bandes(struct mat_2bandes *A){
 
 
 
-// Construire la matrice creuse (buffer 1D) de la décomposition de Cholesky d'une matrice tridiagonale
-// alpha, beta, gamma sont les coefficients des diagonales (pour le problème 1D : alpha = 2 / h^2, beta = -1 / h^2)
+// Obtenir la décomposition de Cholesky
 void calculer_cholesky(struct mat_2bandes *L){
 
     h_carre = 1.0 / pow(N, 2);

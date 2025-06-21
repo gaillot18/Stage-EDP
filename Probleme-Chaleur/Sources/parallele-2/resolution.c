@@ -14,6 +14,7 @@
 
 
 
+// f dont on connait la solution exacte
 static inline __attribute__((always_inline)) double f_source(double x, double y, double t){
 
     double res = (-lambda + 2 * a * pow(pi, 2)) * sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -24,6 +25,7 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
+// Solution exacte
 double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -34,6 +36,7 @@ double u_e(double x, double y, double t){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k){
 
     for (int j = 0 ; j < nb_pt ; j ++){
@@ -46,7 +49,8 @@ void calculer_u_exact(double (*fonction)(double, double, double), double *u, int
 
 
 
-double u_zero(double x, double y){
+// Calculer u_0
+double u_0(double x, double y){
 
     double res = sin(pi * x) * sin(pi * y);
 
@@ -56,7 +60,8 @@ double u_zero(double x, double y){
 
 
 
-void init_u_zero(double (*fonction)(double, double), double **u_div_anc){
+// Allouer et initialiser u_0
+void init_u_0(double (*fonction)(double, double), double **u_div_anc){
 
     *u_div_anc = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
@@ -77,6 +82,7 @@ void init_u_zero(double (*fonction)(double, double), double **u_div_anc){
 
 
 
+// Appliquer le schéma à un point
 static inline __attribute__((always_inline)) double schema(double f, double *u_div_anc, int i, int j, int k){
 
     double res = alpha * u_div_anc[IDX(i, j)]
@@ -89,6 +95,7 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_d
 
 
 
+// Écrire dans un fichier en parallèle
 static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u, int k){
 
     uint64_t offset = (uint64_t)k * (uint64_t)nb_pt * (uint64_t)nb_pt * (uint64_t)sizeof(double);
@@ -110,6 +117,7 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
 
 
 
+// Terminer
 void terminaison(double **permut, double **u, double **u_anc){
 
     if (N_t % 2 != 0){
@@ -122,28 +130,33 @@ void terminaison(double **permut, double **u, double **u_anc){
 
 
 
-// Calculer u_div
+// Fonction principale (calcul uniquement de la solution approchée)
 void calculer_u(double *u_div){
 
     int i_boucle_debut; int j_boucle_debut;
     int i_boucle_fin; int j_boucle_fin;
     double *u_div_anc; double *permut;
 
+    // Vecteur de départ
     init_u_zero(u_zero, &u_div_anc);
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
         u_div[i] = 0.0;
     }
 
+    // Bornes des boucles
     infos_bornes_boucles(&i_boucle_debut, &j_boucle_debut, &i_boucle_fin, &j_boucle_fin);
 
+    // Itérations
     for (int k = 1 ; k <= N_t ; k ++){
 
         # ifdef ECRITURE
         ecrire_double_iteration(u_div_anc, k - 1);
         # endif
 
+        // Communication
         echanger_halos(u_div_anc);
 
+        // Schéma
         for (int j = j_boucle_debut ; j < j_boucle_fin ; j ++){
             for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
                 int i_reel = i_debut + (i - 1);
@@ -168,7 +181,7 @@ void calculer_u(double *u_div){
 
 
 
-// Calculer u_div et u_div_exact en même temps pour avoir l'erreur à chaque itération
+// Fonction principale (calcul de la solution exacte en séquentiel et de la solution approchée pour avoir l'erreur à chaque itération)
 double calculer_u_u_exact(double *u_div){
 
     double *u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
@@ -178,17 +191,22 @@ double calculer_u_u_exact(double *u_div){
     int i_boucle_fin; int j_boucle_fin;
     double *u_div_anc; double *permut;
 
+    // Vecteur de départ
     init_u_zero(u_zero, &u_div_anc);
     for (int i = 0 ; i < (nb_pt_div_i + 2) * (nb_pt_div_j + 2) ; i ++){
         u_div[i] = 0.0;
     }
     
+    // Bornes des boucles
     infos_bornes_boucles(&i_boucle_debut, &j_boucle_debut, &i_boucle_fin, &j_boucle_fin);
 
+    // Itérations
     for (int k = 1 ; k <= N_t ; k ++){
 
+        // Communication
         echanger_halos(u_div_anc);
         
+        // Schéma
         for (int j = j_boucle_debut ; j < j_boucle_fin ; j ++){
             for (int i = i_boucle_debut ; i < i_boucle_fin ; i ++){
                 int i_reel = i_debut + (i - 1);
@@ -198,6 +216,7 @@ double calculer_u_u_exact(double *u_div){
             }
         }
 
+        // Calcul de la solution exacte (en séquentiel)
         regrouper_u(u_div, u);
         if (rang == 0){
             calculer_u_exact(u_e, u_exact, k);

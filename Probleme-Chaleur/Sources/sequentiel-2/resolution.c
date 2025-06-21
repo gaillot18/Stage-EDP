@@ -15,6 +15,7 @@
 
 
 
+// f dont on connait la solution exacte
 static inline __attribute__((always_inline)) double f_source(double x, double y, double t){
 
     double res = (-lambda + 2 * a * pow(pi, 2)) * sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -25,21 +26,7 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
-static inline __attribute__((always_inline)) double f_source_2(double x, double y, double t){
-
-    double res = 0.0;
-
-    if (x >= 0.1 && x <= 0.9 && y >= 0.8 && y <= 0.9 && t <= 0.5){
-        res = 100.0;
-        //printf("x = %f, y = %f, t = %f\n", x, y, t);
-    }
-
-    return res;
-
-}
-
-
-
+// Calculer le second membre b
 static inline __attribute__((always_inline)) void calculer_b(double k, double *u, double *b){
 
     for (int i = 0 ; i < idx_max ; i ++){
@@ -53,6 +40,7 @@ static inline __attribute__((always_inline)) void calculer_b(double k, double *u
 
 
 
+// Solution exacte
 double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -63,6 +51,7 @@ double u_e(double x, double y, double t){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k){
 
     for (int j = 0 ; j < nb_pt ; j ++){
@@ -75,7 +64,8 @@ void calculer_u_exact(double (*fonction)(double, double, double), double *u, int
 
 
 
-double u_zero(double x, double y){
+// Calculer u_0
+double u_0(double x, double y){
 
     double res = sin(pi * x) * sin(pi * y);
 
@@ -85,17 +75,8 @@ double u_zero(double x, double y){
 
 
 
-double u_zero_2(double x, double y){
-
-    double res = 50.0;
-
-    return res;
-
-}
-
-
-
-void init_u_zero(double (*fonction)(double, double), double *u){
+// Allouer et initialiser u_0
+void init_u_0(double (*fonction)(double, double), double *u){
 
     for (int j = 0 ; j < nb_pt ; j ++){
         for (int i = 0 ; i < nb_pt ; i ++){
@@ -107,6 +88,7 @@ void init_u_zero(double (*fonction)(double, double), double *u){
 
 
 
+// Connaitre le type de bord (voir figure du rapport)
 static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
     int res;
@@ -133,6 +115,7 @@ static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
 
 
+// Construire les tableaux lignes, valeurs et offsets (format CSC) pour avoir la matrice creuse de A
 void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
     double val_coin_bas_gauche[3] = {alpha, beta, beta}; // 1
@@ -231,6 +214,7 @@ void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
 
 
+// Allouer et initialiser la matrice creuse A
 cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
     cholmod_sparse *A = cholmod_allocate_sparse(idx_max, idx_max, nb_elements, 1, 1, 0, CHOLMOD_REAL, &c);
@@ -253,7 +237,7 @@ cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
 
 
-// Écrire dans le fichier
+// Écrire dans un fichier
 static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u){
 
     fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
@@ -262,6 +246,7 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
 
 
 
+// Fonction principale (calcul uniquement de la solution approchée)
 void resoudre(cholmod_sparse *A, double *u){
 
     double *b_int = (double *)malloc(idx_max * sizeof(double));
@@ -308,6 +293,7 @@ void resoudre(cholmod_sparse *A, double *u){
 
 
 
+// Fonction principale (calcul de la solution exacte et de la solution approchée pour avoir l'erreur à chaque itération)
 double resoudre_calculer_u_exact(cholmod_sparse *A, double *u){
 
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));

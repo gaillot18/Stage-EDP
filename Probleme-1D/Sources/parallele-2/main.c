@@ -99,7 +99,7 @@ int main(int argc, char **argv){
     u_div = (double *)malloc((nb_pt_div + 2) * sizeof(double));
     if (rang == 0){
         u_exact = (double *)malloc(nb_pt * sizeof(double));
-        calculer_u_exact(u_1, u_exact);
+        calculer_u_exact(u_e_1, u_exact);
     }
     
 

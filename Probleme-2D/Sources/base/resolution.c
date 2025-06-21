@@ -16,7 +16,7 @@
 double h_carre;
 
 
-
+// f dont on connait la solution exacte
 void f_1(double **f){
 
     *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
@@ -31,7 +31,8 @@ void f_1(double **f){
 
 
 
-double u_1(double x, double y){
+// Solution exacte
+double u_e_1(double x, double y){
 
     double res = 1.0 / (8 * pow(pi, 2)) * sin(2 * pi * x) * sin(2 * pi * y);
 
@@ -41,6 +42,7 @@ double u_1(double x, double y){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double), double *u){
 
     double h = 1.0 / N;
@@ -54,6 +56,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
+// Initialiser u_anc
 void init_u_anc(double **u_anc){
 
     *u_anc = (double *)malloc(nb_pt * nb_pt * sizeof(double));
@@ -66,6 +69,7 @@ void init_u_anc(double **u_anc){
 
 
 
+// Connaitre le type de bord (voir figure du rapport)
 static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
     int res;
@@ -92,6 +96,7 @@ static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
 
 
+// Construire la matrice A
 double *construire_matrice(){
 
     h_carre = 1.0 / pow(N, 2);
@@ -197,6 +202,7 @@ double *construire_matrice(){
 
 
 
+// Fonction principale
 void resoudre_gauss(double *A, double *f, double *u){
 
     double *f_int = (double *)malloc(idx_max * sizeof(double));

@@ -66,7 +66,7 @@ int main(int argc, char **argv){
     f_1(&f);
     u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-    calculer_u_exact(u_1, u_exact);
+    calculer_u_exact(u_e_1, u_exact);
 
     //afficher_vecteur_int(lignes, nb_elements);
     //afficher_vecteur_double(valeurs, nb_elements);

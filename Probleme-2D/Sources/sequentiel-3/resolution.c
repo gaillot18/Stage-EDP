@@ -17,6 +17,7 @@ double h_carre;
 
 
 
+// f dont on connait la solution exacte
 void f_1(double **f){
 
     *f = (double *)malloc(nb_pt * nb_pt * sizeof(double));
@@ -31,7 +32,8 @@ void f_1(double **f){
 
 
 
-double u_1(double x, double y){
+// Solution exacte
+double u_e_1(double x, double y){
 
     double res = 1.0 / (8 * pow(pi, 2)) * sin(2 * pi * x) * sin(2 * pi * y);
 
@@ -41,6 +43,7 @@ double u_1(double x, double y){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double), double *u){
 
     double h = 1.0 / N;
@@ -54,6 +57,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
+// Connaitre le type de bord (voir figure du rapport)
 static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
     int res;
@@ -80,6 +84,7 @@ static inline __attribute__((always_inline)) int connaitre_bord(int x, int y){
 
 
 
+// Construire les tableaux lignes, valeurs et offsets (format CSC) pour avoir la matrice creuse de A
 void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
     h_carre = 1.0 / pow(N, 2);
@@ -180,6 +185,7 @@ void construire_matrice_creuse(int **lignes, double **valeurs, int **offsets){
 
 
 
+// Allouer et initialiser la matrice creuse A
 cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
     cholmod_sparse *A = cholmod_allocate_sparse(idx_max, idx_max, nb_elements, 1, 1, 0, CHOLMOD_REAL, &c);
@@ -202,6 +208,7 @@ cholmod_sparse *init_matrice_creuse(int *offsets, int *lignes, double *valeurs){
 
 
 
+// Fonction principale
 void resoudre(cholmod_sparse *A, double *f, double *u){
 
     h_carre = 1.0 / pow(N, 2);

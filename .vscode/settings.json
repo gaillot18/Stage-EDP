@@ -8,6 +8,7 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "queue": "c",
-        "stack": "c"
+        "stack": "c",
+        "math.h": "c"
     }
 }

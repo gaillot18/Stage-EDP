@@ -103,7 +103,7 @@ int main(int argc, char **argv){
     if (rang == 0){
         u = (double *)malloc(nb_pt * nb_pt * sizeof(double));
         u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
-        calculer_u_exact(u_1, u_exact);
+        calculer_u_exact(u_e_1, u_exact);
     }
     
 

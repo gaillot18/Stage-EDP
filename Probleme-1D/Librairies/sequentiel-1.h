@@ -45,9 +45,9 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ../Source/sequentiel-1/resolution.c
 // ======================================================
 void f_0(double **f);
+double u_e_0(double x);
 void f_1(double **f);
-double u_0(double x);
-double u_1(double x);
+double u_e_1(double x);
 void calculer_u_exact(double (*fonction)(double), double *u);
 void calculer_u_jacobi(double *f, double *u);
 void calculer_u_gaussseidel(double *f, double *u);

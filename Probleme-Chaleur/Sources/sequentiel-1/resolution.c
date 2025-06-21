@@ -12,6 +12,7 @@
 
 
 
+// f dont on connait la solution exacte
 static inline __attribute__((always_inline)) double f_source(double x, double y, double t){
 
     double res = (-lambda + 2 * a * pow(pi, 2)) * sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -22,6 +23,7 @@ static inline __attribute__((always_inline)) double f_source(double x, double y,
 
 
 
+// Solution exacte
 double u_e(double x, double y, double t){
 
     double res = sin(pi * x) * sin(pi * y) * exp(-lambda * t);
@@ -32,6 +34,7 @@ double u_e(double x, double y, double t){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double, double), double *u, int k){
 
     for (int j = 0 ; j < nb_pt ; j ++){
@@ -44,7 +47,8 @@ void calculer_u_exact(double (*fonction)(double, double, double), double *u, int
 
 
 
-double u_zero(double x, double y){
+// Calculer u_0
+double u_0(double x, double y){
 
     double res = sin(pi * x) * sin(pi * y);
 
@@ -54,7 +58,8 @@ double u_zero(double x, double y){
 
 
 
-void init_u_zero(double (*fonction)(double, double), double **u_anc){
+// Allouer et initialiser u_0
+void init_u_0(double (*fonction)(double, double), double **u_anc){
 
     *u_anc = (double *)malloc(nb_pt * nb_pt * sizeof(double));
 
@@ -68,6 +73,7 @@ void init_u_zero(double (*fonction)(double, double), double **u_anc){
 
 
 
+// Appliquer le schéma à un point
 static inline __attribute__((always_inline)) double schema(double f, double *u_anc, int i, int j, int k){
 
     double res = alpha * u_anc[IDX(i, j)]
@@ -80,7 +86,7 @@ static inline __attribute__((always_inline)) double schema(double f, double *u_a
 
 
 
-// Écrire dans le fichier
+// Écrire dans un fichier
 static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u){
 
     fwrite(u, sizeof(double), nb_pt * nb_pt, descripteur);
@@ -89,6 +95,7 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
 
 
 
+// Terminer
 void terminaison(double **permut, double **u, double **u_anc){
 
     if (N_t % 2 != 0){
@@ -101,11 +108,13 @@ void terminaison(double **permut, double **u, double **u_anc){
 
 
 
-// Calculer u
+// Fonction principale (calcul uniquement de la solution approchée)
 void calculer_u(double *u){
 
     double *u_anc; double *permut;
-    init_u_zero(u_zero, &u_anc);
+
+    // Vecteur de départ
+    init_u_zero(u_0, &u_anc);
     for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
         u[i] = 0.0;
     }
@@ -116,6 +125,7 @@ void calculer_u(double *u){
         ecrire_double_iteration(u_anc);
         # endif
 
+        // Schéma
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
                 double f = f_source(i * h, j * h, k * h_t);
@@ -137,13 +147,15 @@ void calculer_u(double *u){
 
 
 
-// Calculer u et u_exact en même temps pour avoir l'erreur à chaque itération
+// Fonction principale (calcul de la solution exacte et de la solution approchée pour avoir l'erreur à chaque itération)
 double calculer_u_u_exact(double *u){
 
     double *u_exact = (double *)malloc(nb_pt * nb_pt * sizeof(double));
     double erreur_infty_k; double erreur_infty = 0.0;
     double *u_anc; double *permut;
-    init_u_zero(u_zero, &u_anc);
+
+    // Vecteur de départ
+    init_u_zero(u_0, &u_anc);
     for (int i = 0 ; i < nb_pt * nb_pt ; i ++){
         u[i] = 0.0;
     }
@@ -151,6 +163,7 @@ double calculer_u_u_exact(double *u){
 
     for (int k = 1 ; k <= N_t ; k ++){
 
+        // Schéma
         for (int j = 1 ; j < nb_pt - 1 ; j ++){
             for (int i = 1 ; i < nb_pt - 1 ; i ++){
                 double f = f_source(i * h, j * h, k * h_t);
@@ -158,6 +171,7 @@ double calculer_u_u_exact(double *u){
             }
         }
 
+        // Calcul de la solution exacte
         calculer_u_exact(u_e, u_exact, k);
         erreur_infty_k = norme_infty_diff(u_exact, u, nb_pt * nb_pt);
         if (erreur_infty_k > erreur_infty){

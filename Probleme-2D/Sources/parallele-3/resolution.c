@@ -16,6 +16,7 @@ double h_carre;
 
 
 
+// f dont on connait la solution exacte
 void f_1(double **f){
 
     *f = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
@@ -40,7 +41,8 @@ void f_1(double **f){
 
 
 
-double u_1(double x, double y){
+// Solution exacte
+double u_e_1(double x, double y){
 
     double res = 1.0 / (8 * pow(pi, 2)) * sin(2 * pi * x) * sin(2 * pi * y);
 
@@ -50,6 +52,7 @@ double u_1(double x, double y){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double), double *u){
 
     double h = 1.0 / N;
@@ -63,6 +66,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u){
 
 
 
+// Initialiser u_div_anc
 void init_u_anc(double **u_div_anc){
 
     *u_div_anc = (double *)malloc((nb_pt_div_i + 2) * (nb_pt_div_j + 2) * sizeof(double));
@@ -75,6 +79,7 @@ void init_u_anc(double **u_div_anc){
 
 
 
+// Appliquer le schéma à un point
 static inline __attribute__((always_inline)) double schema(double *f_div, double *u_div_anc, int i, int j){
 
     double res = 0.25 * (
@@ -90,6 +95,7 @@ static inline __attribute__((always_inline)) double schema(double *f_div, double
 
 
 
+// Appliquer le schéma sur les bords
 static inline __attribute__((always_inline)) void calculer_u_jacobi_bords(double *f_div, double *u_div, double *u_div_anc){
 
     // Bords sauf coins
@@ -143,6 +149,7 @@ static inline __attribute__((always_inline)) void calculer_u_jacobi_bords(double
 
 
 
+// Calculer la norme infinie relative
 static inline __attribute__((always_inline)) double norme_infty_iteration(double *u_div, double *u_div_anc){
 
     double norme_nume_div = 0.0;
@@ -173,6 +180,7 @@ static inline __attribute__((always_inline)) double norme_infty_iteration(double
 
 
 
+// Terminer
 void terminaison(double **permut, double **u_div, double **u_div_anc){
 
     if (nb_iteration % 2 != 0){
@@ -185,6 +193,7 @@ void terminaison(double **permut, double **u_div, double **u_div_anc){
 
 
 
+// Fonction principale
 void calculer_u_jacobi(double *f_div, double *u_div){
 
     nb_iteration = 0;

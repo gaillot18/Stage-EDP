@@ -13,6 +13,7 @@ double h_carre;
 
 
 
+// f dont on connait la solution exacte (1)
 void f_0(double **f){
 
     *f = (double *)malloc(nb_pt * sizeof(double));
@@ -24,19 +25,8 @@ void f_0(double **f){
 
 
 
-void f_1(double **f){
-
-    *f = (double *)malloc(nb_pt* sizeof(double));
-    double h = 1.0 / N;
-    for (int i = 0 ; i < nb_pt ; i ++){
-        (*f)[i] = pi * pi * sin(pi * i * h);
-    }
-
-}
-
-
-
-double u_0(double x){
+// Solution exacte (1)
+double u_e_0(double x){
 
     double res = 0.5 * x * (1 - x);
 
@@ -46,7 +36,21 @@ double u_0(double x){
 
 
 
-double u_1(double x){
+// f dont on connait la solution exacte (2)
+void f_1(double **f){
+
+    *f = (double *)malloc(nb_pt * sizeof(double));
+    double h = 1.0 / N;
+    for (int i = 0 ; i < nb_pt ; i ++){
+        (*f)[i] = pi * pi * sin(pi * i * h);
+    }
+
+}
+
+
+
+// Solution exacte (2)
+double u_e_1(double x){
 
     double res = sin(pi * x);
 
@@ -56,6 +60,7 @@ double u_1(double x){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double), double *u){
 
     double h = 1.0 / N;
@@ -67,6 +72,7 @@ void calculer_u_exact(double (*fonction)(double), double *u){
 
 
 
+// Initialiser u_anc
 void init_u_anc(double **u_anc){
 
     *u_anc = (double *)malloc(nb_pt * sizeof(double));
@@ -79,6 +85,7 @@ void init_u_anc(double **u_anc){
 
 
 
+// Appliquer le schéma à un point
 static inline __attribute__((always_inline)) double schema(double *f, double *u_anc, int i){
 
     double res = 0.5 * ((u_anc[i - 1] + u_anc[i + 1]) + h_carre * f[i]);
@@ -89,6 +96,7 @@ static inline __attribute__((always_inline)) double schema(double *f, double *u_
 
 
 
+// Calculer la norme infinie relative
 static inline __attribute__((always_inline)) double norme_infty_iteration(double *u, double *u_anc){
 
     double norme_nume = 0.0;
@@ -113,6 +121,7 @@ static inline __attribute__((always_inline)) double norme_infty_iteration(double
 
 
 
+// Terminer
 void terminaison(double **permut, double **u, double **u_anc){
 
     if (nb_iteration % 2 != 0){
@@ -125,6 +134,7 @@ void terminaison(double **permut, double **u, double **u_anc){
 
 
 
+// Fonction principale
 void calculer_u_jacobi(double *f, double *u){
 
     nb_iteration = 0;

@@ -67,7 +67,7 @@ void mat_Nbandes_vers_mat_trans(struct mat_Nbandes *A, double **B);
 // ../Source/sequentiel-2/resolution.c
 // ======================================================
 void f_1(double **f);
-double u_1(double x, double y);
+double u_e_1(double x, double y);
 void init_mat_Nbandes(struct mat_Nbandes *A);
 void liberer_mat_Nbandes(struct mat_Nbandes *A);
 void calculer_cholesky(struct mat_Nbandes *L);

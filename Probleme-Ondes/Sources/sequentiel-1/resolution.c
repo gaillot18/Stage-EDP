@@ -14,6 +14,7 @@ double const_1;
 
 
 
+// u_0 dont on connait la solution exacte
 double u_0(double x){
 
     double res = sin(pi * x);
@@ -24,6 +25,7 @@ double u_0(double x){
 
 
 
+// u_1 dont on connait la solution exacte
 double u_1(double x){
 
     double res = 0.0;
@@ -34,6 +36,7 @@ double u_1(double x){
 
 
 
+// Solution exacte
 double u_e(double x, double t){
 
     double res = cos(pi * t) * sin(pi * x);
@@ -44,6 +47,7 @@ double u_e(double x, double t){
 
 
 
+// Calculer la solution exacte
 void calculer_u_exact(double (*fonction)(double, double), double *u, int k){
 
     for (int i = 0 ; i < nb_pt ; i ++){
@@ -54,6 +58,7 @@ void calculer_u_exact(double (*fonction)(double, double), double *u, int k){
 
 
 
+// Allouer et initialiser u_0
 void init_u_0(double (*fonction)(double), double **u_anc_1){
 
     *u_anc_1 = (double *)malloc(nb_pt * sizeof(double));
@@ -68,21 +73,23 @@ void init_u_0(double (*fonction)(double), double **u_anc_1){
 
 
 
+// Allouer et initialiser u_1 (k = 0)
 void init_u_1(double (*fonction)(double), double *u_anc_1, double **u_anc_0){
     
     *u_anc_0 = (double *)malloc(nb_pt * sizeof(double));
 
-    (*u_anc_0)[0] = 0.0;
-    (*u_anc_0)[nb_pt - 1] = 0.0;
+    (*u_anc_0)[0] = 0.0; (*u_anc_0)[nb_pt - 1] = 0.0;
 
     for (int i = 1; i < nb_pt - 1; i++) {
-        (*u_anc_0)[i] = u_anc_1[i] + h_t * fonction(i * h);
+        (*u_anc_0)[i] = h_t * fonction(i * h) + u_anc_1[i];
     }
+
 }
 
 
 
 
+// Appliquer le schéma à un point (k > 0)
 static inline __attribute__((always_inline)) double schema(double *u_anc_0, double *u_anc_1, int i, int k){
 
     // const_1 = pow(c, 2) * pow(h_t, 2) / pow(h, 2)
@@ -94,7 +101,7 @@ static inline __attribute__((always_inline)) double schema(double *u_anc_0, doub
 
 
 
-// Écrire dans le fichier
+// Écrire dans un fichier
 static inline __attribute__((always_inline, unused)) void ecrire_double_iteration(double *u){
 
     fwrite(u, sizeof(double), nb_pt, descripteur);
@@ -103,6 +110,7 @@ static inline __attribute__((always_inline, unused)) void ecrire_double_iteratio
 
 
 
+// Terminer
 void terminaison(double **permut, double **u, double **u_anc_0, double **u_anc_1){
 
     int nb_permut = 0;
@@ -124,7 +132,7 @@ void terminaison(double **permut, double **u, double **u_anc_0, double **u_anc_1
 
 
 
-// Calculer u
+// Fonction principale (calcul uniquement de la solution approchée)
 void calculer_u(double *u){
 
     const_1 = pow(c, 2) * pow(h_t, 2) / pow(h, 2);
@@ -158,7 +166,7 @@ void calculer_u(double *u){
 
 
 
-// Calculer u et u_exact en même temps pour avoir l'erreur à chaque itération
+// Fonction principale (calcul de la solution exacte et de la solution approchée pour avoir l'erreur à chaque itération)
 double calculer_u_u_exact(double *u){
 
     double *u_exact = (double *)malloc(nb_pt * sizeof(double));

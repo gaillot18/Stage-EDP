@@ -48,6 +48,6 @@ void ecrire_resultats(double *resultats, const char *entete, int n, const char *
 // ../Source/parallele-1/resolution.c
 // ======================================================
 void f_1(double **f);
-double u_1(double x, double y);
+double u_e_1(double x, double y);
 void calculer_u_exact(double (*fonction)(double, double), double *u);
 void calculer_u_jacobi(double *f, double *u);

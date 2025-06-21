@@ -65,9 +65,9 @@ void mat_2bandes_vers_mat_trans(struct mat_2bandes *A, double **B);
 // ../Source/sequentiel-2/resolution.c
 // ======================================================
 void f_0(double **f);
+double u_e_0(double x);
 void f_1(double **f);
-double u_0(double x);
-double u_1(double x);
+double u_e_1(double x);
 void init_mat_2bandes(struct mat_2bandes *A);
 void liberer_mat_2bandes(struct mat_2bandes *A);
 void calculer_u_exact(double (*fonction)(double), double *u);

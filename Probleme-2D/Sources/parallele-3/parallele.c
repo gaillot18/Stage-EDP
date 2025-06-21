@@ -10,6 +10,7 @@
 
 
 
+// (Debug) Afficher un vecteur dans l'ordre des rangs avec un message
 void affichage_ordonne(double *u_divise, char *message){
     for (int i = 0 ; i < nb_cpu ; i ++){
         if (rang == i){
@@ -98,6 +99,7 @@ void creer_types(){
 
 
 
+// Obtenir les indices de départ et d'arrivé de la boucle principale du schéma (adaptés pour itérer sur les bords locaux qui ne sont pas globaux)
 void infos_bornes_boucles(int *i_boucle_debut, int *j_boucle_debut, int *i_boucle_fin, int *j_boucle_fin){
 
     *i_boucle_debut = 1; *j_boucle_debut = 1;
@@ -153,12 +155,15 @@ void test_fin_echange_halos(){
 
 
 // Regrouper les parties finales dans un vecteur sur le rang 0
+// Principe : Le rang 0 crée dynamiquement un type dérivé pour recevoir le domaine adapté à la taille de chaque processus
 void regrouper_u(double *u_div, double *u){
 
+    // Dans l'ordre des rangs
     for (int i = 1 ; i < nb_cpu ; i ++){
 
         if (rang == i){
 
+            // Envoyer les informations nécessaire au rang 0 pour construire le type dérivé dynamiquement
             MPI_Send(&nb_pt_div_i, 1, MPI_INT, 0, etiquette, comm_2D);
             MPI_Send(&nb_pt_div_j, 1, MPI_INT, 0, etiquette, comm_2D);
             MPI_Send(&i_debut, 1, MPI_INT, 0, etiquette, comm_2D);
@@ -175,6 +180,7 @@ void regrouper_u(double *u_div, double *u){
             int i_debut_recv;
             int j_debut_recv;
 
+            // Recevoir les informations nécessaire des autres rangs pour construire le type dérivé dynamiquement
             MPI_Recv(&nb_pt_div_i_recv, 1, MPI_INT, i, etiquette, comm_2D, &statut);
             MPI_Recv(&nb_pt_div_j_recv, 1, MPI_INT, i, etiquette, comm_2D, &statut);
             MPI_Recv(&i_debut_recv, 1, MPI_INT, i, etiquette, comm_2D, &statut);
@@ -184,6 +190,7 @@ void regrouper_u(double *u_div, double *u){
             int sous_taille_recv[2] = {nb_pt_div_j_recv, nb_pt_div_i_recv};
             int debut_recv[2] = {j_debut_recv, i_debut_recv};
 
+            // Type dérvié dynamique
             MPI_Type_create_subarray(2, taille_recv, sous_taille_recv, debut_recv, MPI_ORDER_C, MPI_DOUBLE, &bloc_recv);
             MPI_Type_commit(&bloc_recv);
 
@@ -198,6 +205,8 @@ void regrouper_u(double *u_div, double *u){
     }
 
     if (rang == 0){
+
+        // Le rang 0 connait déjà ses propres informations, pas d'envois / récéptions
 
         MPI_Datatype bloc_recv;
 
